@@ -7,18 +7,18 @@ DROP TABLE IF EXISTS delivieries;
 DROP TABLE IF EXISTS trackings;
 
 CREATE TABLE customers (
-                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                           firstName VARCHAR(255),
-                           lastName VARCHAR(255),
+                           customer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                           first_name VARCHAR(255),
+                           last_name VARCHAR(255),
                            email VARCHAR(255)
 );
 
 
 CREATE TABLE couriers (
-                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          couriersCompany VARCHAR(255),
-                          firstName VARCHAR(255),
-                          lastName VARCHAR(255)
+                          courier_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          couriers_Company VARCHAR(255),
+                          first_name VARCHAR(255),
+                          last_name VARCHAR(255)
 );
 CREATE TABLE orders (
                         order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -26,5 +26,9 @@ CREATE TABLE orders (
                         receiver_address VARCHAR(255),
                         package_type VARCHAR(255),
                         package_size VARCHAR(255),
-                        delivery_date VARCHAR(255)
+                        preferred_delivery_date VARCHAR(255),
+                        customer_id INT NOT NULL,
+                        CONSTRAINT FK_CustomerOrder FOREIGN KEY (customer_id)
+                            REFERENCES customers(customer_id)
+
 );
