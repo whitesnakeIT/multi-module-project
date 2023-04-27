@@ -1,17 +1,15 @@
 CREATE SCHEMA IF NOT EXISTS test;
 
-DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS customers cascade ;
 DROP TABLE IF EXISTS couriers;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS delivieries;
 DROP TABLE IF EXISTS trackings;
 
 CREATE TABLE customers (
-
                            customer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                            first_name VARCHAR(255),
                            last_name VARCHAR(255),
-
                            email VARCHAR(255)
 );
 
@@ -21,7 +19,6 @@ CREATE TABLE couriers (
                           couriers_Company VARCHAR(255),
                           first_name VARCHAR(255),
                           last_name VARCHAR(255)
-
 );
 CREATE TABLE orders (
                         order_id BIGINT AUTO_INCREMENT PRIMARY KEY,

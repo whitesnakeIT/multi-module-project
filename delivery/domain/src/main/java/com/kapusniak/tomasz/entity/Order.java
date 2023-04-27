@@ -37,9 +37,13 @@ public class Order {
     @Column(name = "package_size")
     private PackageSize packageSize;
 
-    @Column(name = "delivery_date")
-//    @DateTimeFormat(pattern = "yyyy.MM.dd")
-    private LocalDate deliveryDate;
+    @Column(name = "preferred_delivery_date")
+    private LocalDate preferredDeliveryDate;
+
+    @ManyToOne
+    @ToString.Exclude
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
 
     @Override

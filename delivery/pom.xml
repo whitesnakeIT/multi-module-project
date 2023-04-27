@@ -10,6 +10,7 @@
     </parent>
 
     <packaging>pom</packaging>
+
     <artifactId>delivery</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>delivery-module</name>
