@@ -10,6 +10,7 @@
     </parent>
 
     <packaging>pom</packaging>
+
     <artifactId>delivery-administration</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>delivery-administration-module</name>
@@ -33,5 +34,6 @@
 
         </dependencies>
     </dependencyManagement>
+
 
 </project>

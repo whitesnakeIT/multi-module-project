@@ -10,6 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+
     <artifactId>delivery-delivery-application</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
