@@ -10,7 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.kapusniak.tomasz</groupId>
+
     <artifactId>delivery-administration-delivery-administration-infrastructure</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 

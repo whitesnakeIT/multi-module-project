@@ -10,9 +10,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.kapusniak.tomasz</groupId>
+
     <artifactId>delivery-delivery-application</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    
 </project>
