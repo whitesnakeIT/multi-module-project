@@ -33,7 +33,7 @@ class OrderRepositoryTest {
 
         then(ordersByPackageType)
                 .extracting(Order::getPackageType)
-                .containsExactly(PackageType.DOCUMENT);
+                .containsOnly(PackageType.DOCUMENT);
     }
 
     @Test
@@ -64,7 +64,7 @@ class OrderRepositoryTest {
 
         then(ordersByPackageSize)
                 .extracting(Order::getPackageSize)
-                .containsExactly(PackageSize.EXTRA_LARGE);
+                .containsOnly(PackageSize.EXTRA_LARGE);
     }
 
     @Test
