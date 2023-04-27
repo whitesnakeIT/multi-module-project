@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.Objects;
 
 @Entity(name = "customers")
@@ -17,7 +18,9 @@ import java.util.Objects;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Column(name = "customer_id", nullable = false)
+
     private Long id;
 
     @Column(name = "first_name")
@@ -28,6 +31,7 @@ public class Customer {
 
     @Column(name = "email")
     private String email;
+
 
     @ToString.Exclude
     @OneToMany(mappedBy = "customer",
