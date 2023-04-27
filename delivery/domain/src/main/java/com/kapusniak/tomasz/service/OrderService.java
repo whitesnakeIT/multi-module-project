@@ -11,6 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+//@Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;

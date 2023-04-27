@@ -9,8 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+//@Transactional
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByPackageType(PackageType packageType);
+
     List<Order> findByPackageSize(PackageSize packageSize);
+
     List<Order> findAllByCustomerId(Long customerId);
 }
