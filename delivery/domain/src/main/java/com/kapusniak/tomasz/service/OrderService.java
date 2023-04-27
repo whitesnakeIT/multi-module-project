@@ -18,7 +18,7 @@ public class OrderService {
 
     public void save(Order order) {
         if (order == null) {
-            throw new RuntimeException("Saving failed. Order is null.");
+            throw new RuntimeException("Saving order failed. Order is null.");
         }
         orderRepository.save(order);
     }
@@ -44,10 +44,16 @@ public class OrderService {
     }
 
     public List<Order> findByPackageType(PackageType packageType) {
+        if (packageType == null) {
+            throw new RuntimeException("Searching for order failed. Package type is null.");
+        }
         return orderRepository.findByPackageType(packageType);
     }
 
     public List<Order> findByPackageSize(PackageSize packageSize) {
+        if (packageSize == null) {
+            throw new RuntimeException("Searching for order failed. Package size is null.");
+        }
         return orderRepository.findByPackageSize(packageSize);
     }
 

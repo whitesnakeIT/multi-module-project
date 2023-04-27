@@ -32,7 +32,8 @@ class OrderRepositoryTest {
                 .isEqualTo(3);
 
         then(ordersByPackageType)
-                .allMatch(order -> order.getPackageType().equals(PackageType.DOCUMENT));
+                .extracting(Order::getPackageType)
+                .containsExactly(PackageType.DOCUMENT);
     }
 
     @Test
@@ -62,7 +63,8 @@ class OrderRepositoryTest {
                 .isEqualTo(1);
 
         then(ordersByPackageSize)
-                .allMatch(order -> order.getPackageSize().equals(PackageSize.EXTRA_LARGE));
+                .extracting(Order::getPackageSize)
+                .containsExactly(PackageSize.EXTRA_LARGE);
     }
 
     @Test
@@ -91,6 +93,7 @@ class OrderRepositoryTest {
         then(ordersByCustomerId.size())
                 .isEqualTo(3);
     }
+
     @Test
     @DisplayName("should return empty list of orders based on customer id")
     void findAllByCustomerIdNotExisting() {
