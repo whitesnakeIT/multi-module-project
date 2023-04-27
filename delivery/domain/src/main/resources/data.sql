@@ -1,4 +1,5 @@
 
+
 INSERT INTO customers (first_name, last_name, email)
 VALUES
     ('Adam', 'Nowak', 'adam.nowak@example.com'),
@@ -6,6 +7,7 @@ VALUES
     ('Piotr', 'Wiśniewski', 'piotr.wisniewski@example.com'),
     ('Maria', 'Lewandowska', 'maria.lewandowska@example.com'),
     ('Tomasz', 'Wójcik', 'tomasz.wojcik@example.com');
+
 
 INSERT INTO couriers (couriers_company, first_name, last_name)
 VALUES

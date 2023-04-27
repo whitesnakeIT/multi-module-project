@@ -26,7 +26,6 @@
         <module>integration</module>
     </modules>
 
-
     <profiles>
         <profile>
             <id>jdk11</id>

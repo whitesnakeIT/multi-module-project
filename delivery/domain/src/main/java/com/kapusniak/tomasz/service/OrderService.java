@@ -3,6 +3,7 @@ package com.kapusniak.tomasz.service;
 import com.kapusniak.tomasz.entity.Order;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
+
 import com.kapusniak.tomasz.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 //@Transactional
+
 public class OrderService {
 
     private final OrderRepository orderRepository;

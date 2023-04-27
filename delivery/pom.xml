@@ -10,7 +10,7 @@
     </parent>
 
     <packaging>pom</packaging>
-<!--    <groupId>com.kapusniak.tomasz</groupId>-->
+
     <artifactId>delivery</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>delivery-module</name>

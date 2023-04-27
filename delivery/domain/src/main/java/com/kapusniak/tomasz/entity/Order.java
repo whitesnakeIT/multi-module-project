@@ -45,6 +45,7 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -19,6 +19,7 @@ CREATE TABLE couriers (
                           couriers_Company VARCHAR(255),
                           first_name VARCHAR(255),
                           last_name VARCHAR(255)
+                          
 );
 CREATE TABLE orders (
                         order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
