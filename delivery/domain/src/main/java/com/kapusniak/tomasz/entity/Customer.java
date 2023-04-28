@@ -11,10 +11,12 @@ import java.util.List;
 
 import java.util.Objects;
 
-@Entity(name = "customers")
+@Entity
 @Getter
 @Setter
 @ToString
+@Table(name = "customers", schema = "test")
+
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

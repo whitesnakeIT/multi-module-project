@@ -6,14 +6,15 @@ import org.hibernate.Hibernate;
 
 import java.util.Objects;
 
-@Entity(name = "tracking")
+@Entity
 @Getter
 @Setter
 @ToString
+@Table(name = "tracking", schema = "test")
 public class Tracking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "tracking_id", nullable = false)
     private Long id;
 
     @Override

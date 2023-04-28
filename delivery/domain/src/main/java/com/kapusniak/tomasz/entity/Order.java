@@ -4,7 +4,6 @@ import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
@@ -16,7 +15,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
+@Table(name = "orders", schema = "test")
+
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
