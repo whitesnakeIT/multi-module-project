@@ -1,17 +1,19 @@
+use test;
 
 INSERT INTO customers (first_name, last_name, email)
 VALUES
-    ('Tomasz', 'Nowak', 'tomasz.nowak@example.com'),
+    ('Adam', 'Nowak', 'adam.nowak@example.com'),
     ('Monika', 'Kowalska', 'monika.kowalska@example.com'),
     ('Piotr', 'Wiśniewski', 'piotr.wisniewski@example.com'),
     ('Maria', 'Lewandowska', 'maria.lewandowska@example.com'),
     ('Tomasz', 'Wójcik', 'tomasz.wojcik@example.com');
 
-INSERT INTO couriers (couriers_company, first_name, last_name)
+
+INSERT INTO couriers (courier_company, first_name, last_name)
 VALUES
     ('DHL', 'Jan', 'Kowalski'),
-    ('DHL', 'Anna', 'Nowak'),
-    ('DHL', 'Michał', 'Wójcik'),
+    ('DPD', 'Anna', 'Nowak'),
+    ('UPS', 'Michał', 'Wójcik'),
     ('FEDEX', 'Katarzyna', 'Lewandowska'),
     ('GLS', 'Piotr', 'Szymański');
 

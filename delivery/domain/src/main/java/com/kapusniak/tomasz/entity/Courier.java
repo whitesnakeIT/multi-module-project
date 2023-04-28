@@ -8,15 +8,15 @@ import org.hibernate.Hibernate;
 import java.util.Objects;
 
 
-@Entity(name = "couriers")
+@Entity
 @Getter
 @Setter
-
 @ToString
+@Table(name = "couriers", schema = "test")
 public class Courier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "courier_id", nullable = false)
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
