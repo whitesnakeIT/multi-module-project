@@ -1,10 +1,18 @@
 CREATE SCHEMA IF NOT EXISTS test;
+use test;
+DROP TABLE IF EXISTS couriers cascade;
+DROP TABLE IF EXISTS customers cascade;
+DROP TABLE IF EXISTS deliveries cascade;
+DROP TABLE IF EXISTS orders cascade;
+DROP TABLE IF EXISTS tracking cascade;
 
-DROP TABLE IF EXISTS customers;
-DROP TABLE IF EXISTS couriers;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS delivieries;
-DROP TABLE IF EXISTS trackings;
+
+CREATE TABLE couriers (
+                          courier_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          courier_company VARCHAR(255),
+                          first_name VARCHAR(255),
+                          last_name VARCHAR(255)
+);
 
 CREATE TABLE customers (
                            customer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -14,22 +22,24 @@ CREATE TABLE customers (
 );
 
 
-CREATE TABLE couriers (
-                          courier_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          couriers_Company VARCHAR(255),
-                          first_name VARCHAR(255),
-                          last_name VARCHAR(255)
-                          
-);
 CREATE TABLE orders (
                         order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         sender_address VARCHAR(255),
                         receiver_address VARCHAR(255),
                         package_type VARCHAR(255),
                         package_size VARCHAR(255),
-                        preferred_delivery_date VARCHAR(255),
+                        preferred_delivery_date date,
                         customer_id INT NOT NULL,
                         CONSTRAINT FK_CustomerOrder FOREIGN KEY (customer_id)
                             REFERENCES customers(customer_id)
 
 );
+
+CREATE TABLE tracking (
+    tracking_id BIGINT AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE deliveries (
+    delivery_id BIGINT AUTO_INCREMENT PRIMARY KEY
+);
+

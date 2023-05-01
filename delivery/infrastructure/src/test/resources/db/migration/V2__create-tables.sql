@@ -1,5 +1,6 @@
 use test;
 
+DROP TABLE IF EXISTS couriers cascade;
 DROP TABLE IF EXISTS customers cascade;
 DROP TABLE IF EXISTS deliveries cascade;
 DROP TABLE IF EXISTS orders cascade;
