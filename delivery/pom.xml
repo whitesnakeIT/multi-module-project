@@ -22,16 +22,27 @@
         <module>infrastructure</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.kapusniak.tomasz</groupId>
+                <artifactId>bom</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-<!--                        <version>${spring.boot.version}</version>-->
-                    </plugin>
-                </plugins>
-            </pluginManagement>
-        </build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <!--                        <version>${spring.boot.version}</version>-->
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

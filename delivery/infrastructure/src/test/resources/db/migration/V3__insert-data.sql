@@ -1,4 +1,4 @@
-
+use test;
 
 INSERT INTO customers (first_name, last_name, email)
 VALUES
@@ -9,7 +9,7 @@ VALUES
     ('Tomasz', 'Wójcik', 'tomasz.wojcik@example.com');
 
 
-INSERT INTO couriers (couriers_company, first_name, last_name)
+INSERT INTO couriers (courier_company, first_name, last_name)
 VALUES
     ('DHL', 'Jan', 'Kowalski'),
     ('DPD', 'Anna', 'Nowak'),

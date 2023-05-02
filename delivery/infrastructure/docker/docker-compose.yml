@@ -1,0 +1,13 @@
+version: '3.8'
+name: delivery
+services:
+  app:
+    container_name: myapp
+    image: delivery-delivery-infrastructure:1.0.0
+    ports:
+      - "8080:8080"
+    build:
+      context: ../
+      dockerfile: docker/delivery-delivery-infrastructure/Dockerfile
+
+
