@@ -3,7 +3,6 @@ package com.kapusniak.tomasz.service;
 import com.kapusniak.tomasz.entity.Order;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
-
 import com.kapusniak.tomasz.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 //@Transactional
-
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -31,7 +29,7 @@ public class OrderService {
 
     public List<Order> findAllByCustomerId(Long customerId) {
         if (customerId == null) {
-            throw new RuntimeException("Searching for customer orders failed. Order id is null.");
+            throw new RuntimeException("Searching for customer orders failed. Customer id is null.");
         }
         return orderRepository.findAllByCustomerId(customerId);
     }
