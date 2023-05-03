@@ -8,7 +8,6 @@ import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Objects;
 
 @Entity
@@ -18,6 +17,7 @@ import java.util.Objects;
 @Table(name = "customers", schema = "test")
 
 public class Customer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id", nullable = false)

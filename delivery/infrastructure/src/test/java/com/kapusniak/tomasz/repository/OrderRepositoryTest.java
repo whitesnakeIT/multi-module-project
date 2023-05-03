@@ -20,6 +20,9 @@ class OrderRepositoryTest {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private DeliveryRepository deliveryRepository;
+
     @Test
     @DisplayName("should return list of orders with correct size based on package type")
     void findByPackageType() {
@@ -41,6 +44,7 @@ class OrderRepositoryTest {
     void findByPackageTypeEmpty() {
 
         // given
+        deliveryRepository.deleteAll();
         orderRepository.deleteAll();
 
         // when
@@ -72,6 +76,7 @@ class OrderRepositoryTest {
     void findByPackageSizeEmpty() {
 
         // given
+        deliveryRepository.deleteAll();
         orderRepository.deleteAll();
 
         // when
@@ -99,6 +104,7 @@ class OrderRepositoryTest {
     void findAllByCustomerIdNotExisting() {
 
         // given
+        deliveryRepository.deleteAll();
         orderRepository.deleteAll();
 
         // when
