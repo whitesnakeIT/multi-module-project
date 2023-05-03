@@ -2,9 +2,13 @@ package com.kapusniak.tomasz.entity;
 
 import com.kapusniak.tomasz.enums.CourierCompany;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -28,6 +32,12 @@ public class Courier {
 
     @Column(name = "last_name")
     private String lastName;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "courier",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Delivery> deliveryList = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

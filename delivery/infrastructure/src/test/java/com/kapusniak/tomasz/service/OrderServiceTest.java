@@ -83,7 +83,6 @@ class OrderServiceTest {
 
         // verify
         then(orderRepository).shouldHaveNoInteractions();
-
     }
 
     @Test
@@ -105,7 +104,6 @@ class OrderServiceTest {
         then(orderRepository)
                 .should(times(1))
                 .findAll();
-
     }
 
     @Test
@@ -113,7 +111,9 @@ class OrderServiceTest {
     void findById() {
 
         // given
-        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+        given(orderRepository.findById(
+                anyLong()))
+                .willReturn(Optional.of(order));
         Long orderId = 1L;
 
         // when
@@ -141,8 +141,8 @@ class OrderServiceTest {
                 .hasMessage("Searching for order failed. Order id is null.");
 
         // verify
-        then(orderRepository).shouldHaveNoInteractions();
-
+        then(orderRepository)
+                .shouldHaveNoInteractions();
     }
 
     @Test
@@ -158,7 +158,6 @@ class OrderServiceTest {
 
         // then
         assertThat(ordersByPackageType.size()).isGreaterThan(0);
-
     }
 
     @Test
@@ -176,7 +175,6 @@ class OrderServiceTest {
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Searching for order failed. Package type is null.");
-
     }
 
     @Test
@@ -192,7 +190,6 @@ class OrderServiceTest {
 
         // then
         assertThat(ordersByPackageSize.size()).isGreaterThan(0);
-
     }
 
     @Test
@@ -212,13 +209,47 @@ class OrderServiceTest {
                 .hasMessage("Searching for order failed. Package size is null.");
     }
 
+    @Test
+    @DisplayName("should return list of all customer orders based on customer id")
+    void findAllByCustomerId() {
+
+        // given
+        Long customerId = 1L;
+        given(orderRepository.findAllByCustomerId(any()))
+                .willReturn(orderList);
+
+        // when
+        List<Order> ordersByCustomerId = orderService.findAllByCustomerId(customerId);
+
+        // then
+        assertThat(ordersByCustomerId.size()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("should throw an exception when customer id is null")
+    void findAllByCustomerIdNull() {
+
+        // given
+        Long customerId = null;
+
+        // when
+        Throwable throwable = catchThrowable(() ->
+                orderService.findAllByCustomerId(customerId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Searching for customer orders failed. Customer id is null.");
+    }
 
     @Test
     @DisplayName("should delete an order based on order id")
     void delete() {
 
         // given
-        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+        given(orderRepository.findById(
+                anyLong()))
+                .willReturn(Optional.of(order));
         Long orderId = 1L;
 
         // when
@@ -228,8 +259,6 @@ class OrderServiceTest {
         then(orderRepository)
                 .should(times(1))
                 .delete(order);
-
-
     }
 
     @Test
@@ -246,7 +275,6 @@ class OrderServiceTest {
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Deleting order failed. Order id is null.");
-
     }
 
 }
