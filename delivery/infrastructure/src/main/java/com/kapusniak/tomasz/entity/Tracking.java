@@ -1,7 +1,9 @@
 package com.kapusniak.tomasz.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
@@ -10,7 +12,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table(name = "tracking", schema = "test")
+@Table(name = "tracking")
 public class Tracking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

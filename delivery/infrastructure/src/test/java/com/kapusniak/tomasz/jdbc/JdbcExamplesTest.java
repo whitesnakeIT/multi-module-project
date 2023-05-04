@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-jdbc-test.properties")
-@Profile("test")
+@ActiveProfiles("jdbc")
 class JdbcExamplesTest {
 
     @Mock
@@ -71,7 +71,7 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .update("INSERT INTO test.CUSTOMERS (FIRST_NAME, LAST_NAME, EMAIL) VALUES (? , ?, ?)",
+                .update("INSERT INTO CUSTOMERS (FIRST_NAME, LAST_NAME, EMAIL) VALUES (? , ?, ?)",
                         firstName,
                         lastName,
                         email);
@@ -104,13 +104,13 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .queryForObject("SELECT test.CUSTOMERS.* FROM test.CUSTOMERS WHERE CUSTOMER_ID = ?",
+                .queryForObject("SELECT CUSTOMERS.* FROM CUSTOMERS WHERE CUSTOMER_ID = ?",
                         new Object[]{customerId},
                         customerRowMapper);
 
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT * FROM test.ORDERS WHERE CUSTOMER_ID = 1",
+                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = 1",
                         orderRowMapper);
     }
 
@@ -138,12 +138,12 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT test.CUSTOMERS.* FROM test.CUSTOMERS",
+                .query("SELECT CUSTOMERS.* FROM CUSTOMERS",
                         customerRowMapper);
 
         then(jdbcTemplate)
                 .should(times(2))
-                .query("SELECT * FROM test.ORDERS WHERE CUSTOMER_ID = null",
+                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = null",
                         orderRowMapper);
     }
 
@@ -189,7 +189,7 @@ class JdbcExamplesTest {
         // verifu
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT * FROM test.ORDERS",
+                .query("SELECT * FROM ORDERS",
                         orderRowMapper);
     }
 
@@ -212,7 +212,7 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT * FROM test.ORDERS WHERE CUSTOMER_ID = " + customerId,
+                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerId,
                         orderRowMapper);
 
     }
@@ -240,7 +240,7 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .queryForObject("SELECT * FROM test.ORDERS WHERE ORDER_ID = ?",
+                .queryForObject("SELECT * FROM ORDERS WHERE ORDER_ID = ?",
                         new Object[]{1L},
                         orderRowMapper);
 
