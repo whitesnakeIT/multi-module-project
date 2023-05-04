@@ -13,6 +13,7 @@ public class CourierRowMapper implements RowMapper<Courier> {
 
     @Override
     public Courier mapRow(ResultSet rs, int rowNum) throws SQLException {
+
         Courier courier = new Courier();
         courier.setId(rs.getLong("COURIER_ID"));
         courier.setFirstName(rs.getString("FIRST_NAME"));

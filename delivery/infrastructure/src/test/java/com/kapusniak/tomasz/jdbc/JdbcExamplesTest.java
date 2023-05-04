@@ -1,7 +1,10 @@
 package com.kapusniak.tomasz.jdbc;
 
+import com.kapusniak.tomasz.entity.Courier;
 import com.kapusniak.tomasz.entity.Customer;
+import com.kapusniak.tomasz.entity.Delivery;
 import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.enums.CourierCompany;
 import com.kapusniak.tomasz.jdbc.mapper.CourierRowMapper;
 import com.kapusniak.tomasz.jdbc.mapper.CustomerRowMapper;
 import com.kapusniak.tomasz.jdbc.mapper.OrderRowMapper;
@@ -41,6 +44,8 @@ class JdbcExamplesTest {
 
     private Customer customer;
 
+    private Courier courier;
+
     @BeforeEach
     public void setUp() {
         customer = new Customer();
@@ -48,6 +53,13 @@ class JdbcExamplesTest {
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setEmail("testEmail");
+
+        courier = new Courier();
+        courier.setId(1L);
+        courier.setFirstName("courierFirstName");
+        courier.setLastName("courierLastName");
+        courier.setCourierCompany(CourierCompany.DPD);
+        courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
     }
 
     @Test
@@ -75,6 +87,33 @@ class JdbcExamplesTest {
                         firstName,
                         lastName,
                         email);
+    }
+
+    @Test
+    @DisplayName("should return courier if exist based on courier id")
+    void getCourierById() {
+
+        // given
+        given(jdbcTemplate.queryForObject(
+                any(String.class),
+                new Object[]{any(Object.class)},
+                any(CourierRowMapper.class)))
+                .willReturn(courier);
+
+        Long courierId = 1L;
+
+        // when
+        Courier courierById = jdbcExamples.getCourierById(courierId);
+
+        // then
+        assertThat(courierById.getId()).isNotNull();
+
+        // verify
+        then(jdbcTemplate)
+                .should(times(1))
+                .queryForObject("SELECT * FROM COURIERS WHERE COURIER_ID = ?",
+                        new Object[]{courierId},
+                        courierRowMapper);
     }
 
     @Test
@@ -145,6 +184,23 @@ class JdbcExamplesTest {
                 .should(times(2))
                 .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = null",
                         orderRowMapper);
+    }
+
+    @Test
+    @DisplayName("should return null instead of throwing an exception " +
+            "when can't find customer by customer id ")
+    void getCustomerByNonExistingId() {
+
+        // given
+        Long notExistingCustomerId = 1_000_000L;
+
+        // when
+        Customer customerNull = jdbcExamples.getCustomerById(notExistingCustomerId);
+
+        //then
+        assertThat(customerNull)
+                .isNull();
+
     }
 
     @Test
