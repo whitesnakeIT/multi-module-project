@@ -31,11 +31,11 @@ CREATE TABLE orders
     receiver_address        VARCHAR(255),
     package_type            VARCHAR(255),
     package_size            VARCHAR(255),
-    preferred_delivery_date date,
+    preferred_delivery_date DATE,
     customer_id             BIGINT NOT NULL,
     CONSTRAINT FK_CustomerOrder
         FOREIGN KEY (customer_id)
-            REFERENCES test.customers (customer_id)
+            REFERENCES customers (customer_id)
 
 );
 
@@ -54,9 +54,9 @@ CREATE TABLE deliveries
     order_id        BIGINT,
     CONSTRAINT FK_Delivery_Courier
         FOREIGN KEY (courier_id)
-            REFERENCES test.couriers (courier_id),
+            REFERENCES couriers (courier_id),
     CONSTRAINT FK_Delivery_Order
         FOREIGN KEY (order_id)
-            REFERENCES test.orders (order_id)
+            REFERENCES orders (order_id)
 
 );

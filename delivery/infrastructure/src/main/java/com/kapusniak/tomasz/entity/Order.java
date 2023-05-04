@@ -15,7 +15,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table(name = "orders", schema = "test")
+@Table(name = "orders")
 
 public class Order {
     @Id

@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import static org.mockito.BDDMockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application-test.properties")
 class OrderServiceTest {
 
     Order order = new Order();
