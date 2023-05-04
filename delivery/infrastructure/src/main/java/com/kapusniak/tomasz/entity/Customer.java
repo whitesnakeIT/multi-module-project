@@ -14,7 +14,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table(name = "customers", schema = "test")
+@Table(name = "customers")
 
 public class Customer {
 

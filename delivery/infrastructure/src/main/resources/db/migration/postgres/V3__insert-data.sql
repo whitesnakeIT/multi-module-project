@@ -1,4 +1,3 @@
-use test;
 
 INSERT INTO customers (first_name, last_name, email)
 VALUES ('Adam', 'Nowak', 'adam.nowak@example.com'),

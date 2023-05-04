@@ -16,7 +16,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@Table(name = "couriers", schema = "test")
+@Table(name = "couriers")
 public class Courier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

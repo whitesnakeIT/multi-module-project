@@ -19,10 +19,6 @@ public class SpringJdbcConfig {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
-                .setName("test")
-                .addScript("classpath:/db/migration/V1__create-schema.sql")
-                .addScript("classpath:/db/migration/V2__create-tables.sql")
-                .addScript("classpath:/db/migration/V3__insert-data.sql")
                 .build();
     }
 
