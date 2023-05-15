@@ -1,5 +1,6 @@
 package com.kapusniak.tomasz.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
 import jakarta.persistence.*;
@@ -11,7 +12,7 @@ import org.hibernate.Hibernate;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity(name = "orders")
+@Entity
 @Getter
 @Setter
 @ToString
@@ -40,6 +41,7 @@ public class Order {
     @Column(name = "preferred_delivery_date")
     private LocalDate preferredDeliveryDate;
 
+    @JsonIgnore
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "customer_id")

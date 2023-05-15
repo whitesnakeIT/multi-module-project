@@ -14,11 +14,11 @@ public class CourierService {
 
     private final CourierRepository courierRepository;
 
-    public void save(Courier courier) {
+    public Courier save(Courier courier) {
         if (courier == null) {
             throw new RuntimeException("Saving courier failed. Courier is null.");
         }
-        courierRepository.save(courier);
+        return courierRepository.save(courier);
     }
 
     public List<Courier> findAll() {
@@ -39,6 +39,21 @@ public class CourierService {
         }
         Courier courier = findById(courierId);
         courierRepository.delete(courier);
+    }
+
+    public Courier update(Long id, Courier courier) {
+        if (id == null) {
+            throw new RuntimeException("Updating courier failed. Courier id is null.");
+        }
+        if (courier == null) {
+            throw new RuntimeException("Updating courier failed. Courier is null.");
+        }
+
+        Courier courierFromDb = findById(id);
+        courierFromDb.setFirstName(courier.getFirstName());
+        courierFromDb.setLastName(courier.getLastName());
+
+        return courierRepository.save(courierFromDb);
     }
 
 }

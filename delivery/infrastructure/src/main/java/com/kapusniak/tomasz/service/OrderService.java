@@ -16,11 +16,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public void save(Order order) {
+    public Order save(Order order) {
         if (order == null) {
             throw new RuntimeException("Saving order failed. Order is null.");
         }
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     public List<Order> findAll() {
@@ -64,4 +64,23 @@ public class OrderService {
         Order order = findById(orderId);
         orderRepository.delete(order);
     }
+
+    public Order update(Long id, Order order) {
+        if (id == null) {
+            throw new RuntimeException("Updating order failed. Order id is null.");
+        }
+        if (order == null) {
+            throw new RuntimeException("Updating order failed. Order is null.");
+        }
+
+        Order orderFromDb = findById(id);
+        orderFromDb.setSenderAddress(order.getSenderAddress());
+        orderFromDb.setReceiverAddress(order.getReceiverAddress());
+        orderFromDb.setPackageType(order.getPackageType());
+        orderFromDb.setPackageSize(order.getPackageSize());
+
+        return orderRepository.save(orderFromDb);
+    }
+
 }
+    
