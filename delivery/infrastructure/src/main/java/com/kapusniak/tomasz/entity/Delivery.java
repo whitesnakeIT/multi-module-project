@@ -1,5 +1,6 @@
 package com.kapusniak.tomasz.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kapusniak.tomasz.enums.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class Delivery {
     @Column(name = "delivery_time")
     private LocalDateTime deliveryTime;
 
+    @JsonIgnore
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "courier_id")
