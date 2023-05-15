@@ -19,6 +19,7 @@ public class Tracking {
     @Column(name = "tracking_id", nullable = false)
     private Long id;
 
+    private String localization;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

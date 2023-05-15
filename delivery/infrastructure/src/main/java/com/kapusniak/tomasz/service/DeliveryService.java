@@ -14,11 +14,11 @@ public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
 
-    public void save(Delivery delivery) {
+    public Delivery save(Delivery delivery) {
         if (delivery == null) {
             throw new RuntimeException("Saving delivery failed. Delivery is null.");
         }
-        deliveryRepository.save(delivery);
+        return deliveryRepository.save(delivery);
     }
 
     public List<Delivery> findAll() {
@@ -41,4 +41,19 @@ public class DeliveryService {
         deliveryRepository.delete(delivery);
     }
 
+    public Delivery update(Long id, Delivery delivery) {
+        if (id == null) {
+            throw new RuntimeException("Updating delivery failed. Delivery id is null.");
+        }
+        if (delivery == null) {
+            throw new RuntimeException("Updating delivery failed. Delivery is null.");
+        }
+
+        Delivery deliveryFromDb = findById(id);
+        deliveryFromDb.setPrice(delivery.getPrice());
+        deliveryFromDb.setDeliveryStatus(delivery.getDeliveryStatus());
+        deliveryFromDb.setDeliveryTime(delivery.getDeliveryTime());
+
+        return deliveryRepository.save(deliveryFromDb);
+    }
 }

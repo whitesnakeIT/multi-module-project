@@ -14,11 +14,11 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
 
-    public void save(Customer customer) {
+    public Customer save(Customer customer) {
         if (customer == null) {
             throw new RuntimeException("Saving customer failed. Customer is null.");
         }
-        customerRepository.save(customer);
+        return customerRepository.save(customer);
     }
 
     public List<Customer> findAll() {
@@ -40,5 +40,22 @@ public class CustomerService {
         Customer customer = findById(customerId);
         customerRepository.delete(customer);
     }
+
+    public Customer update(Long id, Customer customer) {
+        if (id == null) {
+            throw new RuntimeException("Updating customer failed. Customer id is null.");
+        }
+        if (customer == null) {
+            throw new RuntimeException("Updating customer failed. Customer is null.");
+        }
+
+        Customer customerFromDb = findById(id);
+        customerFromDb.setEmail(customer.getEmail());
+        customerFromDb.setFirstName(customer.getFirstName());
+        customerFromDb.setLastName(customer.getLastName());
+
+        return customerRepository.save(customerFromDb);
+    }
+
 
 }
