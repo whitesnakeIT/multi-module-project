@@ -3,6 +3,8 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.entity.Courier;
 import com.kapusniak.tomasz.service.CourierService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,10 @@ public class CourierController {
     }
 
     @PostMapping
-    public Courier createCourier(@RequestBody Courier courier) {
-        return courierService.save(courier);
+    public ResponseEntity<Courier> createCourier(@RequestBody Courier courier) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(courierService.save(courier));
     }
 
     @PutMapping("/{id}")
@@ -35,8 +39,9 @@ public class CourierController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCourier(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCourier(@PathVariable Long id) {
         courierService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
