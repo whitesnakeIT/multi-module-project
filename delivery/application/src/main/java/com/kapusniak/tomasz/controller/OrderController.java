@@ -3,6 +3,8 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.entity.Order;
 import com.kapusniak.tomasz.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,10 @@ public class OrderController {
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.save(order);
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(orderService.save(order));
     }
 
     @PutMapping("/{id}")
@@ -35,8 +39,9 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOrder(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         orderService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
