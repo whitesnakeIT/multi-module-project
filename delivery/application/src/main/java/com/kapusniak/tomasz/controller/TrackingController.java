@@ -3,6 +3,8 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.entity.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,10 @@ public class TrackingController {
     }
 
     @PostMapping
-    public Tracking createTracking(@RequestBody Tracking tracking) {
-        return trackingService.save(tracking);
+    public ResponseEntity<Tracking> createTracking(@RequestBody Tracking tracking) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(trackingService.save(tracking));
     }
 
     @PutMapping("/{id}")
@@ -35,8 +39,9 @@ public class TrackingController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTracking(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTracking(@PathVariable Long id) {
         trackingService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

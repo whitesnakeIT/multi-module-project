@@ -3,6 +3,8 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.entity.Delivery;
 import com.kapusniak.tomasz.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +27,10 @@ public class DeliveryController {
     }
 
     @PostMapping
-    public Delivery createDelivery(@RequestBody Delivery delivery) {
-        return deliveryService.save(delivery);
+    public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery delivery) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(deliveryService.save(delivery));
     }
 
     @PutMapping("/{id}")
@@ -35,8 +39,9 @@ public class DeliveryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDelivery(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDelivery(@PathVariable Long id) {
         deliveryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
