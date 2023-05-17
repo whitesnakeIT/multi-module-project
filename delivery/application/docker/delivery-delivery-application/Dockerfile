@@ -1,15 +1,11 @@
-FROM openjdk:latest
+FROM tomcat:latest
 
 LABEL authors="tomasz"
 
-RUN mkdir /usr/local/app
+COPY target/delivery.war /usr/local/tomcat/webapps/ROOT.war
 
-COPY target/delivery-delivery-application-0.0.1-SNAPSHOT.jar /usr/local/app
-
-WORKDIR /usr/local/app
-
-RUN mv delivery-delivery-application-0.0.1-SNAPSHOT.jar app.jar
+WORKDIR /usr/local/tomcat
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["bin/catalina.sh", "run"]
