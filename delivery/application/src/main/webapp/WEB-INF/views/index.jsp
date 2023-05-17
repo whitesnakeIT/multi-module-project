@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>Title</title>
+    <title>Welcome!</title>
 </head>
 <body>
 <h1>!404 :)</h1>
