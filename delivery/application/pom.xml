@@ -19,6 +19,9 @@
         <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
         <swagger-annotations.version>2.2.9</swagger-annotations.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
+        <delivery-delivery-infrastructure.version>0.0.1-SNAPSHOT</delivery-delivery-infrastructure.version>
+        <tomcat-embed.version>10.1.1</tomcat-embed.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -29,6 +32,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -44,7 +48,7 @@
         <dependency>
             <groupId>com.kapusniak.tomasz</groupId>
             <artifactId>delivery-delivery-infrastructure</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${delivery-delivery-infrastructure.version}</version>
         </dependency>
 
         <dependency>
@@ -79,12 +83,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.servlet.jsp.jstl</groupId>
-            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -92,32 +91,15 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
         </dependency>
 
-
     </dependencies>
     <build>
+        <finalName>delivery</finalName>
         <plugins>
-            <!--            <plugin>-->
-            <!--                <groupId>org.springframework.boot</groupId>-->
-            <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-            <!--                <version>3.0.0</version>-->
-            <!--                <configuration>-->
-            <!--                    <mainClass>com.kapusniak.tomasz.Application</mainClass>-->
-            <!--                                        <attach>false</attach>-->
-            <!--                </configuration>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <goals>-->
-            <!--                            <goal>repackage</goal>-->
-            <!--                        </goals>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>${maven-war-plugin.version}</version>
                 <configuration>
-                    <attachClasses>true</attachClasses>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <archive>
                         <manifest>
@@ -146,7 +128,7 @@
                                 ApiUtil.java
                             </supportingFilesToGenerate>
                             <configOptions>
-                                <!--                                <delegatePattern>true</delegatePattern>-->
+                                <delegatePattern>true</delegatePattern>
                                 <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
