@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,12 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class OrderRowMapper implements RowMapper<Order> {
+public class OrderRowMapper implements RowMapper<OrderEntity> {
 
     @Override
-    public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public OrderEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-        Order order = new Order();
+        OrderEntity order = new OrderEntity();
         order.setId(rs.getLong("ORDER_ID"));
         order.setPackageType(PackageType.valueOf(rs.getString("PACKAGE_TYPE")));
         order.setPackageSize(PackageSize.valueOf(rs.getString("PACKAGE_SIZE")));

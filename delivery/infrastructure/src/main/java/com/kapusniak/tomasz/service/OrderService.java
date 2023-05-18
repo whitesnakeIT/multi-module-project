@@ -1,9 +1,9 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
-import com.kapusniak.tomasz.repository.OrderRepository;
+import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +14,27 @@ import java.util.List;
 //@Transactional
 public class OrderService {
 
-    private final OrderRepository orderRepository;
+    private final OrderJpaRepository orderRepository;
 
-    public Order save(Order order) {
+    public OrderEntity save(OrderEntity order) {
         if (order == null) {
             throw new RuntimeException("Saving order failed. Order is null.");
         }
         return orderRepository.save(order);
     }
 
-    public List<Order> findAll() {
+    public List<OrderEntity> findAll() {
         return orderRepository.findAll();
     }
 
-    public List<Order> findAllByCustomerId(Long customerId) {
+    public List<OrderEntity> findAllByCustomerId(Long customerId) {
         if (customerId == null) {
             throw new RuntimeException("Searching for customer orders failed. Customer id is null.");
         }
         return orderRepository.findAllByCustomerId(customerId);
     }
 
-    public Order findById(Long orderId) {
+    public OrderEntity findById(Long orderId) {
         if (orderId == null) {
             throw new RuntimeException("Searching for order failed. Order id is null.");
         }
@@ -43,14 +43,14 @@ public class OrderService {
                 .orElseThrow(RuntimeException::new);
     }
 
-    public List<Order> findByPackageType(PackageType packageType) {
+    public List<OrderEntity> findByPackageType(PackageType packageType) {
         if (packageType == null) {
             throw new RuntimeException("Searching for order failed. Package type is null.");
         }
         return orderRepository.findByPackageType(packageType);
     }
 
-    public List<Order> findByPackageSize(PackageSize packageSize) {
+    public List<OrderEntity> findByPackageSize(PackageSize packageSize) {
         if (packageSize == null) {
             throw new RuntimeException("Searching for order failed. Package size is null.");
         }
@@ -61,11 +61,11 @@ public class OrderService {
         if (orderId == null) {
             throw new RuntimeException("Deleting order failed. Order id is null.");
         }
-        Order order = findById(orderId);
+        OrderEntity order = findById(orderId);
         orderRepository.delete(order);
     }
 
-    public Order update(Long id, Order order) {
+    public OrderEntity update(Long id, OrderEntity order) {
         if (id == null) {
             throw new RuntimeException("Updating order failed. Order id is null.");
         }
@@ -73,7 +73,7 @@ public class OrderService {
             throw new RuntimeException("Updating order failed. Order is null.");
         }
 
-        Order orderFromDb = findById(id);
+        OrderEntity orderFromDb = findById(id);
         orderFromDb.setSenderAddress(order.getSenderAddress());
         orderFromDb.setReceiverAddress(order.getReceiverAddress());
         orderFromDb.setPackageType(order.getPackageType());

@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,19 +39,19 @@ public class OrderControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
     }
 
-    public Order getOrder() {
-        Order order1 = new Order();
+    public OrderEntity getOrder() {
+        OrderEntity order1 = new OrderEntity();
         order1.setId(1L);
         order1.setSenderAddress("testSenderAddress1");
         return order1;
     }
 
-    public List<Order> getOrderList() {
-        List<Order> orders = new ArrayList<>();
-        Order order1 = new Order();
+    public List<OrderEntity> getOrderList() {
+        List<OrderEntity> orders = new ArrayList<>();
+        OrderEntity order1 = new OrderEntity();
         order1.setId(1L);
         order1.setSenderAddress("testSenderAddress1");
-        Order order2 = new Order();
+        OrderEntity order2 = new OrderEntity();
         order2.setId(2L);
         order2.setSenderAddress("testSenderAddress2");
         orders.add(order1);
@@ -62,7 +62,7 @@ public class OrderControllerTest {
     @Test
     @DisplayName("should correctly return list of orders")
     public void getAllOrders() throws Exception {
-        List<Order> orders = getOrderList();
+        List<OrderEntity> orders = getOrderList();
         when(orderService.findAll()).thenReturn(orders);
 
         mockMvc.perform(get("/api/v1/orders"))
@@ -82,7 +82,7 @@ public class OrderControllerTest {
     @Test
     @DisplayName("should correctly return order based on order id")
     public void getOrderById() throws Exception {
-        Order order = getOrder();
+        OrderEntity order = getOrder();
 
         when(orderService.findById(1L)).thenReturn(order);
 
@@ -101,9 +101,9 @@ public class OrderControllerTest {
     @Test
     @DisplayName("should return created order")
     public void createOrder() throws Exception {
-        Order order = getOrder();
+        OrderEntity order = getOrder();
         when(orderService
-                .save(any(Order.class)))
+                .save(any(OrderEntity.class)))
                 .thenReturn(getOrder());
 
         mockMvc.perform(post("/api/v1/orders")
@@ -116,7 +116,7 @@ public class OrderControllerTest {
 
         verify(orderService,
                 times(1))
-                .save(any(Order.class));
+                .save(any(OrderEntity.class));
         verifyNoMoreInteractions(orderService);
     }
 
@@ -124,9 +124,9 @@ public class OrderControllerTest {
     @DisplayName("should return updated order")
     public void updateOrder() throws Exception {
 
-        Order order = getOrder();
+        OrderEntity order = getOrder();
         when(orderService.update(eq(1L),
-                any(Order.class))).thenReturn(order);
+                any(OrderEntity.class))).thenReturn(order);
         mockMvc.perform(put("/api/v1/orders/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(order)))
@@ -137,7 +137,7 @@ public class OrderControllerTest {
 
         verify(orderService,
                 times(1))
-                .update(eq(1L), any(Order.class));
+                .update(eq(1L), any(OrderEntity.class));
         verifyNoMoreInteractions(orderService);
     }
 

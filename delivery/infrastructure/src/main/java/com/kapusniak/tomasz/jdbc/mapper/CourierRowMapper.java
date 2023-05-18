@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
-import com.kapusniak.tomasz.entity.Courier;
+import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.enums.CourierCompany;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -9,12 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class CourierRowMapper implements RowMapper<Courier> {
+public class CourierRowMapper implements RowMapper<CourierEntity> {
 
     @Override
-    public Courier mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public CourierEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-        Courier courier = new Courier();
+        CourierEntity courier = new CourierEntity();
         courier.setId(rs.getLong("COURIER_ID"));
         courier.setFirstName(rs.getString("FIRST_NAME"));
         courier.setLastName(rs.getString("LAST_NAME"));

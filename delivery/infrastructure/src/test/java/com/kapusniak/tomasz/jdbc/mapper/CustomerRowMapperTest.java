@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
-import com.kapusniak.tomasz.entity.Customer;
+import com.kapusniak.tomasz.entity.CustomerEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class CustomerRowMapperTest {
     void mapRow() throws SQLException {
 
         // when
-        Customer customer = customerRowMapper.mapRow(resultSet, 1);
+        CustomerEntity customer = customerRowMapper.mapRow(resultSet, 1);
 
         // then
         assertNotNull(customer);

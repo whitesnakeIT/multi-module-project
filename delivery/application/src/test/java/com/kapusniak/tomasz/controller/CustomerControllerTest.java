@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapusniak.tomasz.entity.Customer;
+import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,19 +39,19 @@ public class CustomerControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
     }
 
-    public Customer getCustomer() {
-        Customer customer1 = new Customer();
+    public CustomerEntity getCustomer() {
+        CustomerEntity customer1 = new CustomerEntity();
         customer1.setId(1L);
         customer1.setFirstName("John");
         return customer1;
     }
 
-    public List<Customer> getCustomerList() {
-        List<Customer> customers = new ArrayList<>();
-        Customer customer1 = new Customer();
+    public List<CustomerEntity> getCustomerList() {
+        List<CustomerEntity> customers = new ArrayList<>();
+        CustomerEntity customer1 = new CustomerEntity();
         customer1.setId(1L);
         customer1.setFirstName("John");
-        Customer customer2 = new Customer();
+        CustomerEntity customer2 = new CustomerEntity();
         customer2.setId(2L);
         customer2.setFirstName("Tom");
         customers.add(customer1);
@@ -62,7 +62,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("should correctly return list of customers")
     public void getAllCustomers() throws Exception {
-        List<Customer> customers = getCustomerList();
+        List<CustomerEntity> customers = getCustomerList();
         when(customerService.findAll()).thenReturn(customers);
 
         mockMvc.perform(get("/api/v1/customers"))
@@ -82,7 +82,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("should correctly return customer based on customer id")
     public void getCustomerById() throws Exception {
-        Customer customer = getCustomer();
+        CustomerEntity customer = getCustomer();
 
         when(customerService.findById(1L)).thenReturn(customer);
 
@@ -101,9 +101,9 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("should return created customer")
     public void createCustomer() throws Exception {
-        Customer customer = getCustomer();
+        CustomerEntity customer = getCustomer();
         when(customerService
-                .save(any(Customer.class)))
+                .save(any(CustomerEntity.class)))
                 .thenReturn(getCustomer());
 
         mockMvc.perform(post("/api/v1/customers")
@@ -116,7 +116,7 @@ public class CustomerControllerTest {
 
         verify(customerService,
                 times(1))
-                .save(any(Customer.class));
+                .save(any(CustomerEntity.class));
         verifyNoMoreInteractions(customerService);
     }
 
@@ -124,9 +124,9 @@ public class CustomerControllerTest {
     @DisplayName("should return updated customer")
     public void updateCustomer() throws Exception {
 
-        Customer customer = getCustomer();
+        CustomerEntity customer = getCustomer();
         when(customerService.update(eq(1L),
-                any(Customer.class))).thenReturn(customer);
+                any(CustomerEntity.class))).thenReturn(customer);
         mockMvc.perform(put("/api/v1/customers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customer)))
@@ -137,7 +137,7 @@ public class CustomerControllerTest {
 
         verify(customerService,
                 times(1))
-                .update(eq(1L), any(Customer.class));
+                .update(eq(1L), any(CustomerEntity.class));
         verifyNoMoreInteractions(customerService);
     }
 

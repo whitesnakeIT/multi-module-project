@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapusniak.tomasz.entity.Delivery;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.enums.DeliveryStatus;
 import com.kapusniak.tomasz.service.DeliveryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,19 +40,19 @@ public class DeliveryControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(deliveryController).build();
     }
 
-    public Delivery getDelivery() {
-        Delivery delivery1 = new Delivery();
+    public DeliveryEntity getDelivery() {
+        DeliveryEntity delivery1 = new DeliveryEntity();
         delivery1.setId(1L);
         delivery1.setDeliveryStatus(DeliveryStatus.CREATED);
         return delivery1;
     }
 
-    public List<Delivery> getDeliveryList() {
-        List<Delivery> deliveries = new ArrayList<>();
-        Delivery delivery1 = new Delivery();
+    public List<DeliveryEntity> getDeliveryList() {
+        List<DeliveryEntity> deliveries = new ArrayList<>();
+        DeliveryEntity delivery1 = new DeliveryEntity();
         delivery1.setId(1L);
         delivery1.setDeliveryStatus(DeliveryStatus.CREATED);
-        Delivery delivery2 = new Delivery();
+        DeliveryEntity delivery2 = new DeliveryEntity();
         delivery2.setId(2L);
         delivery2.setDeliveryStatus(DeliveryStatus.DELIVERED);
         deliveries.add(delivery1);
@@ -63,7 +63,7 @@ public class DeliveryControllerTest {
     @Test
     @DisplayName("should correctly return list of deliveries")
     public void getAllDeliveries() throws Exception {
-        List<Delivery> deliveries = getDeliveryList();
+        List<DeliveryEntity> deliveries = getDeliveryList();
         when(deliveryService.findAll()).thenReturn(deliveries);
 
         mockMvc.perform(get("/api/v1/deliveries"))
@@ -83,7 +83,7 @@ public class DeliveryControllerTest {
     @Test
     @DisplayName("should correctly return delivery based on delivery id")
     public void getDeliveryById() throws Exception {
-        Delivery delivery = getDelivery();
+        DeliveryEntity delivery = getDelivery();
 
         when(deliveryService.findById(1L)).thenReturn(delivery);
 
@@ -102,9 +102,9 @@ public class DeliveryControllerTest {
     @Test
     @DisplayName("should return created delivery")
     public void createDelivery() throws Exception {
-        Delivery delivery = getDelivery();
+        DeliveryEntity delivery = getDelivery();
         when(deliveryService
-                .save(any(Delivery.class)))
+                .save(any(DeliveryEntity.class)))
                 .thenReturn(getDelivery());
 
         mockMvc.perform(post("/api/v1/deliveries")
@@ -117,7 +117,7 @@ public class DeliveryControllerTest {
 
         verify(deliveryService,
                 times(1))
-                .save(any(Delivery.class));
+                .save(any(DeliveryEntity.class));
         verifyNoMoreInteractions(deliveryService);
     }
 
@@ -125,9 +125,9 @@ public class DeliveryControllerTest {
     @DisplayName("should return updated delivery")
     public void updateDelivery() throws Exception {
 
-        Delivery delivery = getDelivery();
+        DeliveryEntity delivery = getDelivery();
         when(deliveryService.update(eq(1L),
-                any(Delivery.class))).thenReturn(delivery);
+                any(DeliveryEntity.class))).thenReturn(delivery);
         mockMvc.perform(put("/api/v1/deliveries/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(delivery)))
@@ -138,7 +138,7 @@ public class DeliveryControllerTest {
 
         verify(deliveryService,
                 times(1))
-                .update(eq(1L), any(Delivery.class));
+                .update(eq(1L), any(DeliveryEntity.class));
         verifyNoMoreInteractions(deliveryService);
     }
 

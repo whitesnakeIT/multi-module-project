@@ -1,17 +1,21 @@
-package com.kapusniak.tomasz.repository;
-
-import com.kapusniak.tomasz.entity.Order;
+package com.kapusniak.tomasz.ports.service;
 
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.kapusniak.tomasz.model.Order;
 
 import java.util.List;
 
-@Repository
-//@Transactional
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderService {
+    Order save(Order order);
+
+    Order findById(Long id);
+
+    List<Order> findAll();
+
+    void delete(Long orderId);
+
+    Order update(Order order);
 
     List<Order> findByPackageType(PackageType packageType);
 

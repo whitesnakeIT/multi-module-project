@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Customer;
-import com.kapusniak.tomasz.repository.CustomerRepository;
+import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,20 +12,20 @@ import java.util.List;
 //@Transactional
 public class CustomerService {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerJpaRepository customerRepository;
 
-    public Customer save(Customer customer) {
+    public CustomerEntity save(CustomerEntity customer) {
         if (customer == null) {
             throw new RuntimeException("Saving customer failed. Customer is null.");
         }
         return customerRepository.save(customer);
     }
 
-    public List<Customer> findAll() {
+    public List<CustomerEntity> findAll() {
         return customerRepository.findAll();
     }
 
-    public Customer findById(Long customerId) {
+    public CustomerEntity findById(Long customerId) {
         if (customerId == null) {
             throw new RuntimeException("Searching for customer failed. Customer id is null.");
         }
@@ -37,11 +37,11 @@ public class CustomerService {
         if (customerId == null) {
             throw new RuntimeException("Deleting customer failed. Customer id is null.");
         }
-        Customer customer = findById(customerId);
+        CustomerEntity customer = findById(customerId);
         customerRepository.delete(customer);
     }
 
-    public Customer update(Long id, Customer customer) {
+    public CustomerEntity update(Long id, CustomerEntity customer) {
         if (id == null) {
             throw new RuntimeException("Updating customer failed. Customer id is null.");
         }
@@ -49,7 +49,7 @@ public class CustomerService {
             throw new RuntimeException("Updating customer failed. Customer is null.");
         }
 
-        Customer customerFromDb = findById(id);
+        CustomerEntity customerFromDb = findById(id);
         customerFromDb.setEmail(customer.getEmail());
         customerFromDb.setFirstName(customer.getFirstName());
         customerFromDb.setLastName(customer.getLastName());

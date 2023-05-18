@@ -17,7 +17,8 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "deliveries")
-public class Delivery {
+public class DeliveryEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "delivery_id", nullable = false)
@@ -37,18 +38,18 @@ public class Delivery {
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "courier_id")
-    private Courier courier;
+    private CourierEntity courier;
 
     @ToString.Exclude
     @OneToOne
     @PrimaryKeyJoinColumn
-    private Order order;
+    private OrderEntity order;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Delivery delivery = (Delivery) o;
+        DeliveryEntity delivery = (DeliveryEntity) o;
         return getId() != null && Objects.equals(getId(), delivery.getId());
     }
 

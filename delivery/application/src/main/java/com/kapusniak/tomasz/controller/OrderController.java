@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.controller;
 
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,24 +17,24 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public List<Order> getAllOrders() {
+    public List<OrderEntity> getAllOrders() {
         return orderService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
+    public OrderEntity getOrder(@PathVariable Long id) {
         return orderService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+    public ResponseEntity<OrderEntity> createOrder(@RequestBody OrderEntity order) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.save(order));
     }
 
     @PutMapping("/{id}")
-    public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
+    public OrderEntity updateOrder(@PathVariable Long id, @RequestBody OrderEntity order) {
         return orderService.update(id, order);
     }
 

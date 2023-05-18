@@ -1,9 +1,9 @@
 package com.kapusniak.tomasz.jdbc;
 
-import com.kapusniak.tomasz.entity.Courier;
-import com.kapusniak.tomasz.entity.Customer;
-import com.kapusniak.tomasz.entity.Delivery;
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.CourierCompany;
 import com.kapusniak.tomasz.jdbc.mapper.CourierRowMapper;
 import com.kapusniak.tomasz.jdbc.mapper.CustomerRowMapper;
@@ -42,24 +42,24 @@ class JdbcExamplesTest {
     @InjectMocks
     private JdbcExamples jdbcExamples;
 
-    private Customer customer;
+    private CustomerEntity customer;
 
-    private Courier courier;
+    private CourierEntity courier;
 
     @BeforeEach
     public void setUp() {
-        customer = new Customer();
+        customer = new CustomerEntity();
         customer.setId(1L);
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setEmail("testEmail");
 
-        courier = new Courier();
+        courier = new CourierEntity();
         courier.setId(1L);
         courier.setFirstName("courierFirstName");
         courier.setLastName("courierLastName");
         courier.setCourierCompany(CourierCompany.DPD);
-        courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
+        courier.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
     }
 
     @Test
@@ -103,7 +103,7 @@ class JdbcExamplesTest {
         Long courierId = 1L;
 
         // when
-        Courier courierById = jdbcExamples.getCourierById(courierId);
+        CourierEntity courierById = jdbcExamples.getCourierById(courierId);
 
         // then
         assertThat(courierById.getId()).isNotNull();
@@ -130,12 +130,12 @@ class JdbcExamplesTest {
         given(jdbcTemplate.query(
                 any(String.class),
                 any(OrderRowMapper.class)))
-                .willReturn(List.of(new Order()));
+                .willReturn(List.of(new OrderEntity()));
 
         Long customerId = 1L;
 
         // when
-        Customer customerById = jdbcExamples.getCustomerById(customerId);
+        CustomerEntity customerById = jdbcExamples.getCustomerById(customerId);
 
         // then
         assertThat(customerById.getId()).isNotNull();
@@ -161,15 +161,15 @@ class JdbcExamplesTest {
         given(jdbcTemplate.query(
                 any(String.class),
                 any(CustomerRowMapper.class)))
-                .willReturn(List.of(new Customer(), new Customer()));
+                .willReturn(List.of(new CustomerEntity(), new CustomerEntity()));
 
         given(jdbcTemplate.query(
                 anyString(),
                 any(OrderRowMapper.class)))
-                .willReturn(List.of(new Order()));
+                .willReturn(List.of(new OrderEntity()));
 
         // when
-        List<Customer> customerList = jdbcExamples.getCustomerList();
+        List<CustomerEntity> customerList = jdbcExamples.getCustomerList();
 
         // then
         assertThat(customerList.size()).isEqualTo(2);
@@ -195,7 +195,7 @@ class JdbcExamplesTest {
         Long notExistingCustomerId = 1_000_000L;
 
         // when
-        Customer customerNull = jdbcExamples.getCustomerById(notExistingCustomerId);
+        CustomerEntity customerNull = jdbcExamples.getCustomerById(notExistingCustomerId);
 
         //then
         assertThat(customerNull)
@@ -234,10 +234,10 @@ class JdbcExamplesTest {
         given(jdbcTemplate.query(
                 any(String.class),
                 any(OrderRowMapper.class)))
-                .willReturn(List.of(new Order(), new Order()));
+                .willReturn(List.of(new OrderEntity(), new OrderEntity()));
 
         // when
-        List<Order> orderList = jdbcExamples.getOrderList();
+        List<OrderEntity> orderList = jdbcExamples.getOrderList();
 
         // then
         assertThat(orderList.size()).isEqualTo(2);
@@ -257,10 +257,10 @@ class JdbcExamplesTest {
         given(jdbcTemplate.query(
                 any(String.class),
                 any(OrderRowMapper.class)))
-                .willReturn(List.of(new Order(), new Order()));
+                .willReturn(List.of(new OrderEntity(), new OrderEntity()));
 
         // when
-        List<Order> customerOrderList = jdbcExamples.getCustomerOrderList(customerId);
+        List<OrderEntity> customerOrderList = jdbcExamples.getCustomerOrderList(customerId);
 
         // then
         assertThat(customerOrderList.size()).isEqualTo(2);
@@ -285,10 +285,10 @@ class JdbcExamplesTest {
                 any(String.class),
                 new Object[]{any(Object.class)},
                 any(OrderRowMapper.class)))
-                .willReturn(new Order());
+                .willReturn(new OrderEntity());
 
         // when
-        Order orderById = jdbcExamples.getOrderById(orderId);
+        OrderEntity orderById = jdbcExamples.getOrderById(orderId);
 
         // then
         assertThat(orderById).isNotNull();

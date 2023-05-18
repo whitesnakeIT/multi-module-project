@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class OrderRowMapperTest {
     void mapRow() throws SQLException {
 
         // when
-        Order order = orderRowMapper.mapRow(resultSet, 1);
+        OrderEntity order = orderRowMapper.mapRow(resultSet, 1);
 
         // then
         assertNotNull(order);

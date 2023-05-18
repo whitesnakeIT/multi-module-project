@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.controller;
 
-import com.kapusniak.tomasz.entity.Customer;
+import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,24 +17,24 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
+    public List<CustomerEntity> getAllCustomers() {
         return customerService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Customer getCustomer(@PathVariable Long id) {
+    public CustomerEntity getCustomer(@PathVariable Long id) {
         return customerService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<CustomerEntity> createCustomer(@RequestBody CustomerEntity customer) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(customerService.save(customer));
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+    public CustomerEntity updateCustomer(@PathVariable Long id, @RequestBody CustomerEntity customer) {
         return customerService.update(id, customer);
     }
 

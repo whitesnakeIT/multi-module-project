@@ -18,7 +18,8 @@ import java.util.Objects;
 @ToString
 @Table(name = "orders")
 
-public class Order {
+public class OrderEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id", nullable = false)
@@ -45,14 +46,14 @@ public class Order {
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private CustomerEntity customer;
 
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Order order = (Order) o;
+        OrderEntity order = (OrderEntity) o;
         return getId() != null && Objects.equals(getId(), order.getId());
     }
 

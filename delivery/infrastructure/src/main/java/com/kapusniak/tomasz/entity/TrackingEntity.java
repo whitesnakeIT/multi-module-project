@@ -13,18 +13,20 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "tracking")
-public class Tracking {
+public class TrackingEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tracking_id", nullable = false)
     private Long id;
 
     private String localization;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Tracking tracking = (Tracking) o;
+        TrackingEntity tracking = (TrackingEntity) o;
         return getId() != null && Objects.equals(getId(), tracking.getId());
     }
 

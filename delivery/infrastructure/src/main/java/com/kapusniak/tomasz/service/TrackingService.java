@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Tracking;
-import com.kapusniak.tomasz.repository.TrackingRepository;
+import com.kapusniak.tomasz.entity.TrackingEntity;
+import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +13,20 @@ import java.util.List;
 public class TrackingService {
 
 
-    private final TrackingRepository trackingRepository;
+    private final TrackingJpaRepository trackingRepository;
 
-    public Tracking save(Tracking tracking) {
+    public TrackingEntity save(TrackingEntity tracking) {
         if (tracking == null) {
             throw new RuntimeException("Saving tracking failed. Tracking is null.");
         }
         return trackingRepository.save(tracking);
     }
 
-    public List<Tracking> findAll() {
+    public List<TrackingEntity> findAll() {
         return trackingRepository.findAll();
     }
 
-    public Tracking findById(Long trackingId) {
+    public TrackingEntity findById(Long trackingId) {
         if (trackingId == null) {
             throw new RuntimeException("Searching for tracking failed. Tracking id is null.");
         }
@@ -38,11 +38,11 @@ public class TrackingService {
         if (trackingId == null) {
             throw new RuntimeException("Deleting tracking failed. Tracking id is null.");
         }
-        Tracking tracking = findById(trackingId);
+        TrackingEntity tracking = findById(trackingId);
         trackingRepository.delete(tracking);
     }
 
-    public Tracking update(Long id, Tracking tracking) {
+    public TrackingEntity update(Long id, TrackingEntity tracking) {
         if (id == null) {
             throw new RuntimeException("Updating tracking failed. Tracking id is null.");
         }
@@ -50,7 +50,7 @@ public class TrackingService {
             throw new RuntimeException("Updating tracking failed. Tracking is null.");
         }
 
-        Tracking trackingFromDb = findById(id);
+        TrackingEntity trackingFromDb = findById(id);
         trackingFromDb.setLocalization(tracking.getLocalization());
 
         return trackingRepository.save(trackingFromDb);

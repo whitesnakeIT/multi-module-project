@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapusniak.tomasz.entity.Tracking;
+import com.kapusniak.tomasz.entity.TrackingEntity;
 import com.kapusniak.tomasz.service.TrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,19 +39,19 @@ public class TrackingControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(trackingController).build();
     }
 
-    public Tracking getTracking() {
-        Tracking tracking1 = new Tracking();
+    public TrackingEntity getTracking() {
+        TrackingEntity tracking1 = new TrackingEntity();
         tracking1.setId(1L);
         tracking1.setLocalization("testLocalization1");
         return tracking1;
     }
 
-    public List<Tracking> getTrackingList() {
-        List<Tracking> trackingList = new ArrayList<>();
-        Tracking tracking1 = new Tracking();
+    public List<TrackingEntity> getTrackingList() {
+        List<TrackingEntity> trackingList = new ArrayList<>();
+        TrackingEntity tracking1 = new TrackingEntity();
         tracking1.setId(1L);
         tracking1.setLocalization("testLocalization1");
-        Tracking tracking2 = new Tracking();
+        TrackingEntity tracking2 = new TrackingEntity();
         tracking2.setId(2L);
         tracking2.setLocalization("testLocalization2");
         trackingList.add(tracking1);
@@ -62,7 +62,7 @@ public class TrackingControllerTest {
     @Test
     @DisplayName("should correctly return list of tracking")
     public void getAllTrackings() throws Exception {
-        List<Tracking> trackingList = getTrackingList();
+        List<TrackingEntity> trackingList = getTrackingList();
         when(trackingService.findAll()).thenReturn(trackingList);
 
         mockMvc.perform(get("/api/v1/tracking"))
@@ -82,7 +82,7 @@ public class TrackingControllerTest {
     @Test
     @DisplayName("should correctly return tracking based on tracking id")
     public void getTrackingById() throws Exception {
-        Tracking tracking = getTracking();
+        TrackingEntity tracking = getTracking();
 
         when(trackingService.findById(1L)).thenReturn(tracking);
 
@@ -101,9 +101,9 @@ public class TrackingControllerTest {
     @Test
     @DisplayName("should return created tracking")
     public void createTracking() throws Exception {
-        Tracking tracking = getTracking();
+        TrackingEntity tracking = getTracking();
         when(trackingService
-                .save(any(Tracking.class)))
+                .save(any(TrackingEntity.class)))
                 .thenReturn(getTracking());
 
         mockMvc.perform(post("/api/v1/tracking")
@@ -116,7 +116,7 @@ public class TrackingControllerTest {
 
         verify(trackingService,
                 times(1))
-                .save(any(Tracking.class));
+                .save(any(TrackingEntity.class));
         verifyNoMoreInteractions(trackingService);
     }
 
@@ -124,9 +124,9 @@ public class TrackingControllerTest {
     @DisplayName("should return updated tracking")
     public void updateTracking() throws Exception {
 
-        Tracking tracking = getTracking();
+        TrackingEntity tracking = getTracking();
         when(trackingService.update(eq(1L),
-                any(Tracking.class))).thenReturn(tracking);
+                any(TrackingEntity.class))).thenReturn(tracking);
         mockMvc.perform(put("/api/v1/tracking/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(tracking)))
@@ -137,7 +137,7 @@ public class TrackingControllerTest {
 
         verify(trackingService,
                 times(1))
-                .update(eq(1L), any(Tracking.class));
+                .update(eq(1L), any(TrackingEntity.class));
         verifyNoMoreInteractions(trackingService);
     }
 

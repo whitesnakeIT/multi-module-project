@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Delivery;
-import com.kapusniak.tomasz.repository.DeliveryRepository;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
+import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,20 +12,20 @@ import java.util.List;
 //@Transactional
 public class DeliveryService {
 
-    private final DeliveryRepository deliveryRepository;
+    private final DeliveryJpaRepository deliveryRepository;
 
-    public Delivery save(Delivery delivery) {
+    public DeliveryEntity save(DeliveryEntity delivery) {
         if (delivery == null) {
             throw new RuntimeException("Saving delivery failed. Delivery is null.");
         }
         return deliveryRepository.save(delivery);
     }
 
-    public List<Delivery> findAll() {
+    public List<DeliveryEntity> findAll() {
         return deliveryRepository.findAll();
     }
 
-    public Delivery findById(Long deliveryId) {
+    public DeliveryEntity findById(Long deliveryId) {
         if (deliveryId == null) {
             throw new RuntimeException("Searching for delivery failed. Delivery id is null.");
         }
@@ -37,11 +37,11 @@ public class DeliveryService {
         if (deliveryId == null) {
             throw new RuntimeException("Deleting delivery failed. Delivery id is null.");
         }
-        Delivery delivery = findById(deliveryId);
+        DeliveryEntity delivery = findById(deliveryId);
         deliveryRepository.delete(delivery);
     }
 
-    public Delivery update(Long id, Delivery delivery) {
+    public DeliveryEntity update(Long id, DeliveryEntity delivery) {
         if (id == null) {
             throw new RuntimeException("Updating delivery failed. Delivery id is null.");
         }
@@ -49,7 +49,7 @@ public class DeliveryService {
             throw new RuntimeException("Updating delivery failed. Delivery is null.");
         }
 
-        Delivery deliveryFromDb = findById(id);
+        DeliveryEntity deliveryFromDb = findById(id);
         deliveryFromDb.setPrice(delivery.getPrice());
         deliveryFromDb.setDeliveryStatus(delivery.getDeliveryStatus());
         deliveryFromDb.setDeliveryTime(delivery.getDeliveryTime());

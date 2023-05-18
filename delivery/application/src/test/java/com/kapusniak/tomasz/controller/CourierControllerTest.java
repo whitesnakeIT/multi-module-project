@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kapusniak.tomasz.entity.Courier;
+import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.service.CourierService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,19 +39,19 @@ public class CourierControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(courierController).build();
     }
 
-    public Courier getCourier() {
-        Courier courier1 = new Courier();
+    public CourierEntity getCourier() {
+        CourierEntity courier1 = new CourierEntity();
         courier1.setId(1L);
         courier1.setFirstName("John");
         return courier1;
     }
 
-    public List<Courier> getCourierList() {
-        List<Courier> couriers = new ArrayList<>();
-        Courier courier1 = new Courier();
+    public List<CourierEntity> getCourierList() {
+        List<CourierEntity> couriers = new ArrayList<>();
+        CourierEntity courier1 = new CourierEntity();
         courier1.setId(1L);
         courier1.setFirstName("John");
-        Courier courier2 = new Courier();
+        CourierEntity courier2 = new CourierEntity();
         courier2.setId(2L);
         courier2.setFirstName("Tom");
         couriers.add(courier1);
@@ -62,7 +62,7 @@ public class CourierControllerTest {
     @Test
     @DisplayName("should correctly return list of couriers")
     public void getAllCouriers() throws Exception {
-        List<Courier> couriers = getCourierList();
+        List<CourierEntity> couriers = getCourierList();
         when(courierService.findAll()).thenReturn(couriers);
 
         mockMvc.perform(get("/api/v1/couriers"))
@@ -82,7 +82,7 @@ public class CourierControllerTest {
     @Test
     @DisplayName("should correctly return courier based on courier id")
     public void getCourierById() throws Exception {
-        Courier courier = getCourier();
+        CourierEntity courier = getCourier();
 
         when(courierService.findById(1L)).thenReturn(courier);
 
@@ -101,9 +101,9 @@ public class CourierControllerTest {
     @Test
     @DisplayName("should return created courier")
     public void createCourier() throws Exception {
-        Courier courier = getCourier();
+        CourierEntity courier = getCourier();
         when(courierService
-                .save(any(Courier.class)))
+                .save(any(CourierEntity.class)))
                 .thenReturn(getCourier());
 
         mockMvc.perform(post("/api/v1/couriers")
@@ -116,7 +116,7 @@ public class CourierControllerTest {
 
         verify(courierService,
                 times(1))
-                .save(any(Courier.class));
+                .save(any(CourierEntity.class));
         verifyNoMoreInteractions(courierService);
     }
 
@@ -124,9 +124,9 @@ public class CourierControllerTest {
     @DisplayName("should return updated courier")
     public void updateCourier() throws Exception {
 
-        Courier courier = getCourier();
+        CourierEntity courier = getCourier();
         when(courierService.update(eq(1L),
-                any(Courier.class))).thenReturn(courier);
+                any(CourierEntity.class))).thenReturn(courier);
         mockMvc.perform(put("/api/v1/couriers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courier)))
@@ -137,7 +137,7 @@ public class CourierControllerTest {
 
         verify(courierService,
                 times(1))
-                .update(eq(1L), any(Courier.class));
+                .update(eq(1L), any(CourierEntity.class));
         verifyNoMoreInteractions(courierService);
     }
 

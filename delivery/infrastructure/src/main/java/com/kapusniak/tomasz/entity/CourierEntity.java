@@ -17,7 +17,8 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "couriers")
-public class Courier {
+public class CourierEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "courier_id", nullable = false)
@@ -37,13 +38,13 @@ public class Courier {
     @OneToMany(mappedBy = "courier",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-    private List<Delivery> deliveryList = new ArrayList<>();
+    private List<DeliveryEntity> deliveryList = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Courier courier = (Courier) o;
+        CourierEntity courier = (CourierEntity) o;
         return getId() != null && Objects.equals(getId(), courier.getId());
     }
 

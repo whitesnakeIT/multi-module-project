@@ -15,6 +15,9 @@
     <properties>
         <spring-hibernate-query-utils.version>1.0.3</spring-hibernate-query-utils.version>
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <delivery-delivery-domain.version>0.0.1-SNAPSHOT</delivery-delivery-domain.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <lombok.version>1.18.26</lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -29,6 +32,12 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+
+        <dependency>
+            <groupId>com.kapusniak.tomasz</groupId>
+            <artifactId>delivery-delivery-domain</artifactId>
+            <version>${delivery-delivery-domain.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -73,6 +82,32 @@
             <version>${jackson-databind-nullable.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

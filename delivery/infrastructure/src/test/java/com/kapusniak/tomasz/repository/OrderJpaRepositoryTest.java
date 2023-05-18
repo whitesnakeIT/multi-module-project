@@ -1,8 +1,10 @@
 package com.kapusniak.tomasz.repository;
 
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
+import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
+import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,27 +22,27 @@ import static org.assertj.core.api.BDDAssertions.then;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 
 @TestPropertySource(locations = "/application-test.properties")
-class OrderRepositoryTest {
+class OrderJpaRepositoryTest {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderJpaRepository orderRepository;
 
     @Autowired
-    private DeliveryRepository deliveryRepository;
+    private DeliveryJpaRepository deliveryRepository;
 
     @Test
     @DisplayName("should return list of orders with correct size based on package type")
     void findByPackageType() {
 
         //when
-        List<Order> ordersByPackageType = orderRepository.findByPackageType(PackageType.DOCUMENT);
+        List<OrderEntity> ordersByPackageType = orderRepository.findByPackageType(PackageType.DOCUMENT);
 
         //then
         then(ordersByPackageType.size())
                 .isEqualTo(3);
 
         then(ordersByPackageType)
-                .extracting(Order::getPackageType)
+                .extracting(OrderEntity::getPackageType)
                 .containsOnly(PackageType.DOCUMENT);
     }
 
@@ -53,7 +55,7 @@ class OrderRepositoryTest {
         orderRepository.deleteAll();
 
         // when
-        List<Order> ordersByPackageType = orderRepository.findByPackageType(PackageType.DOCUMENT);
+        List<OrderEntity> ordersByPackageType = orderRepository.findByPackageType(PackageType.DOCUMENT);
 
         // then
         then(ordersByPackageType)
@@ -65,14 +67,14 @@ class OrderRepositoryTest {
     void findByPackageSize() {
 
         //when
-        List<Order> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.EXTRA_LARGE);
+        List<OrderEntity> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.EXTRA_LARGE);
 
         //then
         then(ordersByPackageSize.size())
                 .isEqualTo(1);
 
         then(ordersByPackageSize)
-                .extracting(Order::getPackageSize)
+                .extracting(OrderEntity::getPackageSize)
                 .containsOnly(PackageSize.EXTRA_LARGE);
     }
 
@@ -85,7 +87,7 @@ class OrderRepositoryTest {
         orderRepository.deleteAll();
 
         // when
-        List<Order> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.EXTRA_LARGE);
+        List<OrderEntity> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.EXTRA_LARGE);
 
         // then
         then(ordersByPackageSize)
@@ -97,7 +99,7 @@ class OrderRepositoryTest {
     void findAllByCustomerIdExisting() {
 
         // when
-        List<Order> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
 
         // then
         then(ordersByCustomerId.size())
@@ -113,7 +115,7 @@ class OrderRepositoryTest {
         orderRepository.deleteAll();
 
         // when
-        List<Order> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
 
         // then
         then(ordersByCustomerId)

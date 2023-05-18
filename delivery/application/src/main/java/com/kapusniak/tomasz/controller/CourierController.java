@@ -1,12 +1,10 @@
 package com.kapusniak.tomasz.controller;
 
-import com.kapusniak.tomasz.entity.Courier;
+import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.service.CourierService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,18 +17,18 @@ public class CourierController {
     private final CourierService courierService;
 
     @GetMapping
-    public List<Courier> getAllCouriers() {
+    public List<CourierEntity> getAllCouriers() {
         return courierService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Courier getCourier(@PathVariable Long id) {
+    public CourierEntity getCourier(@PathVariable Long id) {
         return courierService.findById(id);
     }
 
     @PostMapping
 
-    public ResponseEntity<Courier> createCourier(@RequestBody Courier courier) {
+    public ResponseEntity<CourierEntity> createCourier(@RequestBody CourierEntity courier) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(courierService.save(courier));
@@ -38,7 +36,7 @@ public class CourierController {
     }
 
     @PutMapping("/{id}")
-    public Courier updateCourier(@PathVariable Long id, @RequestBody Courier courier) {
+    public CourierEntity updateCourier(@PathVariable Long id, @RequestBody CourierEntity courier) {
         return courierService.update(id, courier);
     }
 

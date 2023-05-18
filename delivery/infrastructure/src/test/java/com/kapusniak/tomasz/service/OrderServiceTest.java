@@ -1,10 +1,10 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Customer;
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.enums.PackageSize;
 import com.kapusniak.tomasz.enums.PackageType;
-import com.kapusniak.tomasz.repository.OrderRepository;
+import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,11 +28,11 @@ import static org.mockito.BDDMockito.*;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class OrderServiceTest {
 
-    Order order = new Order();
+    OrderEntity order = new OrderEntity();
 
-    List<Order> orderList = new ArrayList<>();
+    List<OrderEntity> orderList = new ArrayList<>();
     @Mock
-    private OrderRepository orderRepository;
+    private OrderJpaRepository orderRepository;
     @InjectMocks
     private OrderService orderService;
 
@@ -45,7 +45,7 @@ class OrderServiceTest {
         order.setSenderAddress("new sender address");
         order.setReceiverAddress("new receiver address");
 
-        Customer customer = new Customer();
+        CustomerEntity customer = new CustomerEntity();
         customer.setId(5L);
         order.setCustomer(customer);
 
@@ -96,7 +96,7 @@ class OrderServiceTest {
                 .willReturn(orderList);
 
         // when
-        List<Order> allOrders = orderService.findAll();
+        List<OrderEntity> allOrders = orderService.findAll();
 
         // then
         assertThat(allOrders.size())
@@ -119,7 +119,7 @@ class OrderServiceTest {
         Long orderId = 1L;
 
         // when
-        Order orderById = orderService.findById(orderId);
+        OrderEntity orderById = orderService.findById(orderId);
 
         // then
         assertThat(orderById)
@@ -156,7 +156,7 @@ class OrderServiceTest {
                 .willReturn(orderList);
 
         // when
-        List<Order> ordersByPackageType = orderService.findByPackageType(PackageType.DOCUMENT);
+        List<OrderEntity> ordersByPackageType = orderService.findByPackageType(PackageType.DOCUMENT);
 
         // then
         assertThat(ordersByPackageType.size()).isGreaterThan(0);
@@ -188,7 +188,7 @@ class OrderServiceTest {
                 .willReturn(orderList);
 
         // when
-        List<Order> ordersByPackageSize = orderService.findByPackageSize(PackageSize.EXTRA_LARGE);
+        List<OrderEntity> ordersByPackageSize = orderService.findByPackageSize(PackageSize.EXTRA_LARGE);
 
         // then
         assertThat(ordersByPackageSize.size()).isGreaterThan(0);
@@ -221,7 +221,7 @@ class OrderServiceTest {
                 .willReturn(orderList);
 
         // when
-        List<Order> ordersByCustomerId = orderService.findAllByCustomerId(customerId);
+        List<OrderEntity> ordersByCustomerId = orderService.findAllByCustomerId(customerId);
 
         // then
         assertThat(ordersByCustomerId.size()).isGreaterThan(0);

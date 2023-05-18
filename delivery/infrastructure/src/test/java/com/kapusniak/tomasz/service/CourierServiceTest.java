@@ -1,8 +1,8 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Courier;
+import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.enums.CourierCompany;
-import com.kapusniak.tomasz.repository.CourierRepository;
+import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,12 +26,12 @@ import static org.mockito.Mockito.times;
 @ActiveProfiles("test")
 class CourierServiceTest {
 
-    Courier courier = new Courier();
+    CourierEntity courier = new CourierEntity();
 
-    List<Courier> courierList = new ArrayList<>();
+    List<CourierEntity> courierList = new ArrayList<>();
 
     @Mock
-    private CourierRepository courierRepository;
+    private CourierJpaRepository courierRepository;
 
     @InjectMocks
     private CourierService courierService;
@@ -88,7 +88,7 @@ class CourierServiceTest {
                 .willReturn(courierList);
 
         // when
-        List<Courier> allCouriers = courierService.findAll();
+        List<CourierEntity> allCouriers = courierService.findAll();
 
         // then
         assertThat(allCouriers.size())
@@ -111,7 +111,7 @@ class CourierServiceTest {
         Long courierId = 1L;
 
         // when
-        Courier courierById = courierService.findById(courierId);
+        CourierEntity courierById = courierService.findById(courierId);
 
         // then
         assertThat(courierById.getId())

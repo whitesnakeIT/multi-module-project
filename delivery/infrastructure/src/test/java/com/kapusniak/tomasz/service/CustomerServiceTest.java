@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Customer;
-import com.kapusniak.tomasz.repository.CustomerRepository;
+import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,12 +24,12 @@ import static org.mockito.Mockito.times;
 @SpringBootTest
 @ActiveProfiles("test")
 class CustomerServiceTest {
-    Customer customer = new Customer();
+    CustomerEntity customer = new CustomerEntity();
 
-    List<Customer> customerList = new ArrayList<>();
+    List<CustomerEntity> customerList = new ArrayList<>();
 
     @Mock
-    private CustomerRepository customerRepository;
+    private CustomerJpaRepository customerRepository;
 
     @InjectMocks
     private CustomerService customerService;
@@ -86,7 +86,7 @@ class CustomerServiceTest {
                 .willReturn(customerList);
 
         // when
-        List<Customer> allCustomers = customerService.findAll();
+        List<CustomerEntity> allCustomers = customerService.findAll();
 
         // then
         assertThat(allCustomers.size())
@@ -109,7 +109,7 @@ class CustomerServiceTest {
         Long customerId = 1L;
 
         // when
-        Customer customerById = customerService.findById(customerId);
+        CustomerEntity customerById = customerService.findById(customerId);
 
         // then
         assertThat(customerById.getId())

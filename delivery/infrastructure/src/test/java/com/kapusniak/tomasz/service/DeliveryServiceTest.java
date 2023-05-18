@@ -1,8 +1,8 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Delivery;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.enums.DeliveryStatus;
-import com.kapusniak.tomasz.repository.DeliveryRepository;
+import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,12 +28,12 @@ import static org.mockito.Mockito.times;
 @ActiveProfiles("test")
 class DeliveryServiceTest {
 
-    Delivery delivery = new Delivery();
+    DeliveryEntity delivery = new DeliveryEntity();
 
-    List<Delivery> deliveryList = new ArrayList<>();
+    List<DeliveryEntity> deliveryList = new ArrayList<>();
 
     @Mock
-    private DeliveryRepository deliveryRepository;
+    private DeliveryJpaRepository deliveryRepository;
 
     @InjectMocks
     private DeliveryService deliveryService;
@@ -92,7 +92,7 @@ class DeliveryServiceTest {
                 .willReturn(deliveryList);
 
         // when
-        List<Delivery> allDeliverys = deliveryService.findAll();
+        List<DeliveryEntity> allDeliverys = deliveryService.findAll();
 
         // then
         assertThat(allDeliverys.size())
@@ -115,7 +115,7 @@ class DeliveryServiceTest {
         Long deliveryId = 1L;
 
         // when
-        Delivery deliveryById = deliveryService.findById(deliveryId);
+        DeliveryEntity deliveryById = deliveryService.findById(deliveryId);
 
         // then
         assertThat(deliveryById.getId())

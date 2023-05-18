@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.controller;
 
-import com.kapusniak.tomasz.entity.Delivery;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,24 +17,24 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @GetMapping
-    public List<Delivery> getAllDeliveries() {
+    public List<DeliveryEntity> getAllDeliveries() {
         return deliveryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Delivery getDelivery(@PathVariable Long id) {
+    public DeliveryEntity getDelivery(@PathVariable Long id) {
         return deliveryService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery delivery) {
+    public ResponseEntity<DeliveryEntity> createDelivery(@RequestBody DeliveryEntity delivery) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(deliveryService.save(delivery));
     }
 
     @PutMapping("/{id}")
-    public Delivery updateDelivery(@PathVariable Long id, @RequestBody Delivery delivery) {
+    public DeliveryEntity updateDelivery(@PathVariable Long id, @RequestBody DeliveryEntity delivery) {
         return deliveryService.update(id, delivery);
     }
 
