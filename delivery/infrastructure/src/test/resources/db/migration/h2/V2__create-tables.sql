@@ -41,7 +41,8 @@ CREATE TABLE orders
 
 CREATE TABLE tracking
 (
-    tracking_id BIGINT AUTO_INCREMENT PRIMARY KEY
+    tracking_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    localization VARCHAR(255)
 );
 
 CREATE TABLE deliveries

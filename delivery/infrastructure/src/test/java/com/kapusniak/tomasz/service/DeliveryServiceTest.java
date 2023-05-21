@@ -1,8 +1,10 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Delivery;
-import com.kapusniak.tomasz.enums.DeliveryStatus;
-import com.kapusniak.tomasz.repository.DeliveryRepository;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
+import com.kapusniak.tomasz.mapstruct.DeliveryEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Delivery;
+import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
+import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,28 +15,35 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
 class DeliveryServiceTest {
 
     Delivery delivery = new Delivery();
+    DeliveryEntity deliveryEntity = new DeliveryEntity();
 
     List<Delivery> deliveryList = new ArrayList<>();
+    List<DeliveryEntity> deliveryEntityList = new ArrayList<>();
 
     @Mock
-    private DeliveryRepository deliveryRepository;
+    private DeliveryJpaRepository deliveryRepository;
 
+    @Mock
+    private DeliveryEntityMapper deliveryEntityMapper;
     @InjectMocks
     private DeliveryService deliveryService;
 
@@ -43,24 +52,51 @@ class DeliveryServiceTest {
         delivery.setId(1L);
         delivery.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
-                        12, 0, 0));
+                        12, 0, 0).atOffset(ZoneOffset.UTC));
         delivery.setDeliveryStatus(DeliveryStatus.CREATED);
-        delivery.setPrice(BigDecimal.valueOf(50.00));
+        delivery.setPrice(50.00);
 
         deliveryList.add(delivery);
         deliveryList.add(delivery);
+
+        deliveryEntity.setId(1L);
+        deliveryEntity.setDeliveryTime(LocalDateTime
+                .of(2023, 5, 3,
+                        12, 0, 0));
+        deliveryEntity.setDeliveryStatus(DeliveryStatus.CREATED);
+        deliveryEntity.setPrice(BigDecimal.valueOf(50.00));
+
+        deliveryEntityList.add(deliveryEntity);
+        deliveryEntityList.add(deliveryEntity);
+
+        when(deliveryEntityMapper
+                .mapToEntity(any(Delivery.class)))
+                .thenReturn(deliveryEntity);
+        when(deliveryEntityMapper
+                .mapToApiModel(any(DeliveryEntity.class)))
+                .thenReturn(delivery);
     }
 
     @Test
     @DisplayName("should correctly save an Delivery entity exactly once")
     void save() {
+
+        //given
+        when(deliveryRepository
+                .save(any(DeliveryEntity.class)))
+                .thenReturn(deliveryEntity);
+
         // when
-        deliveryService.save(delivery);
+        Delivery result = deliveryService.save(delivery);
 
         // then
         then(deliveryRepository)
                 .should(times(1))
-                .save(delivery);
+                .save(deliveryEntityMapper.mapToEntity(delivery));
+
+        // verify
+        assertThat(delivery).isEqualTo(result);
+
     }
 
     @Test
@@ -89,13 +125,13 @@ class DeliveryServiceTest {
 
         // given
         given(deliveryRepository.findAll())
-                .willReturn(deliveryList);
+                .willReturn(deliveryEntityList);
 
         // when
-        List<Delivery> allDeliverys = deliveryService.findAll();
+        List<Delivery> allDelivery = deliveryService.findAll();
 
         // then
-        assertThat(allDeliverys.size())
+        assertThat(allDelivery.size())
                 .isEqualTo(2);
 
         // verify
@@ -111,7 +147,7 @@ class DeliveryServiceTest {
         // given
         given(deliveryRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(delivery));
+                .willReturn(Optional.of(deliveryEntity));
         Long deliveryId = 1L;
 
         // when
@@ -150,7 +186,7 @@ class DeliveryServiceTest {
         // given
         given(deliveryRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(delivery));
+                .willReturn(Optional.of(deliveryEntity));
         Long deliveryId = 1L;
 
         // when
@@ -159,7 +195,7 @@ class DeliveryServiceTest {
         // then
         then(deliveryRepository)
                 .should(times(1))
-                .delete(delivery);
+                .delete(deliveryEntity);
     }
 
     @Test

@@ -1,8 +1,10 @@
 package com.kapusniak.tomasz.service;
 
-import com.kapusniak.tomasz.entity.Courier;
-import com.kapusniak.tomasz.enums.CourierCompany;
-import com.kapusniak.tomasz.repository.CourierRepository;
+import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.mapstruct.CourierEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Courier;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
+import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +19,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 
 @SpringBootTest
@@ -27,11 +29,13 @@ import static org.mockito.Mockito.times;
 class CourierServiceTest {
 
     Courier courier = new Courier();
-
+    CourierEntity courierEntity = new CourierEntity();
     List<Courier> courierList = new ArrayList<>();
-
+    List<CourierEntity> courierEntityList = new ArrayList<>();
     @Mock
-    private CourierRepository courierRepository;
+    private CourierJpaRepository courierRepository;
+    @Mock
+    private CourierEntityMapper courierEntityMapper;
 
     @InjectMocks
     private CourierService courierService;
@@ -45,18 +49,42 @@ class CourierServiceTest {
 
         courierList.add(courier);
         courierList.add(courier);
+
+        courierEntity.setId(1L);
+        courierEntity.setCourierCompany(CourierCompany.DHL);
+        courierEntity.setFirstName("testFirstName");
+        courierEntity.setLastName("testLastName");
+
+        courierEntityList.add(courierEntity);
+        courierEntityList.add(courierEntity);
+
+        when(courierEntityMapper
+                .mapToEntity(any(Courier.class)))
+                .thenReturn(courierEntity);
+        when(courierEntityMapper
+                .mapToApiModel(any(CourierEntity.class)))
+                .thenReturn(courier);
     }
 
     @Test
     @DisplayName("should correctly save an Courier entity exactly once")
     void save() {
+
+        //given
+        when(courierRepository
+                .save(any(CourierEntity.class)))
+                .thenReturn(courierEntity);
+
         // when
-        courierService.save(courier);
+        Courier result = courierService.save(courier);
 
         // then
         then(courierRepository)
                 .should(times(1))
-                .save(courier);
+                .save(courierEntityMapper.mapToEntity(courier));
+
+        // verify
+        assertThat(courier).isEqualTo(result);
     }
 
     @Test
@@ -85,7 +113,7 @@ class CourierServiceTest {
 
         // given
         given(courierRepository.findAll())
-                .willReturn(courierList);
+                .willReturn(courierEntityList);
 
         // when
         List<Courier> allCouriers = courierService.findAll();
@@ -107,7 +135,7 @@ class CourierServiceTest {
         // given
         given(courierRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(courier));
+                .willReturn(Optional.of(courierEntity));
         Long courierId = 1L;
 
         // when
@@ -146,7 +174,7 @@ class CourierServiceTest {
         // given
         given(courierRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(courier));
+                .willReturn(Optional.of(courierEntity));
         Long courierId = 1L;
 
         // when
@@ -155,7 +183,7 @@ class CourierServiceTest {
         // then
         then(courierRepository)
                 .should(times(1))
-                .delete(courier);
+                .delete(courierEntity);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
-import com.kapusniak.tomasz.entity.Courier;
-import com.kapusniak.tomasz.enums.CourierCompany;
+import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class CourierRowMapperTest {
     void mapRow() throws SQLException {
 
         // when
-        Courier courier = courierRowMapper.mapRow(resultSet, 1);
+        CourierEntity courier = courierRowMapper.mapRow(resultSet, 1);
 
         // then
         assertNotNull(courier);

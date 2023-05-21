@@ -10,6 +10,9 @@
     </parent>
 
     <packaging>pom</packaging>
+    <properties>
+        <lombok.version>1.18.26</lombok.version>
+    </properties>
     <artifactId>bom</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>bom-module</name>
@@ -21,7 +24,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.26</version>
+                <version>${lombok.version}</version>
                 <scope>provided</scope>
             </dependency>
 
