@@ -1,8 +1,8 @@
 package com.kapusniak.tomasz.jdbc;
 
-import com.kapusniak.tomasz.entity.Courier;
-import com.kapusniak.tomasz.entity.Customer;
-import com.kapusniak.tomasz.entity.Order;
+import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.jdbc.mapper.CourierRowMapper;
 import com.kapusniak.tomasz.jdbc.mapper.CustomerRowMapper;
 import com.kapusniak.tomasz.jdbc.mapper.OrderRowMapper;
@@ -23,17 +23,17 @@ public class JdbcExamples {
     private final OrderRowMapper orderRowMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public List<Order> getOrderList() {
+    public List<OrderEntity> getOrderList() {
         String query = "SELECT * FROM ORDERS";
         return jdbcTemplate.query(query, orderRowMapper);
     }
 
-    public List<Order> getCustomerOrderList(Long customerId) {
+    public List<OrderEntity> getCustomerOrderList(Long customerId) {
         String query = "SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerId;
         return jdbcTemplate.query(query, orderRowMapper);
     }
 
-    public Order getOrderById(Long orderId) {
+    public OrderEntity getOrderById(Long orderId) {
         String query = "SELECT * FROM ORDERS WHERE ORDER_ID = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{orderId}, orderRowMapper);
     }
@@ -44,12 +44,12 @@ public class JdbcExamples {
                 firstName, lastName, email);
     }
 
-    public Customer getCustomerById(Long customerId) {
+    public CustomerEntity getCustomerById(Long customerId) {
         String query = "SELECT CUSTOMERS.* " +
                 "FROM CUSTOMERS " +
                 "WHERE CUSTOMER_ID = ?";
 
-        Customer customer = null;
+        CustomerEntity customer = null;
         try {
             customer = jdbcTemplate.
                     queryForObject(query, new Object[]{customerId}, customerRowMapper);
@@ -64,7 +64,7 @@ public class JdbcExamples {
         return customer;
     }
 
-    public Courier getCourierById(Long courierId) {
+    public CourierEntity getCourierById(Long courierId) {
         String query = "SELECT * FROM COURIERS WHERE COURIER_ID = ?";
 
         return jdbcTemplate.
@@ -72,11 +72,11 @@ public class JdbcExamples {
     }
 
 
-    public List<Customer> getCustomerList() {
+    public List<CustomerEntity> getCustomerList() {
         String query = "SELECT CUSTOMERS.* " +
                 "FROM CUSTOMERS";
 
-        List<Customer> customers = jdbcTemplate.query(query, customerRowMapper);
+        List<CustomerEntity> customers = jdbcTemplate.query(query, customerRowMapper);
         if (!customers.isEmpty()) {
             customers.forEach(
                     customer -> customer.setOrders(

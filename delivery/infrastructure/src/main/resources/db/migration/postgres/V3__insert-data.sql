@@ -27,3 +27,10 @@ VALUES (1, 'CREATED', 20.00, '2022-04-01 12:00:00', 1, 1),
        (3, 'IN_TRANSIT', 30.00, '2022-04-03 14:00:00', 4, 3),
        (4, 'IN_TRANSIT', 25.00, '2022-04-04 16:00:00', 2, 4),
        (5, 'DELIVERED', 25.00, '2022-04-04 18:00:00', 5, 5);
+
+INSERT INTO tracking (tracking_id, localization)
+VALUES (1, 'Location 1'),
+       (2, 'Location 2'),
+       (3, 'Location 3'),
+       (4, 'Location 4'),
+       (5, 'Location 5');

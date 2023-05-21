@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.database;
 
-import com.kapusniak.tomasz.entity.Order;
-import com.kapusniak.tomasz.repository.OrderRepository;
+import com.kapusniak.tomasz.entity.OrderEntity;
+import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -22,13 +22,13 @@ public class NPlusOneQueriesLoggingTest {
     private static final Logger logger =
             LoggerFactory.getLogger(NPlusOneQueriesLoggingTest.class);
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderJpaRepository orderRepository;
 
     @Test
     void logTest() {
         // Get all the orders from the database
         // -> Triggers 1 query
-        List<Order> orders = orderRepository.findAll();
+        List<OrderEntity> orders = orderRepository.findAll();
 
         orders.forEach(order -> logger.info(
                 order.getCustomer().getFirstName()
@@ -40,7 +40,7 @@ public class NPlusOneQueriesLoggingTest {
     @Test
     void nPlusOneQueriesDetection_isLoggingWhenDetectingNPlusOneQueries() {
         // Fetch the orders without the customers
-        List<Order> orders = orderRepository.findAll();
+        List<OrderEntity> orders = orderRepository.findAll();
 
         // Trigger N+1 queries
         List<String> names = orders.stream()
