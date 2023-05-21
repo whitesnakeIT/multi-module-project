@@ -16,14 +16,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <properties>
         <spring-hibernate-query-utils.version>1.0.3</spring-hibernate-query-utils.version>
-        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
         <delivery-delivery-domain.version>0.0.1-SNAPSHOT</delivery-delivery-domain.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <lombok.version>1.18.26</lombok.version>
-        <openapi-generator-maven-plugin.version>6.5.0</openapi-generator-maven-plugin.version>
-        <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
         <swagger-annotations.version>2.2.9</swagger-annotations.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
+        <open-api.version>0.0.1-SNAPSHOT</open-api.version>
     </properties>
 
     <dependencyManagement>
@@ -43,6 +41,12 @@
             <groupId>com.kapusniak.tomasz</groupId>
             <artifactId>delivery-delivery-domain</artifactId>
             <version>${delivery-delivery-domain.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.kapusniak.tomasz</groupId>
+            <artifactId>open-api</artifactId>
+            <version>${open-api.version}</version>
         </dependency>
 
         <dependency>
@@ -69,19 +73,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-
-        </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>io.springfox</groupId>-->
-        <!--            <artifactId>springfox-swagger2</artifactId>-->
-        <!--            <version>${springfox-swagger2.version}</version>-->
-        <!--        </dependency>-->
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-annotations.version}</version>
         </dependency>
 
         <dependency>
@@ -117,9 +108,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>${jackson-databind-nullable.version}</version>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
         </dependency>
 
         <dependency>
@@ -166,42 +157,6 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-generator-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>
-                                ${project.basedir}/src/main/resources/open-api.yaml
-                            </inputSpec>
-                            <!--                            <output>${project.build.directory}/classes/com/kapusniak/tomasz/openapi</output>-->
-                            <generatorName>spring</generatorName>
-                            <apiPackage>com.kapusniak.tomasz.openapi.api</apiPackage>
-                            <modelPackage>com.kapusniak.tomasz.openapi.model</modelPackage>
-                            <supportingFilesToGenerate>
-                                ApiUtil.java
-                            </supportingFilesToGenerate>
-                            <!--                            <library>spring-boot</library>-->
-                            <configOptions>
-                                <!--                                <delegatePattern>true</delegatePattern>-->
-                                <useSpringBoot3>true</useSpringBoot3>
-                                <interfaceOnly>true</interfaceOnly>
-                                <additional-properties>lombok=true</additional-properties>
-                                <useSpringController>true</useSpringController>
-                                <oneOfTyp>true</oneOfTyp>
-                            </configOptions>
-                            <!--                            <typeMappings>-->
-                            <!--                                OffsetDateTime: 'java.time.LocalDateTime'-->
-                            <!--                            </typeMappings>-->
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
