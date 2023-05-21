@@ -1,6 +1,8 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.DeliveryEntity;
+import com.kapusniak.tomasz.mapstruct.DeliveryEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,46 +16,59 @@ public class DeliveryService {
 
     private final DeliveryJpaRepository deliveryRepository;
 
-    public DeliveryEntity save(DeliveryEntity delivery) {
+    private final DeliveryEntityMapper deliveryEntityMapper;
+
+    public Delivery save(Delivery delivery) {
         if (delivery == null) {
             throw new RuntimeException("Saving delivery failed. Delivery is null.");
         }
-        return deliveryRepository.save(delivery);
+        DeliveryEntity deliveryEntity = deliveryEntityMapper.mapToEntity(delivery);
+        DeliveryEntity savedEntity = deliveryRepository.save(deliveryEntity);
+
+        return deliveryEntityMapper.mapToApiModel(savedEntity);
     }
 
-    public List<DeliveryEntity> findAll() {
-        return deliveryRepository.findAll();
+    public List<Delivery> findAll() {
+        return deliveryRepository
+                .findAll()
+                .stream()
+                .map(deliveryEntityMapper::mapToApiModel)
+                .toList();
     }
 
-    public DeliveryEntity findById(Long deliveryId) {
+    public Delivery findById(Long deliveryId) {
         if (deliveryId == null) {
             throw new RuntimeException("Searching for delivery failed. Delivery id is null.");
         }
-        return deliveryRepository.findById(deliveryId)
-                .orElseThrow(RuntimeException::new);
+        return deliveryEntityMapper.mapToApiModel(deliveryRepository.findById(deliveryId)
+                .orElseThrow(RuntimeException::new));
     }
 
     public void delete(Long deliveryId) {
         if (deliveryId == null) {
             throw new RuntimeException("Deleting delivery failed. Delivery id is null.");
         }
-        DeliveryEntity delivery = findById(deliveryId);
-        deliveryRepository.delete(delivery);
+        Delivery delivery = findById(deliveryId);
+
+        deliveryRepository.delete(deliveryEntityMapper.mapToEntity(delivery));
     }
 
-    public DeliveryEntity update(Long id, DeliveryEntity delivery) {
+    public Delivery update(Long id, Delivery delivery) {
         if (id == null) {
-            throw new RuntimeException("Updating delivery failed. Delivery id is null.");
+            throw new RuntimeException("Updati ng delivery failed. Delivery id is null.");
         }
         if (delivery == null) {
             throw new RuntimeException("Updating delivery failed. Delivery is null.");
         }
 
-        DeliveryEntity deliveryFromDb = findById(id);
-        deliveryFromDb.setPrice(delivery.getPrice());
-        deliveryFromDb.setDeliveryStatus(delivery.getDeliveryStatus());
-        deliveryFromDb.setDeliveryTime(delivery.getDeliveryTime());
+        Delivery deliveryFromDb = findById(id);
 
-        return deliveryRepository.save(deliveryFromDb);
+        // update
+
+        DeliveryEntity updatedDelivery = deliveryRepository
+                .save(deliveryEntityMapper.mapToEntity(deliveryFromDb));
+
+        return deliveryEntityMapper.mapToApiModel(updatedDelivery);
     }
+
 }

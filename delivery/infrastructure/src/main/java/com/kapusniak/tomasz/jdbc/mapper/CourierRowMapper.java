@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
-import com.kapusniak.tomasz.enums.CourierCompany;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

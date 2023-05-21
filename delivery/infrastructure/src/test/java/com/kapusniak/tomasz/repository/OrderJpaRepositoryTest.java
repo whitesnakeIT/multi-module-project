@@ -1,8 +1,8 @@
 package com.kapusniak.tomasz.repository;
 
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.enums.PackageSize;
-import com.kapusniak.tomasz.enums.PackageType;
+import com.kapusniak.tomasz.openapi.model.PackageSize;
+import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import org.junit.jupiter.api.DisplayName;

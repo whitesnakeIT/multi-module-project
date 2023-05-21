@@ -1,6 +1,8 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.mapstruct.CustomerEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,48 +16,59 @@ public class CustomerService {
 
     private final CustomerJpaRepository customerRepository;
 
-    public CustomerEntity save(CustomerEntity customer) {
+    private final CustomerEntityMapper customerEntityMapper;
+
+    public Customer save(Customer customer) {
         if (customer == null) {
             throw new RuntimeException("Saving customer failed. Customer is null.");
         }
-        return customerRepository.save(customer);
+        CustomerEntity customerEntity = customerEntityMapper.mapToEntity(customer);
+        CustomerEntity savedEntity = customerRepository.save(customerEntity);
+
+        return customerEntityMapper.mapToApiModel(savedEntity);
     }
 
-    public List<CustomerEntity> findAll() {
-        return customerRepository.findAll();
+    public List<Customer> findAll() {
+        return customerRepository
+                .findAll()
+                .stream()
+                .map(customerEntityMapper::mapToApiModel)
+                .toList();
     }
 
-    public CustomerEntity findById(Long customerId) {
+    public Customer findById(Long customerId) {
         if (customerId == null) {
             throw new RuntimeException("Searching for customer failed. Customer id is null.");
         }
-        return customerRepository.findById(customerId)
-                .orElseThrow(RuntimeException::new);
+        return customerEntityMapper.mapToApiModel(customerRepository.findById(customerId)
+                .orElseThrow(RuntimeException::new));
     }
 
     public void delete(Long customerId) {
         if (customerId == null) {
             throw new RuntimeException("Deleting customer failed. Customer id is null.");
         }
-        CustomerEntity customer = findById(customerId);
-        customerRepository.delete(customer);
+        Customer customer = findById(customerId);
+
+        customerRepository.delete(customerEntityMapper.mapToEntity(customer));
     }
 
-    public CustomerEntity update(Long id, CustomerEntity customer) {
+    public Customer update(Long id, Customer customer) {
         if (id == null) {
-            throw new RuntimeException("Updating customer failed. Customer id is null.");
+            throw new RuntimeException("Updati ng customer failed. Customer id is null.");
         }
         if (customer == null) {
             throw new RuntimeException("Updating customer failed. Customer is null.");
         }
 
-        CustomerEntity customerFromDb = findById(id);
-        customerFromDb.setEmail(customer.getEmail());
-        customerFromDb.setFirstName(customer.getFirstName());
-        customerFromDb.setLastName(customer.getLastName());
+        Customer customerFromDb = findById(id);
 
-        return customerRepository.save(customerFromDb);
+        // update 
+
+        CustomerEntity updatedCustomer = customerRepository
+                .save(customerEntityMapper.mapToEntity(customerFromDb));
+
+        return customerEntityMapper.mapToApiModel(updatedCustomer);
     }
-
 
 }

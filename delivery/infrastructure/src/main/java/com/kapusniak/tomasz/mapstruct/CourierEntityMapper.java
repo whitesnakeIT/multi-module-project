@@ -1,12 +1,15 @@
 package com.kapusniak.tomasz.mapstruct;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
-import com.kapusniak.tomasz.model.Courier;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = DeliveryEntityMapper.class)
 public interface CourierEntityMapper {
-    CourierEntity mapToEntity(Courier courier);
+//    CourierEntity mapToEntity(Courier courier);
 
-    Courier mapToModel(CourierEntity courierEntity);
+    CourierEntity mapToEntity(com.kapusniak.tomasz.openapi.model.Courier courier);
+
+//    Courier mapToModel(CourierEntity courierEntity);
+
+    com.kapusniak.tomasz.openapi.model.Courier mapToApiModel(CourierEntity courierEntity);
 }

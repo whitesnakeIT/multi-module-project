@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kapusniak.tomasz.enums.DeliveryStatus;
+import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

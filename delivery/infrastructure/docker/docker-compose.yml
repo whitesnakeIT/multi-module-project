@@ -5,14 +5,14 @@ services:
     depends_on:
       - db
     container_name: myapp
-    image: delivery-delivery-application:1.0.0
+    image: delivery-delivery-infrastructure:1.0.0
     expose:
       - "8080"
     ports:
       - "8080:8080"
     build:
-      context: ../../application
-      dockerfile: docker/delivery-delivery-application/Dockerfile
+      context: ../../infrastructure
+      dockerfile: docker/delivery-delivery-infrastructure/Dockerfile
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://mydb:5432/postgres
       - SPRING_DATASOURCE_USERNAME=tomasz

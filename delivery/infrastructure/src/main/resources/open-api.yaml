@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.11
 info:
   title: API for Delivery Application
   description: This API provides functionality for managing customers, couriers, orders, tracking and deliveries
@@ -39,7 +39,7 @@ paths:
   /customers/{id}:
     get:
       summary: Get a customer by ID
-      operationId: getCustomerById
+      operationId: getCustomer
       parameters:
         - name: id
           in: path
@@ -47,6 +47,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         "200":
           description: Customer found
@@ -66,6 +67,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         description: Customer object that needs to be updated
         required: true
@@ -92,6 +94,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         "204":
           description: Customer deleted successfully
@@ -483,6 +486,8 @@ components:
           type: string
         lastName:
           type: string
+        email:
+          type: string
         orders:
           type: array
           items:
@@ -501,8 +506,8 @@ components:
         deliveryTime:
           type: string
           format: date-time
-        courier:
-          $ref: '#/components/schemas/Courier'
+        #        courier:
+        #          $ref: '#/components/schemas/Courier'
         order:
           $ref: '#/components/schemas/Order'
     Order:
@@ -522,8 +527,8 @@ components:
         preferredDeliveryDate:
           type: string
           format: date
-        customer:
-          $ref: '#/components/schemas/Customer'
+    #        customer:
+    #          $ref: '#/components/schemas/Customer'
     Tracking:
       type: object
       properties:

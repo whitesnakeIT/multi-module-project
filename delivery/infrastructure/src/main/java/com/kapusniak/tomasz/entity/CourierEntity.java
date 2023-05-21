@@ -1,6 +1,6 @@
 package com.kapusniak.tomasz.entity;
 
-import com.kapusniak.tomasz.enums.CourierCompany;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

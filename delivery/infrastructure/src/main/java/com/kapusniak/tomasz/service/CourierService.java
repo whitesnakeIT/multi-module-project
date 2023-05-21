@@ -1,6 +1,8 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.mapstruct.CourierEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,46 +16,59 @@ public class CourierService {
 
     private final CourierJpaRepository courierRepository;
 
-    public CourierEntity save(CourierEntity courier) {
+    private final CourierEntityMapper courierEntityMapper;
+
+    public Courier save(Courier courier) {
         if (courier == null) {
             throw new RuntimeException("Saving courier failed. Courier is null.");
         }
-        return courierRepository.save(courier);
+        CourierEntity courierEntity = courierEntityMapper.mapToEntity(courier);
+        CourierEntity savedEntity = courierRepository.save(courierEntity);
+
+        return courierEntityMapper.mapToApiModel(savedEntity);
     }
 
-    public List<CourierEntity> findAll() {
-        return courierRepository.findAll();
+    public List<Courier> findAll() {
+        return courierRepository
+                .findAll()
+                .stream()
+                .map(courierEntityMapper::mapToApiModel)
+                .toList();
     }
 
-    public CourierEntity findById(Long courierId) {
+    public Courier findById(Long courierId) {
         if (courierId == null) {
             throw new RuntimeException("Searching for courier failed. Courier id is null.");
         }
-        return courierRepository.findById(courierId)
-                .orElseThrow(RuntimeException::new);
+        return courierEntityMapper.mapToApiModel(courierRepository.findById(courierId)
+                .orElseThrow(RuntimeException::new));
     }
 
     public void delete(Long courierId) {
         if (courierId == null) {
             throw new RuntimeException("Deleting courier failed. Courier id is null.");
         }
-        CourierEntity courier = findById(courierId);
-        courierRepository.delete(courier);
+        Courier courier = findById(courierId);
+
+        courierRepository.delete(courierEntityMapper.mapToEntity(courier));
     }
 
-    public CourierEntity update(Long id, CourierEntity courier) {
+    public Courier update(Long id, Courier courier) {
         if (id == null) {
-            throw new RuntimeException("Updating courier failed. Courier id is null.");
+            throw new RuntimeException("Updati ng courier failed. Courier id is null.");
         }
         if (courier == null) {
             throw new RuntimeException("Updating courier failed. Courier is null.");
         }
 
-        CourierEntity courierFromDb = findById(id);
-        courierFromDb.setFirstName(courier.getFirstName());
-        courierFromDb.setLastName(courier.getLastName());
+        Courier courierFromDb = findById(id);
 
-        return courierRepository.save(courierFromDb);
+        // update
+
+        CourierEntity updatedCourier = courierRepository
+                .save(courierEntityMapper.mapToEntity(courierFromDb));
+
+        return courierEntityMapper.mapToApiModel(updatedCourier);
     }
 
 }

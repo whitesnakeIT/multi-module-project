@@ -1,8 +1,8 @@
 package com.kapusniak.tomasz.jdbc.mapper;
 
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.enums.PackageSize;
-import com.kapusniak.tomasz.enums.PackageType;
+import com.kapusniak.tomasz.openapi.model.PackageSize;
+import com.kapusniak.tomasz.openapi.model.PackageType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

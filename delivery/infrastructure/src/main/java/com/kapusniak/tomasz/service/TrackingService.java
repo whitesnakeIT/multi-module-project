@@ -1,6 +1,8 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.TrackingEntity;
+import com.kapusniak.tomasz.mapstruct.TrackingEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,47 +14,61 @@ import java.util.List;
 //@Transactional
 public class TrackingService {
 
-
     private final TrackingJpaRepository trackingRepository;
 
-    public TrackingEntity save(TrackingEntity tracking) {
+    private final TrackingEntityMapper trackingEntityMapper;
+
+    public Tracking save(Tracking tracking) {
         if (tracking == null) {
             throw new RuntimeException("Saving tracking failed. Tracking is null.");
         }
-        return trackingRepository.save(tracking);
+        TrackingEntity trackingEntity = trackingEntityMapper.mapToEntity(tracking);
+        TrackingEntity savedEntity = trackingRepository.save(trackingEntity);
+
+        return trackingEntityMapper.mapToApiModel(savedEntity);
     }
 
-    public List<TrackingEntity> findAll() {
-        return trackingRepository.findAll();
+    public List<Tracking> findAll() {
+        return trackingRepository
+                .findAll()
+                .stream()
+                .map(trackingEntityMapper::mapToApiModel)
+                .toList();
     }
 
-    public TrackingEntity findById(Long trackingId) {
+    public Tracking findById(Long trackingId) {
         if (trackingId == null) {
             throw new RuntimeException("Searching for tracking failed. Tracking id is null.");
         }
-        return trackingRepository.findById(trackingId)
-                .orElseThrow(RuntimeException::new);
+        return trackingEntityMapper.mapToApiModel(trackingRepository.findById(trackingId)
+                .orElseThrow(RuntimeException::new));
     }
 
     public void delete(Long trackingId) {
         if (trackingId == null) {
             throw new RuntimeException("Deleting tracking failed. Tracking id is null.");
         }
-        TrackingEntity tracking = findById(trackingId);
-        trackingRepository.delete(tracking);
+        Tracking tracking = findById(trackingId);
+
+        trackingRepository.delete(trackingEntityMapper.mapToEntity(tracking));
     }
 
-    public TrackingEntity update(Long id, TrackingEntity tracking) {
+    public Tracking update(Long id, Tracking tracking) {
         if (id == null) {
-            throw new RuntimeException("Updating tracking failed. Tracking id is null.");
+            throw new RuntimeException("Updati ng tracking failed. Tracking id is null.");
         }
         if (tracking == null) {
             throw new RuntimeException("Updating tracking failed. Tracking is null.");
         }
 
-        TrackingEntity trackingFromDb = findById(id);
-        trackingFromDb.setLocalization(tracking.getLocalization());
+        Tracking trackingFromDb = findById(id);
 
-        return trackingRepository.save(trackingFromDb);
+        // update
+
+        TrackingEntity updatedTracking = trackingRepository
+                .save(trackingEntityMapper.mapToEntity(trackingFromDb));
+
+        return trackingEntityMapper.mapToApiModel(updatedTracking);
     }
+
 }

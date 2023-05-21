@@ -1,6 +1,8 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.mapstruct.CustomerEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,21 +18,28 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
 class CustomerServiceTest {
-    CustomerEntity customer = new CustomerEntity();
 
-    List<CustomerEntity> customerList = new ArrayList<>();
+    Customer customer = new Customer();
+    CustomerEntity customerEntity = new CustomerEntity();
+
+    List<Customer> customerList = new ArrayList<>();
+    List<CustomerEntity> customerEntityList = new ArrayList<>();
 
     @Mock
     private CustomerJpaRepository customerRepository;
 
+    @Mock
+    private CustomerEntityMapper customerEntityMapper;
     @InjectMocks
     private CustomerService customerService;
 
@@ -43,18 +52,42 @@ class CustomerServiceTest {
 
         customerList.add(customer);
         customerList.add(customer);
+
+        customerEntity.setId(1L);
+        customerEntity.setEmail("testEmail");
+        customerEntity.setFirstName("testFirstName");
+        customerEntity.setLastName("testLastName");
+
+        customerEntityList.add(customerEntity);
+        customerEntityList.add(customerEntity);
+
+        when(customerEntityMapper
+                .mapToEntity(any(Customer.class)))
+                .thenReturn(customerEntity);
+        when(customerEntityMapper
+                .mapToApiModel(any(CustomerEntity.class)))
+                .thenReturn(customer);
     }
 
     @Test
     @DisplayName("should correctly save an Customer entity exactly once")
     void save() {
+
+        //given
+        when(customerRepository
+                .save(any(CustomerEntity.class)))
+                .thenReturn(customerEntity);
+
         // when
-        customerService.save(customer);
+        Customer result = customerService.save(customer);
 
         // then
         then(customerRepository)
                 .should(times(1))
-                .save(customer);
+                .save(customerEntityMapper.mapToEntity(customer));
+
+        // verify
+        assertThat(customer).isEqualTo(result);
     }
 
     @Test
@@ -83,10 +116,10 @@ class CustomerServiceTest {
 
         // given
         given(customerRepository.findAll())
-                .willReturn(customerList);
+                .willReturn(customerEntityList);
 
         // when
-        List<CustomerEntity> allCustomers = customerService.findAll();
+        List<Customer> allCustomers = customerService.findAll();
 
         // then
         assertThat(allCustomers.size())
@@ -105,11 +138,11 @@ class CustomerServiceTest {
         // given
         given(customerRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(customer));
+                .willReturn(Optional.of(customerEntity));
         Long customerId = 1L;
 
         // when
-        CustomerEntity customerById = customerService.findById(customerId);
+        Customer customerById = customerService.findById(customerId);
 
         // then
         assertThat(customerById.getId())
@@ -144,7 +177,7 @@ class CustomerServiceTest {
         // given
         given(customerRepository.findById(
                 anyLong()))
-                .willReturn(Optional.of(customer));
+                .willReturn(Optional.of(customerEntity));
         Long customerId = 1L;
 
         // when
@@ -153,7 +186,7 @@ class CustomerServiceTest {
         // then
         then(customerRepository)
                 .should(times(1))
-                .delete(customer);
+                .delete(customerEntityMapper.mapToEntity(customer));
     }
 
     @Test

@@ -1,86 +1,108 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.enums.PackageSize;
-import com.kapusniak.tomasz.enums.PackageType;
+import com.kapusniak.tomasz.mapstruct.OrderEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Order;
+import com.kapusniak.tomasz.openapi.model.PackageSize;
+import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 //@Transactional
 public class OrderService {
 
     private final OrderJpaRepository orderRepository;
 
-    public OrderEntity save(OrderEntity order) {
+    private final OrderEntityMapper orderEntityMapper;
+
+    public Order save(Order order) {
         if (order == null) {
             throw new RuntimeException("Saving order failed. Order is null.");
         }
-        return orderRepository.save(order);
+        OrderEntity orderEntity = orderEntityMapper.mapToEntity(order);
+        OrderEntity savedEntity = orderRepository.save(orderEntity);
+
+        return orderEntityMapper.mapToApiModel(savedEntity);
     }
 
-    public List<OrderEntity> findAll() {
-        return orderRepository.findAll();
+    public List<Order> findAll() {
+        return orderRepository
+                .findAll()
+                .stream()
+                .map(orderEntityMapper::mapToApiModel)
+                .toList();
     }
 
-    public List<OrderEntity> findAllByCustomerId(Long customerId) {
-        if (customerId == null) {
-            throw new RuntimeException("Searching for customer orders failed. Customer id is null.");
-        }
-        return orderRepository.findAllByCustomerId(customerId);
-    }
-
-    public OrderEntity findById(Long orderId) {
+    public Order findById(Long orderId) {
         if (orderId == null) {
             throw new RuntimeException("Searching for order failed. Order id is null.");
         }
-        return orderRepository
-                .findById(orderId)
-                .orElseThrow(RuntimeException::new);
-    }
-
-    public List<OrderEntity> findByPackageType(PackageType packageType) {
-        if (packageType == null) {
-            throw new RuntimeException("Searching for order failed. Package type is null.");
-        }
-        return orderRepository.findByPackageType(packageType);
-    }
-
-    public List<OrderEntity> findByPackageSize(PackageSize packageSize) {
-        if (packageSize == null) {
-            throw new RuntimeException("Searching for order failed. Package size is null.");
-        }
-        return orderRepository.findByPackageSize(packageSize);
+        return orderEntityMapper.mapToApiModel(orderRepository.findById(orderId)
+                .orElseThrow(RuntimeException::new));
     }
 
     public void delete(Long orderId) {
         if (orderId == null) {
             throw new RuntimeException("Deleting order failed. Order id is null.");
         }
-        OrderEntity order = findById(orderId);
-        orderRepository.delete(order);
+        Order order = findById(orderId);
+
+        orderRepository.delete(orderEntityMapper.mapToEntity(order));
     }
 
-    public OrderEntity update(Long id, OrderEntity order) {
+    public Order update(Long id, Order order) {
         if (id == null) {
-            throw new RuntimeException("Updating order failed. Order id is null.");
+            throw new RuntimeException("Updati ng order failed. Order id is null.");
         }
         if (order == null) {
             throw new RuntimeException("Updating order failed. Order is null.");
         }
 
-        OrderEntity orderFromDb = findById(id);
-        orderFromDb.setSenderAddress(order.getSenderAddress());
-        orderFromDb.setReceiverAddress(order.getReceiverAddress());
-        orderFromDb.setPackageType(order.getPackageType());
-        orderFromDb.setPackageSize(order.getPackageSize());
+        Order orderFromDb = findById(id);
 
-        return orderRepository.save(orderFromDb);
+        // update
+
+        OrderEntity updatedOrder = orderRepository
+                .save(orderEntityMapper.mapToEntity(orderFromDb));
+
+        return orderEntityMapper.mapToApiModel(updatedOrder);
     }
 
+    public List<Order> findByPackageType(PackageType packageType) {
+        if (packageType == null) {
+            throw new RuntimeException("Searching for order failed. Package type is null.");
+        }
+
+        return orderRepository
+                .findByPackageType(packageType)
+                .stream().map(orderEntityMapper::mapToApiModel)
+                .toList();
+    }
+
+    public List<Order> findByPackageSize(PackageSize packageSize) {
+        if (packageSize == null) {
+            throw new RuntimeException("Searching for order failed. Package size is null.");
+        }
+
+        return orderRepository
+                .findByPackageSize(packageSize)
+                .stream().map(orderEntityMapper::mapToApiModel)
+                .toList();
+    }
+
+    public List<Order> findAllByCustomerId(Long customerId) {
+        if (customerId == null) {
+            throw new RuntimeException("Searching for customer orders failed. Customer id is null.");
+        }
+
+        return orderRepository
+                .findAllByCustomerId(customerId)
+                .stream().map(orderEntityMapper::mapToApiModel)
+                .toList();
+    }
 }
-    
