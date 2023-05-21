@@ -35,7 +35,6 @@ public class NPlusOneQueriesLoggingTest {
                         + " packaging type: "
                         + order.getPackageType()));
 
-
     }
 
     @Test

@@ -1,3 +1,3 @@
 # d3vshub-starter
 
-multi-module-project-training
+Delivery multi module application
