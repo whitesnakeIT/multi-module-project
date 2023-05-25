@@ -5,11 +5,12 @@ import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
-//@Transactional
+@Transactional(readOnly = true)
 public interface OrderJpaRepository extends JpaRepository<OrderEntity, Long> {
 
     List<OrderEntity> findByPackageType(PackageType packageType);

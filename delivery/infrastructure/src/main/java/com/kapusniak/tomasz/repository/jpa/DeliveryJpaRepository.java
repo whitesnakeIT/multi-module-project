@@ -3,8 +3,9 @@ package com.kapusniak.tomasz.repository.jpa;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-//@Transactional
+@Transactional(readOnly = true)
 public interface DeliveryJpaRepository extends JpaRepository<DeliveryEntity, Long> {
 }

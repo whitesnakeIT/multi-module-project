@@ -1,6 +1,5 @@
 package com.kapusniak.tomasz.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import jakarta.persistence.*;
@@ -42,7 +41,7 @@ public class OrderEntity {
     @Column(name = "preferred_delivery_date")
     private LocalDate preferredDeliveryDate;
 
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "customer_id")

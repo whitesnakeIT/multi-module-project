@@ -6,12 +6,13 @@ import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-//@Transactional
+@Transactional(readOnly = true)
 public class CourierService {
 
     private final CourierJpaRepository courierRepository;
