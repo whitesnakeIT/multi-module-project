@@ -3,26 +3,27 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.service.CourierService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class CourierControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -106,7 +107,7 @@ public class CourierControllerTest {
         // given
         Courier courier = getCourier();
         when(courierService
-                .save(ArgumentMatchers.any(Courier.class)))
+                .save(any(Courier.class)))
                 .thenReturn(getCourier());
 
         // when
@@ -121,18 +122,17 @@ public class CourierControllerTest {
         // then
         verify(courierService,
                 times(1))
-                .save(ArgumentMatchers.any(Courier.class));
+                .save(any(Courier.class));
         verifyNoMoreInteractions(courierService);
     }
 
     @Test
-    @Disabled
     @DisplayName("should return updated courier")
     public void updateCourier() throws Exception {
         // given
         Courier courier = getCourier();
-        when(courierService.update(ArgumentMatchers.eq(1L),
-                ArgumentMatchers.any(Courier.class))).thenReturn(courier);
+        when(courierService.update(anyLong(),
+                any(Courier.class))).thenReturn(courier);
 
         // when
         mockMvc.perform(put("/api/v1/couriers/1")
@@ -146,7 +146,7 @@ public class CourierControllerTest {
         // then
         verify(courierService,
                 times(1))
-                .update(ArgumentMatchers.eq(1L), ArgumentMatchers.any(Courier.class));
+                .update(eq(1L), any(Courier.class));
         verifyNoMoreInteractions(courierService);
     }
 

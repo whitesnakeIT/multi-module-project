@@ -3,26 +3,27 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.service.OrderService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class OrderControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -60,7 +61,7 @@ public class OrderControllerTest {
     public void getAllOrders() throws Exception {
         // given
         List<Order> orders = getOrderList();
-        Mockito.when(orderService.findAll()).thenReturn(orders);
+        when(orderService.findAll()).thenReturn(orders);
 
         // when
         mockMvc.perform(get("/api/v1/orders"))
@@ -72,10 +73,10 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$[1].senderAddress").value("testSenderAddress2"));
 
         // then
-        Mockito.verify(orderService,
-                        Mockito.times(1))
+        verify(orderService,
+                times(1))
                 .findAll();
-        Mockito.verifyNoMoreInteractions(orderService);
+        verifyNoMoreInteractions(orderService);
     }
 
     @Test
@@ -83,7 +84,7 @@ public class OrderControllerTest {
     public void getOrderById() throws Exception {
         // given
         Order order = getOrder();
-        Mockito.when(orderService.findById(1L)).thenReturn(order);
+        when(orderService.findById(1L)).thenReturn(order);
 
         // when
         mockMvc.perform(get("/api/v1/orders/1"))
@@ -93,10 +94,10 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.senderAddress").value("testSenderAddress1"));
 
         // then
-        Mockito.verify(orderService,
-                        Mockito.times(1))
+        verify(orderService,
+                times(1))
                 .findById(1L);
-        Mockito.verifyNoMoreInteractions(orderService);
+        verifyNoMoreInteractions(orderService);
     }
 
     @Test
@@ -104,8 +105,8 @@ public class OrderControllerTest {
     public void createOrder() throws Exception {
         // given
         Order order = getOrder();
-        Mockito.when(orderService
-                        .save(ArgumentMatchers.any(Order.class)))
+        when(orderService
+                .save(any(Order.class)))
                 .thenReturn(getOrder());
 
         // when
@@ -118,20 +119,19 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.senderAddress").value("testSenderAddress1"));
 
         // then
-        Mockito.verify(orderService,
-                        Mockito.times(1))
-                .save(ArgumentMatchers.any(Order.class));
-        Mockito.verifyNoMoreInteractions(orderService);
+        verify(orderService,
+                times(1))
+                .save(any(Order.class));
+        verifyNoMoreInteractions(orderService);
     }
 
     @Test
-    @Disabled
     @DisplayName("should return updated order")
     public void updateOrder() throws Exception {
         // given
         Order order = getOrder();
-        Mockito.when(orderService.update(ArgumentMatchers.eq(1L),
-                        ArgumentMatchers.any(Order.class)))
+        when(orderService.update(anyLong(),
+                any(Order.class)))
                 .thenReturn(order);
 
         // when
@@ -144,10 +144,10 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.senderAddress").value("testSenderAddress1"));
 
         // then
-        Mockito.verify(orderService,
-                        Mockito.times(1))
-                .update(ArgumentMatchers.eq(1L), ArgumentMatchers.any(Order.class));
-        Mockito.verifyNoMoreInteractions(orderService);
+        verify(orderService,
+                times(1))
+                .update(eq(1L), any(Order.class));
+        verifyNoMoreInteractions(orderService);
     }
 
     @Test
@@ -158,9 +158,9 @@ public class OrderControllerTest {
                 .andExpect(status().isNoContent());
 
         // then
-        Mockito.verify(orderService,
-                        Mockito.times(1))
+        verify(orderService,
+                times(1))
                 .delete(1L);
-        Mockito.verifyNoMoreInteractions(orderService);
+        verifyNoMoreInteractions(orderService);
     }
 }

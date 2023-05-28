@@ -3,26 +3,27 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.service.CustomerService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class CustomerControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -107,7 +108,7 @@ public class CustomerControllerTest {
         // given
         Customer customer = getCustomer();
         when(customerService
-                .save(ArgumentMatchers.any(Customer.class)))
+                .save(any(Customer.class)))
                 .thenReturn(getCustomer());
 
         // when
@@ -122,18 +123,17 @@ public class CustomerControllerTest {
         // then
         verify(customerService,
                 times(1))
-                .save(ArgumentMatchers.any(Customer.class));
+                .save(any(Customer.class));
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
-    @Disabled
     @DisplayName("should return updated customer")
     public void updateCustomer() throws Exception {
         // given
         Customer customer = getCustomer();
-        when(customerService.update(ArgumentMatchers.eq(1L),
-                ArgumentMatchers.any(Customer.class)))
+        when(customerService.update(anyLong(),
+                any(Customer.class)))
                 .thenReturn(customer);
 
         // when
@@ -148,7 +148,7 @@ public class CustomerControllerTest {
         // then
         verify(customerService,
                 times(1))
-                .update(ArgumentMatchers.eq(1L), ArgumentMatchers.any(Customer.class));
+                .update(eq(1L), any(Customer.class));
         verifyNoMoreInteractions(customerService);
     }
 

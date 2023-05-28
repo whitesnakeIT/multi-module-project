@@ -3,8 +3,10 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.openapi.api.OrdersApi;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +21,14 @@ public class OrderController implements OrdersApi {
     private final OrderService orderService;
 
     @Override
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+    public ResponseEntity<Order> createOrder(@RequestBody @Valid Order order) {
         Order save = orderService.save(order);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteOrder(Long orderId) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable("id") Long orderId) {
         orderService.delete(orderId);
 
         return ResponseEntity
@@ -42,13 +44,16 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<Order> getOrder(Long orderId) {
+    public ResponseEntity<Order> getOrder(@PathVariable("id") Long orderId) {
         Order order = orderService.findById(orderId);
+
         return ResponseEntity.ok(order);
     }
 
     @Override
-    public ResponseEntity<Order> updateOrder(Long id, Order order) {
-        return null;
+    public ResponseEntity<Order> updateOrder(@PathVariable("id") Long orderId, @RequestBody @Valid Order order) {
+        Order update = orderService.update(orderId, order);
+
+        return ResponseEntity.ok(update);
     }
 }

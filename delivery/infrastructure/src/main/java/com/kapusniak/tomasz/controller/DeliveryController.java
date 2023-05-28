@@ -3,8 +3,10 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.openapi.api.DeliveriesApi;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.service.DeliveryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +21,14 @@ public class DeliveryController implements DeliveriesApi {
     private final DeliveryService deliveryService;
 
     @Override
-    public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery delivery) {
+    public ResponseEntity<Delivery> createDelivery(@RequestBody @Valid Delivery delivery) {
         Delivery save = deliveryService.save(delivery);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteDelivery(Long deliveryId) {
+    public ResponseEntity<Void> deleteDelivery(@PathVariable("id") Long deliveryId) {
         deliveryService.delete(deliveryId);
 
         return ResponseEntity
@@ -42,13 +44,16 @@ public class DeliveryController implements DeliveriesApi {
     }
 
     @Override
-    public ResponseEntity<Delivery> getDelivery(Long deliveryId) {
+    public ResponseEntity<Delivery> getDelivery(@PathVariable("id") Long deliveryId) {
         Delivery delivery = deliveryService.findById(deliveryId);
+
         return ResponseEntity.ok(delivery);
     }
 
     @Override
-    public ResponseEntity<Delivery> updateDelivery(Long id, Delivery delivery) {
-        return null;
+    public ResponseEntity<Delivery> updateDelivery(@PathVariable("id") Long deliveryId, @RequestBody @Valid Delivery delivery) {
+        Delivery update = deliveryService.update(deliveryId, delivery);
+
+        return ResponseEntity.ok(update);
     }
 }

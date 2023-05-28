@@ -56,7 +56,7 @@ public class TrackingService {
 
     public Tracking update(Long id, Tracking tracking) {
         if (id == null) {
-            throw new RuntimeException("Updati ng tracking failed. Tracking id is null.");
+            throw new RuntimeException("Updating tracking failed. Tracking id is null.");
         }
         if (tracking == null) {
             throw new RuntimeException("Updating tracking failed. Tracking is null.");
@@ -64,12 +64,21 @@ public class TrackingService {
 
         Tracking trackingFromDb = findById(id);
 
-        // update
+        Tracking updatedTracking = updateFields(trackingFromDb, tracking);
 
-        TrackingEntity updatedTracking = trackingRepository
-                .save(trackingEntityMapper.mapToEntity(trackingFromDb));
+        TrackingEntity updatedTrackingEntity = trackingRepository
+                .save(trackingEntityMapper.mapToEntity(updatedTracking));
 
-        return trackingEntityMapper.mapToApiModel(updatedTracking);
+        return trackingEntityMapper.mapToApiModel(updatedTrackingEntity);
     }
 
+    private Tracking updateFields(Tracking trackingFromDb, Tracking newTracking) {
+        if (newTracking.getId() == null) {
+            newTracking.setId(trackingFromDb.getId());
+        }
+        if (!newTracking.getId().equals(trackingFromDb.getId())) {
+            throw new RuntimeException("Updating tracking fields failed. Different id's");
+        }
+        return newTracking;
+    }
 }
