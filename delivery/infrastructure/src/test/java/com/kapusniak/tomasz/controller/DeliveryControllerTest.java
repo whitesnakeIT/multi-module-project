@@ -3,15 +3,14 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.service.DeliveryService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -19,12 +18,14 @@ import java.util.List;
 
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.CREATED;
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.DELIVERED;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class DeliveryControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -107,7 +108,7 @@ public class DeliveryControllerTest {
         // given
         Delivery delivery = getDelivery();
         when(deliveryService
-                .save(ArgumentMatchers.any(Delivery.class)))
+                .save(any(Delivery.class)))
                 .thenReturn(getDelivery());
 
         // when
@@ -122,18 +123,17 @@ public class DeliveryControllerTest {
         // then
         verify(deliveryService,
                 times(1))
-                .save(ArgumentMatchers.any(Delivery.class));
+                .save(any(Delivery.class));
         verifyNoMoreInteractions(deliveryService);
     }
 
     @Test
-    @Disabled
     @DisplayName("should return updated delivery")
     public void updateDelivery() throws Exception {
         // given
         Delivery delivery = getDelivery();
-        when(deliveryService.update(ArgumentMatchers.eq(1L),
-                ArgumentMatchers.any(Delivery.class))).thenReturn(delivery);
+        when(deliveryService.update(anyLong(),
+                any(Delivery.class))).thenReturn(delivery);
 
         // when
         mockMvc.perform(put("/api/v1/deliveries/1")
@@ -147,7 +147,7 @@ public class DeliveryControllerTest {
         // then
         verify(deliveryService,
                 times(1))
-                .update(ArgumentMatchers.eq(1L), ArgumentMatchers.any(Delivery.class));
+                .update(eq(1L), any(Delivery.class));
         verifyNoMoreInteractions(deliveryService);
     }
 

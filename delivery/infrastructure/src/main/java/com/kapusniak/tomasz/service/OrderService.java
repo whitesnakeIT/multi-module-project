@@ -58,7 +58,7 @@ public class OrderService {
 
     public Order update(Long id, Order order) {
         if (id == null) {
-            throw new RuntimeException("Updati ng order failed. Order id is null.");
+            throw new RuntimeException("Updating order failed. Order id is null.");
         }
         if (order == null) {
             throw new RuntimeException("Updating order failed. Order is null.");
@@ -66,12 +66,22 @@ public class OrderService {
 
         Order orderFromDb = findById(id);
 
-        // update
+        Order updatedOrder = updateFields(orderFromDb, order);
 
-        OrderEntity updatedOrder = orderRepository
-                .save(orderEntityMapper.mapToEntity(orderFromDb));
+        OrderEntity updatedOrderEntity = orderRepository
+                .save(orderEntityMapper.mapToEntity(updatedOrder));
 
-        return orderEntityMapper.mapToApiModel(updatedOrder);
+        return orderEntityMapper.mapToApiModel(updatedOrderEntity);
+    }
+
+    private Order updateFields(Order orderFromDb, Order newOrder) {
+        if (newOrder.getId() == null) {
+            newOrder.setId(orderFromDb.getId());
+        }
+        if (!newOrder.getId().equals(orderFromDb.getId())) {
+            throw new RuntimeException("Updating order fields failed. Different id's");
+        }
+        return newOrder;
     }
 
     public List<Order> findByPackageType(PackageType packageType) {

@@ -56,7 +56,7 @@ public class CourierService {
 
     public Courier update(Long id, Courier courier) {
         if (id == null) {
-            throw new RuntimeException("Updati ng courier failed. Courier id is null.");
+            throw new RuntimeException("Updating courier failed. Courier id is null.");
         }
         if (courier == null) {
             throw new RuntimeException("Updating courier failed. Courier is null.");
@@ -64,12 +64,21 @@ public class CourierService {
 
         Courier courierFromDb = findById(id);
 
-        // update
+        Courier updatedCourier = updateFields(courierFromDb, courier);
 
-        CourierEntity updatedCourier = courierRepository
-                .save(courierEntityMapper.mapToEntity(courierFromDb));
+        CourierEntity updatedCourierEntity = courierRepository
+                .save(courierEntityMapper.mapToEntity(updatedCourier));
 
-        return courierEntityMapper.mapToApiModel(updatedCourier);
+        return courierEntityMapper.mapToApiModel(updatedCourierEntity);
     }
 
+    private Courier updateFields(Courier courierFromDb, Courier newCourier) {
+        if (newCourier.getId() == null) {
+            newCourier.setId(courierFromDb.getId());
+        }
+        if (!newCourier.getId().equals(courierFromDb.getId())) {
+            throw new RuntimeException("Updating courier fields failed. Different id's");
+        }
+        return newCourier;
+    }
 }

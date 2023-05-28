@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import static com.kapusniak.tomasz.openapi.model.CourierCompany.DPD;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class DeliveryEntityMapperTest {
 
     private final LocalDateTime localDeliveryTime =
@@ -104,8 +106,21 @@ class DeliveryEntityMapperTest {
     }
 
     @Test
+    @DisplayName("should return null when LocalDateTime is null, instead of throwing an exception")
+    void mapNullLocalDateTimeToOffset() {
+        // given
+        LocalDateTime localDateTime = null;
+
+        // when
+        OffsetDateTime offsetDateTime = deliveryEntityMapper.mapLocalDateTimeToOffset(localDateTime);
+
+        // then
+        assertThat(offsetDateTime).isNull();
+    }
+
+    @Test
     @DisplayName("should correctly map from OffsetDateTime to LocalDateTime")
-    public void shouldMapOffsetToLocalDateTime() {
+    public void mapOffsetToLocalDateTime() {
         // given
         OffsetDateTime offsetDeliveryTime = this.offsetDeliveryTime;
         LocalDateTime localDeliveryTime = this.localDeliveryTime;
@@ -119,7 +134,7 @@ class DeliveryEntityMapperTest {
 
     @Test
     @DisplayName("should correctly map from LocalDateTime to OffsetDateTime")
-    public void shouldMapLocalDateTimeToOffset() {
+    public void mapLocalDateTimeToOffset() {
         // given
         OffsetDateTime offsetDeliveryTime = this.offsetDeliveryTime;
         LocalDateTime localDeliveryTime = this.localDeliveryTime;
@@ -129,6 +144,19 @@ class DeliveryEntityMapperTest {
 
         // then
         assertThat(result).isEqualTo(offsetDeliveryTime);
+    }
+
+    @Test
+    @DisplayName("should return null when OffsetDateTime is null, instead of throwing an exception")
+    void mapNullOffsetToLocalDateTime() {
+        // given
+        OffsetDateTime offsetDateTime = null;
+
+        // when
+        LocalDateTime localDateTime = deliveryEntityMapper.mapOffsetToLocalDateTime(offsetDateTime);
+
+        // then
+        assertThat(localDateTime).isNull();
     }
 
     @Test

@@ -3,8 +3,10 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.openapi.api.CouriersApi;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.service.CourierService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,16 +20,15 @@ public class CourierController implements CouriersApi {
 
     private final CourierService courierService;
 
-
     @Override
-    public ResponseEntity<Courier> createCourier(@RequestBody Courier courier) {
+    public ResponseEntity<Courier> createCourier(@RequestBody @Valid Courier courier) {
         Courier save = courierService.save(courier);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteCourier(Long courierId) {
+    public ResponseEntity<Void> deleteCourier(@PathVariable("id") Long courierId) {
         courierService.delete(courierId);
 
         return ResponseEntity
@@ -43,13 +44,16 @@ public class CourierController implements CouriersApi {
     }
 
     @Override
-    public ResponseEntity<Courier> getCourier(Long courierId) {
+    public ResponseEntity<Courier> getCourier(@PathVariable("id") Long courierId) {
         Courier courier = courierService.findById(courierId);
+
         return ResponseEntity.ok(courier);
     }
 
     @Override
-    public ResponseEntity<Courier> updateCourier(Long id, Courier courier) {
-        return null;
+    public ResponseEntity<Courier> updateCourier(@PathVariable("id") Long courierId, @RequestBody @Valid Courier courier) {
+        Courier update = courierService.update(courierId, courier);
+
+        return ResponseEntity.ok(update);
     }
 }

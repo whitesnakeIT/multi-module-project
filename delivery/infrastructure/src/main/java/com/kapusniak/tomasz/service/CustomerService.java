@@ -56,7 +56,7 @@ public class CustomerService {
 
     public Customer update(Long id, Customer customer) {
         if (id == null) {
-            throw new RuntimeException("Updati ng customer failed. Customer id is null.");
+            throw new RuntimeException("Updating customer failed. Customer id is null.");
         }
         if (customer == null) {
             throw new RuntimeException("Updating customer failed. Customer is null.");
@@ -64,12 +64,22 @@ public class CustomerService {
 
         Customer customerFromDb = findById(id);
 
-        // update 
+        Customer updatedCustomer = updateFields(customerFromDb, customer);
 
-        CustomerEntity updatedCustomer = customerRepository
-                .save(customerEntityMapper.mapToEntity(customerFromDb));
+        CustomerEntity updatedCustomerEntity = customerRepository
+                .save(customerEntityMapper.mapToEntity(updatedCustomer));
 
-        return customerEntityMapper.mapToApiModel(updatedCustomer);
+        return customerEntityMapper.mapToApiModel(updatedCustomerEntity);
+    }
+
+    private Customer updateFields(Customer customerFromDb, Customer newCustomer) {
+        if (newCustomer.getId() == null) {
+            newCustomer.setId(customerFromDb.getId());
+        }
+        if (!newCustomer.getId().equals(customerFromDb.getId())) {
+            throw new RuntimeException("Updating customer fields failed. Different id's");
+        }
+        return newCustomer;
     }
 
 }

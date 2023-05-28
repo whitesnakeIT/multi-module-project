@@ -3,26 +3,27 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class TrackingControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -105,7 +106,7 @@ public class TrackingControllerTest {
         // given
         Tracking tracking = getTracking();
         when(trackingService
-                .save(ArgumentMatchers.any(Tracking.class)))
+                .save(any(Tracking.class)))
                 .thenReturn(getTracking());
 
         // when
@@ -120,18 +121,17 @@ public class TrackingControllerTest {
         // then
         verify(trackingService,
                 times(1))
-                .save(ArgumentMatchers.any(Tracking.class));
+                .save(any(Tracking.class));
         verifyNoMoreInteractions(trackingService);
     }
 
     @Test
-    @Disabled
     @DisplayName("should return updated tracking")
     public void updateTracking() throws Exception {
         // given
         Tracking tracking = getTracking();
-        when(trackingService.update(ArgumentMatchers.eq(1L),
-                ArgumentMatchers.any(Tracking.class)))
+        when(trackingService.update(anyLong(),
+                any(Tracking.class)))
                 .thenReturn(tracking);
 
         // when
@@ -146,7 +146,7 @@ public class TrackingControllerTest {
         // then
         verify(trackingService,
                 times(1))
-                .update(ArgumentMatchers.eq(1L), ArgumentMatchers.any(Tracking.class));
+                .update(eq(1L), any(Tracking.class));
         verifyNoMoreInteractions(trackingService);
     }
 
