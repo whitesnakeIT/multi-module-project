@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kapusniak.tomasz.openapi.model.PackageSize.EXTRA_LARGE;
+import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
+import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
+import static com.kapusniak.tomasz.openapi.model.PackageType.PARCEL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.*;
@@ -36,6 +40,10 @@ class OrderServiceTest {
 
     List<Order> orderList = new ArrayList<>();
     List<OrderEntity> orderEntityList = new ArrayList<>();
+
+    Customer customer = new Customer();
+
+    CustomerEntity customerEntity = new CustomerEntity();
     @Mock
     private OrderJpaRepository orderRepository;
     @Mock
@@ -46,27 +54,28 @@ class OrderServiceTest {
 
     @BeforeEach
     void setup() {
-//        order = new Order();
+        order.setId(1L);
         order.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
-        order.setPackageSize(PackageSize.LARGE);
-        order.setPackageType(PackageType.DOCUMENT);
+        order.setPackageSize(LARGE);
+        order.setPackageType(DOCUMENT);
         order.setSenderAddress("new sender address");
         order.setReceiverAddress("new receiver address");
 
-        Customer customer = new Customer();
+
         customer.setId(5L);
         order.setCustomer(customer);
 
         orderEntityList.add(orderEntity);
         orderEntityList.add(orderEntity);
 
+        orderEntity.setId(1L);
         orderEntity.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
-        orderEntity.setPackageSize(PackageSize.LARGE);
-        orderEntity.setPackageType(PackageType.DOCUMENT);
+        orderEntity.setPackageSize(LARGE);
+        orderEntity.setPackageType(DOCUMENT);
         orderEntity.setSenderAddress("new sender address");
         orderEntity.setReceiverAddress("new receiver address");
 
-        CustomerEntity customerEntity = new CustomerEntity();
+
         customerEntity.setId(5L);
         order.setCustomer(customer);
 
@@ -192,7 +201,7 @@ class OrderServiceTest {
                 .willReturn(orderEntityList);
 
         // when
-        List<Order> ordersByPackageType = orderService.findByPackageType(PackageType.DOCUMENT);
+        List<Order> ordersByPackageType = orderService.findByPackageType(DOCUMENT);
 
         // then
         assertThat(ordersByPackageType.size()).isGreaterThan(0);
@@ -224,7 +233,7 @@ class OrderServiceTest {
                 .willReturn(orderEntityList);
 
         // when
-        List<Order> ordersByPackageSize = orderService.findByPackageSize(PackageSize.EXTRA_LARGE);
+        List<Order> ordersByPackageSize = orderService.findByPackageSize(EXTRA_LARGE);
 
         // then
         assertThat(ordersByPackageSize.size()).isGreaterThan(0);
@@ -315,4 +324,120 @@ class OrderServiceTest {
                 .hasMessage("Deleting order failed. Order id is null.");
     }
 
+    @Test
+    @DisplayName("should throw an exception when id is null")
+    void updateNullId() {
+        // given
+        Long orderId = null;
+
+        // when
+        Throwable throwable = catchThrowable(() ->
+                orderService.update(orderId, order));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating order failed. Order id is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when order is null")
+    void updateNullOrder() {
+        // given
+        Long orderId = 1L;
+        Order order = null;
+
+        // when
+        Throwable thrown = catchThrowable(() ->
+                orderService.update(orderId, order));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating order failed. Order is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when newOrder's id doesn't match orderFromDb's id")
+    void updateIdMissMatch() {
+        // given
+        Order newOrder = new Order();
+        Long oldId = 1L;
+        Long newId = 2L;
+        newOrder.setId(newId);
+
+        // and
+        when(orderRepository.findById(anyLong()))
+                .thenReturn(Optional.of(orderEntity));
+        // when
+        Throwable throwable = catchThrowable(() ->
+                orderService.update(oldId, newOrder));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating order fields failed. Different id's");
+    }
+
+    @Test
+    @DisplayName("should correctly update order when valid id and order are provided")
+    void shouldUpdateOrder() {
+        // given
+        Long orderId = 1L;
+        String newSenderAddress = "newSenderAddress";
+        String newReceiverAddress = "newReceiverAddress";
+        PackageType newPackageType = PARCEL;
+        PackageSize newPackageSize = EXTRA_LARGE;
+        LocalDate newPreferredDeliveryDate = LocalDate.of(2023, 5, 28);
+
+        Long newCustomerId = 3L;
+        // and
+        Order changedOrder = new Order();
+        changedOrder.setSenderAddress(newSenderAddress);
+        changedOrder.setReceiverAddress(newReceiverAddress);
+        changedOrder.setPackageSize(newPackageSize);
+        changedOrder.setPackageType(newPackageType);
+        changedOrder.setPreferredDeliveryDate(newPreferredDeliveryDate);
+        customer.setId(newCustomerId);
+        changedOrder.setCustomer(customer);
+
+        OrderEntity changedOrderEntity = new OrderEntity();
+        changedOrderEntity.setSenderAddress(newSenderAddress);
+        changedOrderEntity.setReceiverAddress(newReceiverAddress);
+        changedOrderEntity.setPackageSize(EXTRA_LARGE);
+        changedOrderEntity.setPackageType(PARCEL);
+        changedOrderEntity.setPreferredDeliveryDate(newPreferredDeliveryDate);
+        changedOrderEntity.setId(newCustomerId);
+        changedOrderEntity.setCustomer(customerEntity);
+
+        // and
+        when(orderRepository.findById(anyLong()))
+                .thenReturn(Optional.of(orderEntity));
+        when(orderRepository.save(any(OrderEntity.class)))
+                .thenReturn(changedOrderEntity);
+
+        //and
+        when(orderEntityMapper
+                .mapToApiModel(changedOrderEntity))
+                .thenReturn(changedOrder);
+
+        // when
+        Order updatedOrder = orderService.update(orderId, changedOrder);
+
+        // then
+        assertThat(updatedOrder).isNotNull();
+        assertThat(updatedOrder.getId()).isEqualTo(orderId);
+        assertThat(updatedOrder.getSenderAddress()).isEqualTo(newSenderAddress);
+        assertThat(updatedOrder.getReceiverAddress()).isEqualTo(newReceiverAddress);
+        assertThat(updatedOrder.getPackageSize()).isEqualTo(newPackageSize);
+        assertThat(updatedOrder.getPackageType()).isEqualTo(newPackageType);
+        assertThat(updatedOrder.getPreferredDeliveryDate()).isEqualTo(newPreferredDeliveryDate);
+
+        assertThat(updatedOrder.getCustomer().getId()).isEqualTo(newCustomerId);
+
+        // verify
+        then(orderRepository)
+                .should(times(1))
+                .save(orderEntity);
+    }
 }
