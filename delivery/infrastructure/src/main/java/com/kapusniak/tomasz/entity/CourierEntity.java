@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 @Entity
@@ -17,7 +15,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "couriers")
-public class CourierEntity {
+public class CourierEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,16 +38,4 @@ public class CourierEntity {
             orphanRemoval = true)
     private List<DeliveryEntity> deliveryList = new ArrayList<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        CourierEntity courier = (CourierEntity) o;
-        return getId() != null && Objects.equals(getId(), courier.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

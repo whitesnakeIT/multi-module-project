@@ -11,6 +11,10 @@ import org.mapstruct.Mapping;
 )
 public interface CustomerEntityMapper {
 
+    @Mapping(
+            target = "orders",
+            qualifiedByName = {"OrderEntityWithoutCustomer"}
+    )
     CustomerEntity mapToEntity(Customer customer);
 
     @Mapping(

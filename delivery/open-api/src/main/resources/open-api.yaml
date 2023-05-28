@@ -461,7 +461,6 @@ paths:
 components:
   schemas:
     Courier:
-      x-class-extra-annotation: '@org.springframework.stereotype.Component'
       type: object
       properties:
         id:
@@ -478,7 +477,6 @@ components:
           items:
             $ref: '#/components/schemas/Delivery'
     Customer:
-      x-class-extra-annotation: '@org.springframework.stereotype.Component'
       type: object
       properties:
         id:
@@ -497,7 +495,6 @@ components:
     Delivery:
       type: object
       x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"courier"})'
-      #      x-class-extra-annotation: '@org.springframework.stereotype.Component'
       properties:
         id:
           type: integer
@@ -515,7 +512,6 @@ components:
         order:
           $ref: '#/components/schemas/Order'
     Order:
-      #      x-class-extra-annotation: '@org.springframework.stereotype.Component'
       x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"customer"})'
       type: object
       properties:
