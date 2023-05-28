@@ -9,7 +9,6 @@ import org.mapstruct.Named;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 
 
 @Mapper(
@@ -23,9 +22,17 @@ public interface DeliveryEntityMapper {
             target = "deliveryTime",
             qualifiedByName = "offsetToLocalDateTime"
     )
+    @Mapping(
+            target = "courier.deliveryList",
+            expression = "java(null)"
+    )
+    @Mapping(
+            target = "order.customer.orders",
+            expression = "java(null)"
+    )
     DeliveryEntity mapToEntity(Delivery delivery);
 
-    List<DeliveryEntity> mapToEntity(List<Delivery> delivery);
+//    List<DeliveryEntity> mapToEntity(List<Delivery> delivery);
 
     @Mapping(
             target = "deliveryTime",
@@ -46,19 +53,47 @@ public interface DeliveryEntityMapper {
             target = "deliveryTime",
             qualifiedByName = "localDateTimeToOffset"
     )
-    @Mapping
-            (target = "courier",
-                    ignore = true)
+    @Mapping(
+            target = "courier",
+            ignore = true
+    )
+    @Mapping(
+            target = "order.customer.orders",
+            ignore = true
+    )
     Delivery mapToApiModelWithoutCourier(DeliveryEntity deliveryEntity);
+
+    @Named("DeliveryEntityWithoutCourier")
+    @Mapping(
+            target = "deliveryTime",
+            qualifiedByName = "offsetToLocalDateTime"
+    )
+    @Mapping(
+            target = "courier",
+            expression = "java(null)"
+    )
+    @Mapping(
+            target = "order.customer.orders",
+            expression = "java(null)"
+    )
+    DeliveryEntity mapToEntityWithoutCourier(Delivery delivery);
 
 
     @Named("offsetToLocalDateTime")
     default LocalDateTime mapOffsetToLocalDateTime(OffsetDateTime offsetDateTime) {
+        if (offsetDateTime == null) {
+//            throw new RuntimeException("Mapping OffsetDateTime to LocalDateTime failed. OffsetDateTime is null.");
+            return null;
+        }
         return offsetDateTime.toLocalDateTime();
     }
 
     @Named("localDateTimeToOffset")
     default OffsetDateTime mapLocalDateTimeToOffset(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+//            throw new RuntimeException("Mapping LocalDateTime to OffsetDateTime failed. LocalDateTime is null.");
+            return null;
+        }
         return localDateTime.atOffset(ZoneOffset.UTC);
     }
 }

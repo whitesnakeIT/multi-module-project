@@ -6,12 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Named("OrderMapper")
 @Mapper(componentModel = "spring")
 public interface OrderEntityMapper {
 
+    @Named("OrderEntityWithCustomerWithoutOrderList")
+    @Mapping(
+            target = "customer.orders",
+            expression = "java(null)"
+    )
     OrderEntity mapToEntity(Order order);
-
 
     @Named("OrderWithCustomerWithoutOrderList")
     @Mapping(
@@ -26,5 +29,12 @@ public interface OrderEntityMapper {
             ignore = true
     )
     Order mapToApiModelWithoutCustomer(OrderEntity orderEntity);
+
+    @Named("OrderEntityWithoutCustomer")
+    @Mapping(
+            target = "customer",
+            ignore = true
+    )
+    OrderEntity mapToApiEntityWithoutCustomer(Order order);
 
 }

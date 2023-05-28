@@ -13,6 +13,10 @@ import org.mapstruct.Mapping;
         }
 )
 public interface CourierEntityMapper {
+    @Mapping(
+            target = "deliveryList",
+            qualifiedByName = "DeliveryEntityWithoutCourier"
+    )
     CourierEntity mapToEntity(Courier courier);
 
     @Mapping(

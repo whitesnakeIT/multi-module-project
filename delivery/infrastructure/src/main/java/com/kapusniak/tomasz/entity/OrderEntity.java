@@ -6,18 +6,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
 @ToString
 @Table(name = "orders")
-
-public class OrderEntity {
+public class OrderEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,23 +38,9 @@ public class OrderEntity {
     @Column(name = "preferred_delivery_date")
     private LocalDate preferredDeliveryDate;
 
-//    @JsonIgnore
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        OrderEntity order = (OrderEntity) o;
-        return getId() != null && Objects.equals(getId(), order.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }
