@@ -281,40 +281,10 @@ class DeliveryServiceTest {
     void shouldUpdateDelivery() {
         // given
         Long deliveryId = 1L;
-        Double newPrice = 40.50D;
-        LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
-        OffsetDateTime newDeliveryOffsetDateTime = newDeliveryLocalDateTime.atOffset(ZoneOffset.UTC);
-        DeliveryStatus newDeliveryStatus = IN_TRANSIT;
-        Long newOrderId = 3L;
-        Long newCourierId = 3L;
-
-        Order newOrder = new Order();
-        newOrder.setId(newOrderId);
-        Courier newCourier = new Courier();
-        newCourier.setId(newCourierId);
-
-
-        OrderEntity newOrderEntity = new OrderEntity();
-        newOrderEntity.setId(newOrderId);
-        CourierEntity newCourierEntity = new CourierEntity();
-        newCourier.setId(newCourierId);
 
         // and
-        Delivery changedDelivery = new Delivery();
-        changedDelivery.setId(deliveryId);
-        changedDelivery.setPrice(newPrice);
-        changedDelivery.setDeliveryTime(newDeliveryOffsetDateTime);
-        changedDelivery.setDeliveryStatus(newDeliveryStatus);
-        changedDelivery.setOrder(newOrder);
-        changedDelivery.setCourier(newCourier);
-
-        DeliveryEntity changedDeliveryEntity = new DeliveryEntity();
-        changedDeliveryEntity.setId(deliveryId);
-        changedDeliveryEntity.setPrice(BigDecimal.valueOf(newPrice));
-        changedDeliveryEntity.setDeliveryTime(newDeliveryLocalDateTime);
-        changedDeliveryEntity.setDeliveryStatus(newDeliveryStatus);
-        changedDeliveryEntity.setOrder(newOrderEntity);
-        changedDeliveryEntity.setCourier(newCourierEntity);
+        Delivery changedDelivery = prepareDeliveryForEdit();
+        DeliveryEntity changedDeliveryEntity = prepareDeliveryEntityForEdit();
 
         // and
         when(deliveryRepository.findById(anyLong()))
@@ -332,13 +302,13 @@ class DeliveryServiceTest {
 
         // then
         assertThat(updatedDelivery).isNotNull();
-        assertThat(updatedDelivery.getId()).isEqualTo(deliveryId);
-        assertThat(updatedDelivery.getDeliveryTime()).isEqualTo(newDeliveryOffsetDateTime);
-        assertThat(updatedDelivery.getPrice()).isEqualTo(newPrice);
-        assertThat(updatedDelivery.getDeliveryStatus()).isEqualTo(newDeliveryStatus);
+        assertThat(updatedDelivery.getId()).isEqualTo(changedDelivery.getId());
+        assertThat(updatedDelivery.getDeliveryTime()).isEqualTo(changedDelivery.getDeliveryTime());
+        assertThat(updatedDelivery.getPrice()).isEqualTo(changedDelivery.getPrice());
+        assertThat(updatedDelivery.getDeliveryStatus()).isEqualTo(changedDelivery.getDeliveryStatus());
 
-        assertThat(updatedDelivery.getOrder().getId()).isEqualTo(newCourierId);
-        assertThat(updatedDelivery.getCourier().getId()).isEqualTo(newOrderId);
+        assertThat(updatedDelivery.getOrder().getId()).isEqualTo(changedDelivery.getOrder().getId());
+        assertThat(updatedDelivery.getCourier().getId()).isEqualTo(changedDelivery.getCourier().getId());
 
         // verify
         then(deliveryRepository)
@@ -346,4 +316,54 @@ class DeliveryServiceTest {
                 .save(deliveryEntity);
     }
 
+    private Delivery prepareDeliveryForEdit() {
+        Long deliveryId = 1L;
+        Double newPrice = 40.50D;
+        LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
+        OffsetDateTime newDeliveryOffsetDateTime = newDeliveryLocalDateTime.atOffset(ZoneOffset.UTC);
+        DeliveryStatus newDeliveryStatus = IN_TRANSIT;
+        Long newOrderId = 3L;
+        Long newCourierId = 3L;
+
+        Delivery changedDelivery = new Delivery();
+        changedDelivery.setId(deliveryId);
+        changedDelivery.setPrice(newPrice);
+        changedDelivery.setDeliveryTime(newDeliveryOffsetDateTime);
+        changedDelivery.setDeliveryStatus(newDeliveryStatus);
+
+        Order newOrder = new Order();
+        newOrder.setId(newOrderId);
+        Courier newCourier = new Courier();
+        newCourier.setId(newCourierId);
+
+        changedDelivery.setOrder(newOrder);
+        changedDelivery.setCourier(newCourier);
+
+        return changedDelivery;
+    }
+
+    private DeliveryEntity prepareDeliveryEntityForEdit() {
+        Long deliveryId = 1L;
+        BigDecimal newPrice = BigDecimal.valueOf(40.50D);
+        LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
+        DeliveryStatus newDeliveryStatus = IN_TRANSIT;
+        Long newOrderId = 3L;
+        Long newCourierId = 3L;
+
+        DeliveryEntity changedDeliveryEntity = new DeliveryEntity();
+        changedDeliveryEntity.setId(deliveryId);
+        changedDeliveryEntity.setPrice(newPrice);
+        changedDeliveryEntity.setDeliveryTime(newDeliveryLocalDateTime);
+        changedDeliveryEntity.setDeliveryStatus(newDeliveryStatus);
+
+        OrderEntity newOrderEntity = new OrderEntity();
+        newOrderEntity.setId(newOrderId);
+        CourierEntity newCourierEntity = new CourierEntity();
+        newCourierEntity.setId(newCourierId);
+
+        changedDeliveryEntity.setOrder(newOrderEntity);
+        changedDeliveryEntity.setCourier(newCourierEntity);
+
+        return changedDeliveryEntity;
+    }
 }

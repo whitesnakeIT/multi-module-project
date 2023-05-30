@@ -384,31 +384,8 @@ class OrderServiceTest {
     void shouldUpdateOrder() {
         // given
         Long orderId = 1L;
-        String newSenderAddress = "newSenderAddress";
-        String newReceiverAddress = "newReceiverAddress";
-        PackageType newPackageType = PARCEL;
-        PackageSize newPackageSize = EXTRA_LARGE;
-        LocalDate newPreferredDeliveryDate = LocalDate.of(2023, 5, 28);
-
-        Long newCustomerId = 3L;
-        // and
-        Order changedOrder = new Order();
-        changedOrder.setSenderAddress(newSenderAddress);
-        changedOrder.setReceiverAddress(newReceiverAddress);
-        changedOrder.setPackageSize(newPackageSize);
-        changedOrder.setPackageType(newPackageType);
-        changedOrder.setPreferredDeliveryDate(newPreferredDeliveryDate);
-        customer.setId(newCustomerId);
-        changedOrder.setCustomer(customer);
-
-        OrderEntity changedOrderEntity = new OrderEntity();
-        changedOrderEntity.setSenderAddress(newSenderAddress);
-        changedOrderEntity.setReceiverAddress(newReceiverAddress);
-        changedOrderEntity.setPackageSize(EXTRA_LARGE);
-        changedOrderEntity.setPackageType(PARCEL);
-        changedOrderEntity.setPreferredDeliveryDate(newPreferredDeliveryDate);
-        changedOrderEntity.setId(newCustomerId);
-        changedOrderEntity.setCustomer(customerEntity);
+        Order changedOrder = prepareOrderForEdit();
+        OrderEntity changedOrderEntity = prepareOrderEntityForEdit();
 
         // and
         when(orderRepository.findById(anyLong()))
@@ -426,18 +403,62 @@ class OrderServiceTest {
 
         // then
         assertThat(updatedOrder).isNotNull();
-        assertThat(updatedOrder.getId()).isEqualTo(orderId);
-        assertThat(updatedOrder.getSenderAddress()).isEqualTo(newSenderAddress);
-        assertThat(updatedOrder.getReceiverAddress()).isEqualTo(newReceiverAddress);
-        assertThat(updatedOrder.getPackageSize()).isEqualTo(newPackageSize);
-        assertThat(updatedOrder.getPackageType()).isEqualTo(newPackageType);
-        assertThat(updatedOrder.getPreferredDeliveryDate()).isEqualTo(newPreferredDeliveryDate);
+        assertThat(updatedOrder.getId()).isEqualTo(changedOrder.getId());
+        assertThat(updatedOrder.getSenderAddress()).isEqualTo(changedOrder.getSenderAddress());
+        assertThat(updatedOrder.getReceiverAddress()).isEqualTo(changedOrder.getReceiverAddress());
+        assertThat(updatedOrder.getPackageSize()).isEqualTo(changedOrder.getPackageSize());
+        assertThat(updatedOrder.getPackageType()).isEqualTo(changedOrder.getPackageType());
+        assertThat(updatedOrder.getPreferredDeliveryDate()).isEqualTo(changedOrder.getPreferredDeliveryDate());
 
-        assertThat(updatedOrder.getCustomer().getId()).isEqualTo(newCustomerId);
+        assertThat(updatedOrder.getCustomer().getId()).isEqualTo(changedOrder.getCustomer().getId());
 
         // verify
         then(orderRepository)
                 .should(times(1))
                 .save(orderEntity);
+    }
+
+    private Order prepareOrderForEdit() {
+        Long orderId = 1L;
+        String newSenderAddress = "newSenderAddress";
+        String newReceiverAddress = "newReceiverAddress";
+        PackageType newPackageType = PARCEL;
+        PackageSize newPackageSize = EXTRA_LARGE;
+        LocalDate newPreferredDeliveryDate = LocalDate.of(2023, 5, 28);
+
+        Long newCustomerId = 3L;
+        Order changedOrder = new Order();
+        changedOrder.setId(orderId);
+        changedOrder.setSenderAddress(newSenderAddress);
+        changedOrder.setReceiverAddress(newReceiverAddress);
+        changedOrder.setPackageSize(newPackageSize);
+        changedOrder.setPackageType(newPackageType);
+        changedOrder.setPreferredDeliveryDate(newPreferredDeliveryDate);
+        customer.setId(newCustomerId);
+        changedOrder.setCustomer(customer);
+
+        return changedOrder;
+    }
+
+    private OrderEntity prepareOrderEntityForEdit() {
+        Long orderId = 1L;
+        String newSenderAddress = "newSenderAddress";
+        String newReceiverAddress = "newReceiverAddress";
+        PackageType newPackageType = PARCEL;
+        PackageSize newPackageSize = EXTRA_LARGE;
+        LocalDate newPreferredDeliveryDate = LocalDate.of(2023, 5, 28);
+
+        Long newCustomerId = 3L;
+        OrderEntity changedOrderEntity = new OrderEntity();
+        changedOrderEntity.setId(orderId);
+        changedOrderEntity.setSenderAddress(newSenderAddress);
+        changedOrderEntity.setReceiverAddress(newReceiverAddress);
+        changedOrderEntity.setPackageSize(newPackageSize);
+        changedOrderEntity.setPackageType(newPackageType);
+        changedOrderEntity.setPreferredDeliveryDate(newPreferredDeliveryDate);
+        customerEntity.setId(newCustomerId);
+        changedOrderEntity.setCustomer(customerEntity);
+
+        return changedOrderEntity;
     }
 }

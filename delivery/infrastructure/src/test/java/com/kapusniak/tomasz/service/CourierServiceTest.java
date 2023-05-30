@@ -266,41 +266,8 @@ class CourierServiceTest {
     void shouldUpdateCourier() {
         // given
         Long courierId = 1L;
-        String newFirstName = "newFirstName";
-        String newLastName = "newLastName";
-        CourierCompany newCourierCompany = FEDEX;
-
-        Long newDelivery1Id = 3L;
-        Long newDelivery2Id = 3L;
-
-        Delivery newDelivery1 = new Delivery();
-        newDelivery1.setId(newDelivery1Id);
-        Delivery newDelivery2 = new Delivery();
-        newDelivery2.setId(newDelivery2Id);
-
-        List<Delivery> newDeliveries = List.of(newDelivery1, newDelivery2);
-
-        DeliveryEntity newDeliveryEntity1 = new DeliveryEntity();
-        newDeliveryEntity1.setId(newDelivery1Id);
-        DeliveryEntity newDeliveryEntity2 = new DeliveryEntity();
-        newDelivery2.setId(newDelivery2Id);
-
-        List<DeliveryEntity> newEntityDeliveries = List.of(newDeliveryEntity1, newDeliveryEntity2);
-
-        // and
-        Courier changedCourier = new Courier();
-        changedCourier.setId(courierId);
-        changedCourier.setFirstName(newFirstName);
-        changedCourier.setLastName(newLastName);
-        changedCourier.setCourierCompany(newCourierCompany);
-        changedCourier.setDeliveryList(newDeliveries);
-
-        CourierEntity changedCourierEntity = new CourierEntity();
-        changedCourierEntity.setId(courierId);
-        changedCourierEntity.setFirstName(newFirstName);
-        changedCourierEntity.setLastName(newLastName);
-        changedCourierEntity.setCourierCompany(newCourierCompany);
-        changedCourierEntity.setDeliveryList(newEntityDeliveries);
+        Courier changedCourier = prepareCourierToEdit();
+        CourierEntity changedCourierEntity = prepareCourierEntityToEdit();
 
         // and
         when(courierRepository.findById(anyLong()))
@@ -319,10 +286,65 @@ class CourierServiceTest {
         // then
         assertThat(updatedCourier).isNotNull();
         assertThat(updatedCourier.getId()).isEqualTo(courierId);
+        assertThat(updatedCourier.getFirstName()).isEqualTo(changedCourier.getFirstName());
+        assertThat(updatedCourier.getLastName()).isEqualTo(changedCourier.getLastName());
+        assertThat(updatedCourier.getCourierCompany()).isEqualTo(changedCourier.getCourierCompany());
+        assertThat(updatedCourier.getDeliveryList().get(0).getId()).isEqualTo(changedCourier.getDeliveryList().get(0).getId());
+        assertThat(updatedCourier.getDeliveryList().get(1).getId()).isEqualTo(changedCourier.getDeliveryList().get(1).getId());
 
         // verify
         then(courierRepository)
                 .should(times(1))
                 .save(courierEntity);
+    }
+
+    private CourierEntity prepareCourierEntityToEdit() {
+        Long courierId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        CourierCompany newCourierCompany = FEDEX;
+
+        Long newDelivery1Id = 3L;
+        Long newDelivery2Id = 3L;
+
+        CourierEntity changedCourierEntity = new CourierEntity();
+        changedCourierEntity.setId(courierId);
+        changedCourierEntity.setFirstName(newFirstName);
+        changedCourierEntity.setLastName(newLastName);
+        changedCourierEntity.setCourierCompany(newCourierCompany);
+
+        DeliveryEntity newDeliveryEntity1 = new DeliveryEntity();
+        newDeliveryEntity1.setId(newDelivery1Id);
+        DeliveryEntity newDeliveryEntity2 = new DeliveryEntity();
+        newDeliveryEntity2.setId(newDelivery2Id);
+
+        changedCourierEntity.setDeliveryList(List.of(newDeliveryEntity1, newDeliveryEntity2));
+
+        return changedCourierEntity;
+    }
+
+    private Courier prepareCourierToEdit() {
+        Long courierId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        CourierCompany newCourierCompany = FEDEX;
+
+        Long newDelivery1Id = 3L;
+        Long newDelivery2Id = 3L;
+
+        Courier changedCourier = new Courier();
+        changedCourier.setId(courierId);
+        changedCourier.setFirstName(newFirstName);
+        changedCourier.setLastName(newLastName);
+        changedCourier.setCourierCompany(newCourierCompany);
+
+        Delivery newDelivery1 = new Delivery();
+        newDelivery1.setId(newDelivery1Id);
+        Delivery newDelivery2 = new Delivery();
+        newDelivery2.setId(newDelivery2Id);
+
+        changedCourier.setDeliveryList(List.of(newDelivery1, newDelivery2));
+
+        return changedCourier;
     }
 }

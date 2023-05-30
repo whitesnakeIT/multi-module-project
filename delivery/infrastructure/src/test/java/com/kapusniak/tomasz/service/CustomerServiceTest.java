@@ -267,41 +267,8 @@ class CustomerServiceTest {
     void shouldUpdateCustomer() {
         // given
         Long customerId = 1L;
-        String newFirstName = "newFirstName";
-        String newLastName = "newLastName";
-        String newEmail = "newEmail";
-        Long newOrder1Id = 3L;
-        Long newOrder2Id = 3L;
-
-        Order newOrder1 = new Order();
-        newOrder1.setId(newOrder1Id);
-        Order newOrder2 = new Order();
-        newOrder2.setId(newOrder2Id);
-
-        List<Order> newOrders = List.of(newOrder1, newOrder2);
-
-        OrderEntity newOrderEntity1 = new OrderEntity();
-        newOrderEntity1.setId(newOrder1Id);
-        OrderEntity newOrderEntity2 = new OrderEntity();
-        newOrder2.setId(newOrder2Id);
-
-        List<OrderEntity> newEntityOrders = List.of(newOrderEntity1, newOrderEntity2);
-
-
-        // and
-        Customer changedCustomer = new Customer();
-        changedCustomer.setId(customerId);
-        changedCustomer.setFirstName(newFirstName);
-        changedCustomer.setLastName(newLastName);
-        changedCustomer.setEmail(newEmail);
-        changedCustomer.setOrders(newOrders);
-
-        CustomerEntity changedCustomerEntity = new CustomerEntity();
-        changedCustomerEntity.setId(customerId);
-        changedCustomerEntity.setFirstName(newFirstName);
-        changedCustomerEntity.setLastName(newLastName);
-        changedCustomerEntity.setEmail(newEmail);
-        changedCustomerEntity.setOrders(newEntityOrders);
+        Customer changedCustomer = prepareCustomerToEdit();
+        CustomerEntity changedCustomerEntity = prepareCustomerEntityToEdit();
 
         // and
         when(customerRepository.findById(anyLong()))
@@ -319,17 +286,64 @@ class CustomerServiceTest {
 
         // then
         assertThat(updatedCustomer).isNotNull();
-        assertThat(updatedCustomer.getId()).isEqualTo(customerId);
-        assertThat(updatedCustomer.getFirstName()).isEqualTo(newFirstName);
-        assertThat(updatedCustomer.getLastName()).isEqualTo(newLastName);
-        assertThat(updatedCustomer.getEmail()).isEqualTo(newEmail);
+        assertThat(updatedCustomer.getId()).isEqualTo(changedCustomer.getId());
+        assertThat(updatedCustomer.getFirstName()).isEqualTo(changedCustomer.getFirstName());
+        assertThat(updatedCustomer.getLastName()).isEqualTo(changedCustomer.getLastName());
+        assertThat(updatedCustomer.getEmail()).isEqualTo(changedCustomer.getEmail());
 
-        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(newOrder1Id);
-        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(newOrder2Id);
+        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
+        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
 
         // verify
         then(customerRepository)
                 .should(times(1))
                 .save(customerEntity);
+    }
+
+    private Customer prepareCustomerToEdit() {
+        Long customerId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        String newEmail = "newEmail";
+        Long newOrder1Id = 3L;
+        Long newOrder2Id = 3L;
+
+        Customer changedCustomer = new Customer();
+        changedCustomer.setId(customerId);
+        changedCustomer.setFirstName(newFirstName);
+        changedCustomer.setLastName(newLastName);
+        changedCustomer.setEmail(newEmail);
+
+        Order newOrder1 = new Order();
+        newOrder1.setId(newOrder1Id);
+        Order newOrder2 = new Order();
+        newOrder2.setId(newOrder2Id);
+
+        changedCustomer.setOrders(List.of(newOrder1, newOrder2));
+
+        return changedCustomer;
+    }
+
+    private CustomerEntity prepareCustomerEntityToEdit() {
+        Long customerId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        String newEmail = "newEmail";
+        Long newOrder1Id = 3L;
+        Long newOrder2Id = 3L;
+
+        CustomerEntity changedCustomerEntity = new CustomerEntity();
+        changedCustomerEntity.setId(customerId);
+        changedCustomerEntity.setFirstName(newFirstName);
+        changedCustomerEntity.setLastName(newLastName);
+        changedCustomerEntity.setEmail(newEmail);
+        OrderEntity newOrderEntity1 = new OrderEntity();
+        newOrderEntity1.setId(newOrder1Id);
+        OrderEntity newOrderEntity2 = new OrderEntity();
+        newOrderEntity2.setId(newOrder2Id);
+
+        changedCustomerEntity.setOrders(List.of(newOrderEntity1, newOrderEntity2));
+
+        return changedCustomerEntity;
     }
 }

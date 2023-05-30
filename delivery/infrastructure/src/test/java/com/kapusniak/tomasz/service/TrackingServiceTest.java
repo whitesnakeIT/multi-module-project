@@ -257,14 +257,8 @@ class TrackingServiceTest {
     void shouldUpdateTracking() {
         // given
         Long trackingId = 1L;
-        String newLocalization = "newLocalization";
-
-        // and
-        Tracking changedTracking = new Tracking();
-        changedTracking.setLocalization(newLocalization);
-
-        TrackingEntity changedTrackingEntity = new TrackingEntity();
-        changedTrackingEntity.setLocalization(newLocalization);
+        Tracking changedTracking = prepareTrackingForEdit();
+        TrackingEntity changedTrackingEntity = prepareTrackingEntityForEdit();
 
         // and
         when(trackingRepository.findById(anyLong()))
@@ -282,12 +276,34 @@ class TrackingServiceTest {
 
         // then
         assertThat(updatedTracking).isNotNull();
-        assertThat(updatedTracking.getId()).isEqualTo(trackingId);
-        assertThat(updatedTracking.getLocalization()).isEqualTo(newLocalization);
+        assertThat(updatedTracking.getId()).isEqualTo(changedTracking.getId());
+        assertThat(updatedTracking.getLocalization()).isEqualTo(changedTracking.getLocalization());
 
         // verify
         then(trackingRepository)
                 .should(times(1))
                 .save(trackingEntity);
+    }
+
+    private Tracking prepareTrackingForEdit() {
+        Long trackingId = 1L;
+        String newLocalization = "newLocalization";
+
+        Tracking changedTracking = new Tracking();
+        changedTracking.setId(trackingId);
+        changedTracking.setLocalization(newLocalization);
+
+        return changedTracking;
+    }
+
+    private TrackingEntity prepareTrackingEntityForEdit() {
+        Long trackingId = 1L;
+        String newLocalization = "newLocalization";
+
+        TrackingEntity changedTrackingEntity = new TrackingEntity();
+        changedTrackingEntity.setId(trackingId);
+        changedTrackingEntity.setLocalization(newLocalization);
+
+        return changedTrackingEntity;
     }
 }
