@@ -19,6 +19,7 @@ public class CustomerService {
 
     private final CustomerEntityMapper customerEntityMapper;
 
+    @Transactional
     public Customer save(Customer customer) {
         if (customer == null) {
             throw new RuntimeException("Saving customer failed. Customer is null.");
@@ -45,6 +46,7 @@ public class CustomerService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long customerId) {
         if (customerId == null) {
             throw new RuntimeException("Deleting customer failed. Customer id is null.");
@@ -54,6 +56,7 @@ public class CustomerService {
         customerRepository.delete(customerEntityMapper.mapToEntity(customer));
     }
 
+    @Transactional
     public Customer update(Long id, Customer customer) {
         if (id == null) {
             throw new RuntimeException("Updating customer failed. Customer id is null.");

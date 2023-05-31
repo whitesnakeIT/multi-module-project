@@ -21,6 +21,7 @@ public class OrderService {
 
     private final OrderEntityMapper orderEntityMapper;
 
+    @Transactional
     public Order save(Order order) {
         if (order == null) {
             throw new RuntimeException("Saving order failed. Order is null.");
@@ -47,6 +48,7 @@ public class OrderService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long orderId) {
         if (orderId == null) {
             throw new RuntimeException("Deleting order failed. Order id is null.");
@@ -56,6 +58,7 @@ public class OrderService {
         orderRepository.delete(orderEntityMapper.mapToEntity(order));
     }
 
+    @Transactional
     public Order update(Long id, Order order) {
         if (id == null) {
             throw new RuntimeException("Updating order failed. Order id is null.");

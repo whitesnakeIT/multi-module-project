@@ -19,6 +19,7 @@ public class TrackingService {
 
     private final TrackingEntityMapper trackingEntityMapper;
 
+    @Transactional
     public Tracking save(Tracking tracking) {
         if (tracking == null) {
             throw new RuntimeException("Saving tracking failed. Tracking is null.");
@@ -45,6 +46,7 @@ public class TrackingService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long trackingId) {
         if (trackingId == null) {
             throw new RuntimeException("Deleting tracking failed. Tracking id is null.");
@@ -54,6 +56,7 @@ public class TrackingService {
         trackingRepository.delete(trackingEntityMapper.mapToEntity(tracking));
     }
 
+    @Transactional
     public Tracking update(Long id, Tracking tracking) {
         if (id == null) {
             throw new RuntimeException("Updating tracking failed. Tracking id is null.");
