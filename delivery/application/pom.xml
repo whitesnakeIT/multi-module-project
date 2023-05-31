@@ -13,10 +13,6 @@
     <artifactId>delivery-delivery-application</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <properties>
-        <delivery-delivery-infrastructure.version>0.0.1-SNAPSHOT</delivery-delivery-infrastructure.version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -30,12 +26,6 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.kapusniak.tomasz</groupId>
-            <artifactId>delivery-delivery-infrastructure</artifactId>
-            <version>${delivery-delivery-infrastructure.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -1,9 +1,13 @@
 package com.kapusniak.tomasz.service;
 
+import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.mapstruct.DeliveryEntityMapper;
+import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
+import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,11 +19,14 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.CREATED;
+import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.IN_TRANSIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +60,7 @@ class DeliveryServiceTest {
         delivery.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0).atOffset(ZoneOffset.UTC));
-        delivery.setDeliveryStatus(DeliveryStatus.CREATED);
+        delivery.setDeliveryStatus(CREATED);
         delivery.setPrice(50.00);
 
         deliveryList.add(delivery);
@@ -63,7 +70,7 @@ class DeliveryServiceTest {
         deliveryEntity.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0));
-        deliveryEntity.setDeliveryStatus(DeliveryStatus.CREATED);
+        deliveryEntity.setDeliveryStatus(CREATED);
         deliveryEntity.setPrice(BigDecimal.valueOf(50.00));
 
         deliveryEntityList.add(deliveryEntity);
@@ -212,5 +219,151 @@ class DeliveryServiceTest {
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Deleting delivery failed. Delivery id is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when id is null")
+    void updateNullId() {
+        // given
+        Long deliveryId = null;
+
+        // when
+        Throwable throwable = catchThrowable(() ->
+                deliveryService.update(deliveryId, delivery));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating delivery failed. Delivery id is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when delivery is null")
+    void updateNullDelivery() {
+        // given
+        Long deliveryId = 1L;
+        Delivery delivery = null;
+
+        // when
+        Throwable thrown = catchThrowable(() ->
+                deliveryService.update(deliveryId, delivery));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating delivery failed. Delivery is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when newDelivery's id doesn't match deliveryFromDb's id")
+    void updateIdMissMatch() {
+        // given
+        Delivery newDelivery = new Delivery();
+        Long oldId = 1L;
+        Long newId = 2L;
+        newDelivery.setId(newId);
+
+        // and
+        when(deliveryRepository.findById(anyLong()))
+                .thenReturn(Optional.of(deliveryEntity));
+        // when
+        Throwable throwable = catchThrowable(() ->
+                deliveryService.update(oldId, newDelivery));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating delivery fields failed. Different id's");
+    }
+
+    @Test
+    @DisplayName("should correctly update delivery when valid id and delivery are provided")
+    void shouldUpdateDelivery() {
+        // given
+        Long deliveryId = 1L;
+
+        // and
+        Delivery changedDelivery = prepareDeliveryForEdit();
+        DeliveryEntity changedDeliveryEntity = prepareDeliveryEntityForEdit();
+
+        // and
+        when(deliveryRepository.findById(anyLong()))
+                .thenReturn(Optional.of(deliveryEntity));
+        when(deliveryRepository.save(any(DeliveryEntity.class)))
+                .thenReturn(changedDeliveryEntity);
+
+        //and
+        when(deliveryEntityMapper
+                .mapToApiModel(changedDeliveryEntity))
+                .thenReturn(changedDelivery);
+
+        // when
+        Delivery updatedDelivery = deliveryService.update(deliveryId, changedDelivery);
+
+        // then
+        assertThat(updatedDelivery).isNotNull();
+        assertThat(updatedDelivery.getId()).isEqualTo(changedDelivery.getId());
+        assertThat(updatedDelivery.getDeliveryTime()).isEqualTo(changedDelivery.getDeliveryTime());
+        assertThat(updatedDelivery.getPrice()).isEqualTo(changedDelivery.getPrice());
+        assertThat(updatedDelivery.getDeliveryStatus()).isEqualTo(changedDelivery.getDeliveryStatus());
+
+        assertThat(updatedDelivery.getOrder().getId()).isEqualTo(changedDelivery.getOrder().getId());
+        assertThat(updatedDelivery.getCourier().getId()).isEqualTo(changedDelivery.getCourier().getId());
+
+        // verify
+        then(deliveryRepository)
+                .should(times(1))
+                .save(deliveryEntity);
+    }
+
+    private Delivery prepareDeliveryForEdit() {
+        Long deliveryId = 1L;
+        Double newPrice = 40.50D;
+        LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
+        OffsetDateTime newDeliveryOffsetDateTime = newDeliveryLocalDateTime.atOffset(ZoneOffset.UTC);
+        DeliveryStatus newDeliveryStatus = IN_TRANSIT;
+        Long newOrderId = 3L;
+        Long newCourierId = 3L;
+
+        Delivery changedDelivery = new Delivery();
+        changedDelivery.setId(deliveryId);
+        changedDelivery.setPrice(newPrice);
+        changedDelivery.setDeliveryTime(newDeliveryOffsetDateTime);
+        changedDelivery.setDeliveryStatus(newDeliveryStatus);
+
+        Order newOrder = new Order();
+        newOrder.setId(newOrderId);
+        Courier newCourier = new Courier();
+        newCourier.setId(newCourierId);
+
+        changedDelivery.setOrder(newOrder);
+        changedDelivery.setCourier(newCourier);
+
+        return changedDelivery;
+    }
+
+    private DeliveryEntity prepareDeliveryEntityForEdit() {
+        Long deliveryId = 1L;
+        BigDecimal newPrice = BigDecimal.valueOf(40.50D);
+        LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
+        DeliveryStatus newDeliveryStatus = IN_TRANSIT;
+        Long newOrderId = 3L;
+        Long newCourierId = 3L;
+
+        DeliveryEntity changedDeliveryEntity = new DeliveryEntity();
+        changedDeliveryEntity.setId(deliveryId);
+        changedDeliveryEntity.setPrice(newPrice);
+        changedDeliveryEntity.setDeliveryTime(newDeliveryLocalDateTime);
+        changedDeliveryEntity.setDeliveryStatus(newDeliveryStatus);
+
+        OrderEntity newOrderEntity = new OrderEntity();
+        newOrderEntity.setId(newOrderId);
+        CourierEntity newCourierEntity = new CourierEntity();
+        newCourierEntity.setId(newCourierId);
+
+        changedDeliveryEntity.setOrder(newOrderEntity);
+        changedDeliveryEntity.setCourier(newCourierEntity);
+
+        return changedDeliveryEntity;
     }
 }

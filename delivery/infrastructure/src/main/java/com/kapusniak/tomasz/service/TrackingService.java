@@ -6,18 +6,20 @@ import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-//@Transactional
+@Transactional(readOnly = true)
 public class TrackingService {
 
     private final TrackingJpaRepository trackingRepository;
 
     private final TrackingEntityMapper trackingEntityMapper;
 
+    @Transactional
     public Tracking save(Tracking tracking) {
         if (tracking == null) {
             throw new RuntimeException("Saving tracking failed. Tracking is null.");
@@ -44,6 +46,7 @@ public class TrackingService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long trackingId) {
         if (trackingId == null) {
             throw new RuntimeException("Deleting tracking failed. Tracking id is null.");
@@ -53,9 +56,10 @@ public class TrackingService {
         trackingRepository.delete(trackingEntityMapper.mapToEntity(tracking));
     }
 
+    @Transactional
     public Tracking update(Long id, Tracking tracking) {
         if (id == null) {
-            throw new RuntimeException("Updati ng tracking failed. Tracking id is null.");
+            throw new RuntimeException("Updating tracking failed. Tracking id is null.");
         }
         if (tracking == null) {
             throw new RuntimeException("Updating tracking failed. Tracking is null.");
@@ -63,12 +67,21 @@ public class TrackingService {
 
         Tracking trackingFromDb = findById(id);
 
-        // update
+        Tracking updatedTracking = updateFields(trackingFromDb, tracking);
 
-        TrackingEntity updatedTracking = trackingRepository
-                .save(trackingEntityMapper.mapToEntity(trackingFromDb));
+        TrackingEntity updatedTrackingEntity = trackingRepository
+                .save(trackingEntityMapper.mapToEntity(updatedTracking));
 
-        return trackingEntityMapper.mapToApiModel(updatedTracking);
+        return trackingEntityMapper.mapToApiModel(updatedTrackingEntity);
     }
 
+    private Tracking updateFields(Tracking trackingFromDb, Tracking newTracking) {
+        if (newTracking.getId() == null) {
+            newTracking.setId(trackingFromDb.getId());
+        }
+        if (!newTracking.getId().equals(trackingFromDb.getId())) {
+            throw new RuntimeException("Updating tracking fields failed. Different id's");
+        }
+        return newTracking;
+    }
 }

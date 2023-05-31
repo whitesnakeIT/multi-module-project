@@ -3,8 +3,10 @@ package com.kapusniak.tomasz.controller;
 import com.kapusniak.tomasz.openapi.api.CustomersApi;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,14 +21,14 @@ public class CustomerController implements CustomersApi {
     private final CustomerService customerService;
 
     @Override
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Customer> createCustomer(@RequestBody @Valid Customer customer) {
         Customer save = customerService.save(customer);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteCustomer(Long customerId) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") Long customerId) {
         customerService.delete(customerId);
 
         return ResponseEntity
@@ -42,13 +44,16 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<Customer> getCustomer(Long customerId) {
+    public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long customerId) {
         Customer customer = customerService.findById(customerId);
+
         return ResponseEntity.ok(customer);
     }
 
     @Override
-    public ResponseEntity<Customer> updateCustomer(Long id, Customer customer) {
-        return null;
+    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") Long customerId, @RequestBody @Valid Customer customer) {
+        Customer update = customerService.update(customerId, customer);
+
+        return ResponseEntity.ok(update);
     }
 }

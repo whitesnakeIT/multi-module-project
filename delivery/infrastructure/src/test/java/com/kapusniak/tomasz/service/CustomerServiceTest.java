@@ -1,8 +1,10 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.mapstruct.CustomerEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
+import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -203,5 +205,145 @@ class CustomerServiceTest {
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Deleting customer failed. Customer id is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when id is null")
+    void updateNullId() {
+        // given
+        Long customerId = null;
+
+        // when
+        Throwable throwable = catchThrowable(() ->
+                customerService.update(customerId, customer));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating customer failed. Customer id is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when customer is null")
+    void updateNullCustomer() {
+        // given
+        Long customerId = 1L;
+        Customer customer = null;
+
+        // when
+        Throwable thrown = catchThrowable(() ->
+                customerService.update(customerId, customer));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating customer failed. Customer is null.");
+    }
+
+    @Test
+    @DisplayName("should throw an exception when newCustomer's id doesn't match customerFromDb's id")
+    void updateIdMissMatch() {
+        // given
+        Customer newCustomer = new Customer();
+        Long oldId = 1L;
+        Long newId = 2L;
+        newCustomer.setId(newId);
+
+        // and
+        when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.of(customerEntity));
+        // when
+        Throwable throwable = catchThrowable(() ->
+                customerService.update(oldId, newCustomer));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Updating customer fields failed. Different id's");
+    }
+
+    @Test
+    @DisplayName("should correctly update customer when valid id and customer are provided")
+    void shouldUpdateCustomer() {
+        // given
+        Long customerId = 1L;
+        Customer changedCustomer = prepareCustomerToEdit();
+        CustomerEntity changedCustomerEntity = prepareCustomerEntityToEdit();
+
+        // and
+        when(customerRepository.findById(anyLong()))
+                .thenReturn(Optional.of(customerEntity));
+        when(customerRepository.save(any(CustomerEntity.class)))
+                .thenReturn(changedCustomerEntity);
+
+        //and
+        when(customerEntityMapper
+                .mapToApiModel(changedCustomerEntity))
+                .thenReturn(changedCustomer);
+
+        // when
+        Customer updatedCustomer = customerService.update(customerId, changedCustomer);
+
+        // then
+        assertThat(updatedCustomer).isNotNull();
+        assertThat(updatedCustomer.getId()).isEqualTo(changedCustomer.getId());
+        assertThat(updatedCustomer.getFirstName()).isEqualTo(changedCustomer.getFirstName());
+        assertThat(updatedCustomer.getLastName()).isEqualTo(changedCustomer.getLastName());
+        assertThat(updatedCustomer.getEmail()).isEqualTo(changedCustomer.getEmail());
+
+        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
+        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
+
+        // verify
+        then(customerRepository)
+                .should(times(1))
+                .save(customerEntity);
+    }
+
+    private Customer prepareCustomerToEdit() {
+        Long customerId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        String newEmail = "newEmail";
+        Long newOrder1Id = 3L;
+        Long newOrder2Id = 3L;
+
+        Customer changedCustomer = new Customer();
+        changedCustomer.setId(customerId);
+        changedCustomer.setFirstName(newFirstName);
+        changedCustomer.setLastName(newLastName);
+        changedCustomer.setEmail(newEmail);
+
+        Order newOrder1 = new Order();
+        newOrder1.setId(newOrder1Id);
+        Order newOrder2 = new Order();
+        newOrder2.setId(newOrder2Id);
+
+        changedCustomer.setOrders(List.of(newOrder1, newOrder2));
+
+        return changedCustomer;
+    }
+
+    private CustomerEntity prepareCustomerEntityToEdit() {
+        Long customerId = 1L;
+        String newFirstName = "newFirstName";
+        String newLastName = "newLastName";
+        String newEmail = "newEmail";
+        Long newOrder1Id = 3L;
+        Long newOrder2Id = 3L;
+
+        CustomerEntity changedCustomerEntity = new CustomerEntity();
+        changedCustomerEntity.setId(customerId);
+        changedCustomerEntity.setFirstName(newFirstName);
+        changedCustomerEntity.setLastName(newLastName);
+        changedCustomerEntity.setEmail(newEmail);
+        OrderEntity newOrderEntity1 = new OrderEntity();
+        newOrderEntity1.setId(newOrder1Id);
+        OrderEntity newOrderEntity2 = new OrderEntity();
+        newOrderEntity2.setId(newOrder2Id);
+
+        changedCustomerEntity.setOrders(List.of(newOrderEntity1, newOrderEntity2));
+
+        return changedCustomerEntity;
     }
 }

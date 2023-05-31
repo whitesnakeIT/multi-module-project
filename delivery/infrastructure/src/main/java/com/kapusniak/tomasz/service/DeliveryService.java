@@ -6,18 +6,20 @@ import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-//@Transactional
+@Transactional(readOnly = true)
 public class DeliveryService {
 
     private final DeliveryJpaRepository deliveryRepository;
 
     private final DeliveryEntityMapper deliveryEntityMapper;
 
+    @Transactional
     public Delivery save(Delivery delivery) {
         if (delivery == null) {
             throw new RuntimeException("Saving delivery failed. Delivery is null.");
@@ -44,6 +46,7 @@ public class DeliveryService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long deliveryId) {
         if (deliveryId == null) {
             throw new RuntimeException("Deleting delivery failed. Delivery id is null.");
@@ -53,9 +56,10 @@ public class DeliveryService {
         deliveryRepository.delete(deliveryEntityMapper.mapToEntity(delivery));
     }
 
+    @Transactional
     public Delivery update(Long id, Delivery delivery) {
         if (id == null) {
-            throw new RuntimeException("Updati ng delivery failed. Delivery id is null.");
+            throw new RuntimeException("Updating delivery failed. Delivery id is null.");
         }
         if (delivery == null) {
             throw new RuntimeException("Updating delivery failed. Delivery is null.");
@@ -63,12 +67,22 @@ public class DeliveryService {
 
         Delivery deliveryFromDb = findById(id);
 
-        // update
+        Delivery updatedDelivery = updateFields(deliveryFromDb, delivery);
 
-        DeliveryEntity updatedDelivery = deliveryRepository
-                .save(deliveryEntityMapper.mapToEntity(deliveryFromDb));
+        DeliveryEntity updatedDeliveryEntity = deliveryRepository
+                .save(deliveryEntityMapper.mapToEntity(updatedDelivery));
 
-        return deliveryEntityMapper.mapToApiModel(updatedDelivery);
+        return deliveryEntityMapper.mapToApiModel(updatedDeliveryEntity);
+    }
+
+    private Delivery updateFields(Delivery deliveryFromDb, Delivery newDelivery) {
+        if (newDelivery.getId() == null) {
+            newDelivery.setId(deliveryFromDb.getId());
+        }
+        if (!newDelivery.getId().equals(deliveryFromDb.getId())) {
+            throw new RuntimeException("Updating delivery fields failed. Different id's");
+        }
+        return newDelivery;
     }
 
 }

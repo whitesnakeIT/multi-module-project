@@ -494,6 +494,7 @@ components:
             $ref: '#/components/schemas/Order'
     Delivery:
       type: object
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"courier"})'
       properties:
         id:
           type: integer
@@ -506,11 +507,12 @@ components:
         deliveryTime:
           type: string
           format: date-time
-        #        courier:
-        #          $ref: '#/components/schemas/Courier'
+        courier:
+          $ref: '#/components/schemas/Courier'
         order:
           $ref: '#/components/schemas/Order'
     Order:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"customer"})'
       type: object
       properties:
         id:
@@ -527,8 +529,8 @@ components:
         preferredDeliveryDate:
           type: string
           format: date
-    #        customer:
-    #          $ref: '#/components/schemas/Customer'
+        customer:
+          $ref: '#/components/schemas/Customer'
     Tracking:
       type: object
       properties:

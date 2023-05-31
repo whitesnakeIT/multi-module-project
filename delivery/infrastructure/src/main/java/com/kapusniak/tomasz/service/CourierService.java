@@ -6,18 +6,20 @@ import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-//@Transactional
+@Transactional(readOnly = true)
 public class CourierService {
 
     private final CourierJpaRepository courierRepository;
 
     private final CourierEntityMapper courierEntityMapper;
 
+    @Transactional
     public Courier save(Courier courier) {
         if (courier == null) {
             throw new RuntimeException("Saving courier failed. Courier is null.");
@@ -44,6 +46,7 @@ public class CourierService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long courierId) {
         if (courierId == null) {
             throw new RuntimeException("Deleting courier failed. Courier id is null.");
@@ -53,9 +56,10 @@ public class CourierService {
         courierRepository.delete(courierEntityMapper.mapToEntity(courier));
     }
 
+    @Transactional
     public Courier update(Long id, Courier courier) {
         if (id == null) {
-            throw new RuntimeException("Updati ng courier failed. Courier id is null.");
+            throw new RuntimeException("Updating courier failed. Courier id is null.");
         }
         if (courier == null) {
             throw new RuntimeException("Updating courier failed. Courier is null.");
@@ -63,12 +67,21 @@ public class CourierService {
 
         Courier courierFromDb = findById(id);
 
-        // update
+        Courier updatedCourier = updateFields(courierFromDb, courier);
 
-        CourierEntity updatedCourier = courierRepository
-                .save(courierEntityMapper.mapToEntity(courierFromDb));
+        CourierEntity updatedCourierEntity = courierRepository
+                .save(courierEntityMapper.mapToEntity(updatedCourier));
 
-        return courierEntityMapper.mapToApiModel(updatedCourier);
+        return courierEntityMapper.mapToApiModel(updatedCourierEntity);
     }
 
+    private Courier updateFields(Courier courierFromDb, Courier newCourier) {
+        if (newCourier.getId() == null) {
+            newCourier.setId(courierFromDb.getId());
+        }
+        if (!newCourier.getId().equals(courierFromDb.getId())) {
+            throw new RuntimeException("Updating courier fields failed. Different id's");
+        }
+        return newCourier;
+    }
 }
