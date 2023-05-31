@@ -35,6 +35,7 @@ CREATE TABLE orders
     CONSTRAINT FK_CustomerOrder
         FOREIGN KEY (customer_id)
             REFERENCES customers (customer_id)
+            ON DELETE CASCADE
 );
 
 CREATE TABLE tracking
@@ -59,4 +60,5 @@ CREATE TABLE deliveries
     CONSTRAINT FK_Delivery_Order
         FOREIGN KEY (order_id)
             REFERENCES orders (order_id)
+            ON DELETE CASCADE
 );

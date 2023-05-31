@@ -19,6 +19,7 @@ public class CourierService {
 
     private final CourierEntityMapper courierEntityMapper;
 
+    @Transactional
     public Courier save(Courier courier) {
         if (courier == null) {
             throw new RuntimeException("Saving courier failed. Courier is null.");
@@ -45,6 +46,7 @@ public class CourierService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long courierId) {
         if (courierId == null) {
             throw new RuntimeException("Deleting courier failed. Courier id is null.");
@@ -54,6 +56,7 @@ public class CourierService {
         courierRepository.delete(courierEntityMapper.mapToEntity(courier));
     }
 
+    @Transactional
     public Courier update(Long id, Courier courier) {
         if (id == null) {
             throw new RuntimeException("Updating courier failed. Courier id is null.");

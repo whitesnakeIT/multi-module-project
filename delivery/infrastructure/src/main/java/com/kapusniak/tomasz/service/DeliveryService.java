@@ -19,6 +19,7 @@ public class DeliveryService {
 
     private final DeliveryEntityMapper deliveryEntityMapper;
 
+    @Transactional
     public Delivery save(Delivery delivery) {
         if (delivery == null) {
             throw new RuntimeException("Saving delivery failed. Delivery is null.");
@@ -45,6 +46,7 @@ public class DeliveryService {
                 .orElseThrow(RuntimeException::new));
     }
 
+    @Transactional
     public void delete(Long deliveryId) {
         if (deliveryId == null) {
             throw new RuntimeException("Deleting delivery failed. Delivery id is null.");
@@ -54,6 +56,7 @@ public class DeliveryService {
         deliveryRepository.delete(deliveryEntityMapper.mapToEntity(delivery));
     }
 
+    @Transactional
     public Delivery update(Long id, Delivery delivery) {
         if (id == null) {
             throw new RuntimeException("Updating delivery failed. Delivery id is null.");
