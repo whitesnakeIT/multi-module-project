@@ -3,6 +3,7 @@ package com.kapusniak.tomasz.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,7 @@ public class TrackingTest {
     }
 
     @Test
-    @DisplayName("should edited Tracking to database after executing method" +
+    @DisplayName("should save Tracking to database after executing method" +
             " from controller")
     void createTracking() throws Exception {
         // given
