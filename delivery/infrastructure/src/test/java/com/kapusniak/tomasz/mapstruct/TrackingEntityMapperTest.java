@@ -18,7 +18,7 @@ class TrackingEntityMapperTest {
     private TrackingEntityMapper trackingEntityMapper;
 
     @Test
-    @DisplayName("should map Tracking to TrackingEntity and add random uuid")
+    @DisplayName("should map Tracking to TrackingEntity")
     public void mapToEntity() {
         // given
         Tracking tracking = new Tracking();
@@ -26,23 +26,22 @@ class TrackingEntityMapperTest {
         tracking.setLocalization("testLocalization");
 
         // when
-        TrackingEntity entity = trackingEntityMapper.mapToEntity(tracking);
+        TrackingEntity trackingEntity = trackingEntityMapper.mapToEntity(tracking);
 
         // then
-        assertThat(entity).isNotNull();
-        assertThat(tracking.getId()).isEqualTo(entity.getId());
-        assertThat(tracking.getLocalization()).isEqualTo(entity.getLocalization());
-        assertThat(entity.getUuid()).isNotNull();
+        assertThat(trackingEntity).isNotNull();
+        assertThat(tracking.getId()).isEqualTo(trackingEntity.getId());
+        assertThat(tracking.getLocalization()).isEqualTo(trackingEntity.getLocalization());
+        assertThat(trackingEntity.getUuid()).isNotNull();
     }
 
     @Test
-    @DisplayName("should map TrackingEntity to Tracking without uuid")
+    @DisplayName("should map TrackingEntity to Tracking")
     public void mapToApiModel() {
         // given
         TrackingEntity entity = new TrackingEntity();
         entity.setId(1L);
         entity.setLocalization("123456789");
-        entity.setUuid("3208be6f-eacc-4da3-8761-e80a60404a5b");
 
         // when
         Tracking tracking = trackingEntityMapper.mapToApiModel(entity);

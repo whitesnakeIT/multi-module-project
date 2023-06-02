@@ -494,7 +494,7 @@ components:
             $ref: '#/components/schemas/Order'
     Delivery:
       type: object
-      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"courier"})'
+#      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"courier"})'
       properties:
         id:
           type: integer
@@ -512,7 +512,6 @@ components:
         order:
           $ref: '#/components/schemas/Order'
     Order:
-      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"customer"})'
       type: object
       properties:
         id:
