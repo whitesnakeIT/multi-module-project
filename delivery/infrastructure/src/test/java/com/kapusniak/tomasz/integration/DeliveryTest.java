@@ -60,7 +60,7 @@ public class DeliveryTest {
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/deliveries/1"));
+                        "/api/v1/deliveries/" + deliveryId));
 
         // then
         result.andExpect(status().isOk())
@@ -107,8 +107,6 @@ public class DeliveryTest {
                         .value(deliveryList.get(0).getId()))
                 .andExpect(jsonPath("$[1].id")
                         .value(deliveryList.get(1).getId()));
-
-
     }
 
     @Sql("classpath:integration-test-scripts/cleanup.sql")

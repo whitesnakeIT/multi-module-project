@@ -24,14 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class DeliveryEntityMapperTest {
 
-    private final LocalDateTime localDeliveryTime =
-            LocalDateTime.of(2023, 5, 28, 12, 0, 0);
-    private final OffsetDateTime offsetDeliveryTime =
-            localDeliveryTime.atOffset(ZoneOffset.UTC);
     @Autowired
     private DeliveryEntityMapper deliveryEntityMapper;
 
     public Delivery prepareDelivery() {
+        LocalDateTime localDeliveryTime =
+                LocalDateTime.of(2023, 5, 28, 12, 0, 0);
+        OffsetDateTime offsetDeliveryTime =
+                localDeliveryTime.atOffset(ZoneOffset.UTC);
         Delivery delivery = new Delivery();
         delivery.setId(1L);
         delivery.setPrice(20.50d);
@@ -44,6 +44,8 @@ class DeliveryEntityMapperTest {
     }
 
     public DeliveryEntity prepareDeliveryEntity() {
+        LocalDateTime localDeliveryTime =
+                LocalDateTime.of(2023, 5, 28, 12, 0, 0);
         DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setId(1L);
         deliveryEntity.setPrice(BigDecimal.valueOf(20.50d));
@@ -106,62 +108,8 @@ class DeliveryEntityMapperTest {
     }
 
     @Test
-    @DisplayName("should return null when LocalDateTime is null, instead of throwing an exception")
-    void mapNullLocalDateTimeToOffset() {
-        // given
-        LocalDateTime localDateTime = null;
-
-        // when
-        OffsetDateTime offsetDateTime = deliveryEntityMapper.mapLocalDateTimeToOffset(localDateTime);
-
-        // then
-        assertThat(offsetDateTime).isNull();
-    }
-
-    @Test
-    @DisplayName("should correctly map from OffsetDateTime to LocalDateTime")
-    public void mapOffsetToLocalDateTime() {
-        // given
-        OffsetDateTime offsetDeliveryTime = this.offsetDeliveryTime;
-        LocalDateTime localDeliveryTime = this.localDeliveryTime;
-
-        // when
-        LocalDateTime result = deliveryEntityMapper.mapOffsetToLocalDateTime(offsetDeliveryTime);
-
-        // then
-        assertThat(result).isEqualTo(localDeliveryTime);
-    }
-
-    @Test
-    @DisplayName("should correctly map from LocalDateTime to OffsetDateTime")
-    public void mapLocalDateTimeToOffset() {
-        // given
-        OffsetDateTime offsetDeliveryTime = this.offsetDeliveryTime;
-        LocalDateTime localDeliveryTime = this.localDeliveryTime;
-
-        // when
-        OffsetDateTime result = deliveryEntityMapper.mapLocalDateTimeToOffset(localDeliveryTime);
-
-        // then
-        assertThat(result).isEqualTo(offsetDeliveryTime);
-    }
-
-    @Test
-    @DisplayName("should return null when OffsetDateTime is null, instead of throwing an exception")
-    void mapNullOffsetToLocalDateTime() {
-        // given
-        OffsetDateTime offsetDateTime = null;
-
-        // when
-        LocalDateTime localDateTime = deliveryEntityMapper.mapOffsetToLocalDateTime(offsetDateTime);
-
-        // then
-        assertThat(localDateTime).isNull();
-    }
-
-    @Test
-    @DisplayName("should map Delivery to DeliveryEntity with ignored Courier.DeliveryList" +
-            " and Order.Customer.Orders fields to avoid cycle dependencies")
+    @DisplayName("should map Delivery to DeliveryEntity with null Courier.DeliveryList" +
+            " and ignored Order.Customer.Orders fields to avoid cycle dependencies")
     void mapToEntity() {
         // given
         Delivery delivery = prepareDelivery();
@@ -176,6 +124,8 @@ class DeliveryEntityMapperTest {
 
         assertThat(deliveryEntity.getCourier().getUuid()).isNotNull();
         assertThat(deliveryEntity.getCourier().getId()).isEqualTo(delivery.getCourier().getId());
+
+        assertThat(deliveryEntity.getCourier().getDeliveryList()).isNull();
         assertThat(deliveryEntity.getOrder().getCustomer().getOrders()).isNull();
     }
 
@@ -194,47 +144,9 @@ class DeliveryEntityMapperTest {
         assertThat(delivery.getPrice()).isEqualTo(deliveryEntity.getPrice().doubleValue());
         assertThat(delivery.getDeliveryStatus()).isEqualTo(deliveryEntity.getDeliveryStatus());
 
+        assertThat(delivery.getCourier().getDeliveryList()).isNull();
         assertThat(delivery.getCourier().getId()).isEqualTo(deliveryEntity.getCourier().getId());
         assertThat(delivery.getOrder().getCustomer().getOrders()).isNull();
-    }
-
-    @Test
-    @DisplayName("should map DeliveryEntity to Delivery with ignored Courier" +
-            " and Order.Customer.Orders fields, method can be used in other mappers, to avoid cycle dependencies")
-    void mapToApiModelWithoutCourier() {
-        // given
-        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
-
-        // when
-        Delivery delivery = deliveryEntityMapper.mapToApiModelWithoutCourier(deliveryEntity);
-
-        // then
-        assertThat(delivery.getId()).isEqualTo(deliveryEntity.getId());
-        assertThat(delivery.getPrice()).isEqualTo(deliveryEntity.getPrice().doubleValue());
-        assertThat(delivery.getDeliveryStatus()).isEqualTo(deliveryEntity.getDeliveryStatus());
-
-        assertThat(delivery.getCourier()).isNull();
-        assertThat(delivery.getOrder().getCustomer().getOrders()).isNull();
-    }
-
-    @Test
-    @DisplayName("should map Delivery to DeliveryEntity with ignored Courier," +
-            " and Order.Customer.Orders fields, method can be used in other mappers, to avoid cycle dependencies")
-    void mapToEntityWithoutCourier() {
-        // given
-        Delivery delivery = prepareDelivery();
-
-        // when
-        DeliveryEntity deliveryEntity = deliveryEntityMapper.mapToEntityWithoutCourier(delivery);
-
-        // then
-        assertThat(deliveryEntity.getId()).isEqualTo(delivery.getId());
-        assertThat(deliveryEntity.getPrice()).isEqualTo(BigDecimal.valueOf(delivery.getPrice()));
-        assertThat(deliveryEntity.getDeliveryStatus()).isEqualTo(delivery.getDeliveryStatus());
-
-        assertThat(deliveryEntity.getUuid()).isNotNull();
-        assertThat(deliveryEntity.getCourier()).isNull();
-        assertThat(deliveryEntity.getOrder().getCustomer().getOrders()).isNull();
     }
 
 }

@@ -21,15 +21,33 @@ class CustomerEntityMapperTest {
     @Autowired
     private CustomerEntityMapper customerEntityMapper;
 
+    public List<Order> prepareOrderList() {
+        Order order1 = new Order();
+        Order order2 = new Order();
+
+        return List.of(order1, order2);
+    }
+
     public Customer prepareCustomer() {
         Customer customer = new Customer();
         customer.setId(1L);
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setEmail("test@test.com");
-        customer.setOrders(List.of(new Order(), new Order()));
+
+        List<Order> orders = prepareOrderList();
+        orders.forEach(order -> order.setCustomer(customer));
+        customer.setOrders(orders);
+
 
         return customer;
+    }
+
+    public List<OrderEntity> prepareOrderEntityList() {
+        OrderEntity orderEntity1 = new OrderEntity();
+        OrderEntity orderEntity2 = new OrderEntity();
+
+        return List.of(orderEntity1, orderEntity2);
     }
 
     public CustomerEntity prepareCustomerEntity() {
@@ -38,14 +56,17 @@ class CustomerEntityMapperTest {
         customerEntity.setFirstName("testFirstName");
         customerEntity.setLastName("testLastName");
         customerEntity.setEmail("test@test.com");
-        customerEntity.setOrders(List.of(new OrderEntity(), new OrderEntity()));
+
+        List<OrderEntity> orderEntities = prepareOrderEntityList();
+        orderEntities.forEach(orderEntity -> orderEntity.setCustomer(customerEntity));
+        customerEntity.setOrders(orderEntities);
 
         return customerEntity;
     }
 
     @Test
     @DisplayName("should map from Customer to CustomerEntity with ignored" +
-            " Order.Customer field to avoid cycle dependencies")
+            " Order.Customer.Orders field to avoid cycle dependencies")
     void mapToEntity() {
         // given
         Customer customer = prepareCustomer();
@@ -61,13 +82,17 @@ class CustomerEntityMapperTest {
 
         assertThat(customerEntity.getOrders()).isNotNull();
         assertThat(customerEntity.getUuid()).isNotNull();
-        assertThat(customerEntity.getOrders().get(0).getCustomer()).isNull();
-        assertThat(customerEntity.getOrders().get(1).getCustomer()).isNull();
+
+        assertThat(customerEntity.getOrders().get(0).getCustomer()).isNotNull();
+        assertThat(customerEntity.getOrders().get(1).getCustomer()).isNotNull();
+
+        assertThat(customerEntity.getOrders().get(0).getCustomer().getOrders()).isNull();
+        assertThat(customerEntity.getOrders().get(1).getCustomer().getOrders()).isNull();
     }
 
     @Test
     @DisplayName("should map from CustomerEntity to Customer with ignored" +
-            " Order.Customer field to avoid cycle dependencies")
+            " Order.Customer.Orders field to avoid cycle dependencies")
     void mapToApiModel() {
         // given
         CustomerEntity customerEntity = prepareCustomerEntity();
@@ -82,8 +107,11 @@ class CustomerEntityMapperTest {
         assertThat(customer.getEmail()).isEqualTo(customerEntity.getEmail());
 
         assertThat(customer.getOrders()).isNotNull();
-        assertThat(customer.getOrders().get(0).getCustomer()).isNull();
-        assertThat(customer.getOrders().get(1).getCustomer()).isNull();
+        assertThat(customer.getOrders().get(0).getCustomer()).isNotNull();
+        assertThat(customer.getOrders().get(1).getCustomer()).isNotNull();
+
+        assertThat(customer.getOrders().get(0).getCustomer().getOrders()).isNull();
+        assertThat(customer.getOrders().get(1).getCustomer().getOrders()).isNull();
 
     }
 }

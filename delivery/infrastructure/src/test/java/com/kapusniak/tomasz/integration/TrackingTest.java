@@ -3,7 +3,7 @@ package com.kapusniak.tomasz.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
-import org.junit.jupiter.api.Disabled;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,8 @@ public class TrackingTest {
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/tracking/1"));
+                        "/api/v1/tracking/" + trackingId));
+
 
         // then
         result.andExpect(status().isOk())
@@ -128,8 +129,7 @@ public class TrackingTest {
     }
 
     @Test
-    @Disabled
-    @DisplayName("should save edited Tracking to database after executing method" +
+    @DisplayName("should save Tracking to database after executing method" +
             " from controller")
     void createTracking() throws Exception {
         // given

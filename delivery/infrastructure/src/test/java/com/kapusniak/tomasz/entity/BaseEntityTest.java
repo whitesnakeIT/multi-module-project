@@ -11,7 +11,7 @@ public class BaseEntityTest {
 
     @Test
     @DisplayName("should check if equals method of uuid is working correctly")
-    public void equals_sameUuid_shouldReturnTrue() {
+    public void compareWithSameUuid() {
         //given
         String uuid = UUID.randomUUID().toString();
 
@@ -31,7 +31,8 @@ public class BaseEntityTest {
     @Test
     @DisplayName("should check if ConcreteEntity is extending Base entity" +
             " then UUID number is generating correctly")
-    public void assigningUuidToDifferentEntities() {
+    public void compareWithDifferentUuid() {
+
         //given
         BaseEntity entity1 = new ConcreteEntity();
         BaseEntity entity2 = new ConcreteEntity();

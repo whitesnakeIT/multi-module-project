@@ -72,7 +72,8 @@ class OrderEntityMapperTest {
     }
 
     @Test
-    @DisplayName("should map Order to OrderEntity with ignored Customer.Orders field to avoid cycle dependencies")
+    @DisplayName("should map Order to OrderEntity with null Customer.Orders field" +
+            " to avoid cycle dependencies")
     public void mapToEntity() {
         // given
         Order order = prepareOrder();
@@ -93,7 +94,8 @@ class OrderEntityMapperTest {
     }
 
     @Test
-    @DisplayName("should map OrderEntity to Order with ignored Customer.Orders field to avoid cycle dependencies")
+    @DisplayName("should map OrderEntity to Order with ignored Customer.Orders field" +
+            " to avoid cycle dependencies")
     public void mapToApiModel() {
         // given
         OrderEntity orderEntity = prepareOrderEntity();
@@ -112,44 +114,4 @@ class OrderEntityMapperTest {
         assertThat(order.getCustomer().getOrders()).isNull();
     }
 
-    @Test
-    @DisplayName("should map OrderEntity to Order with ignored Customer field, method can be used in other mappers," +
-            " to avoid cycle dependencies")
-    public void shouldMapToApiModelWithoutCustomer() {
-        // given
-        OrderEntity orderEntity = prepareOrderEntity();
-
-        // when
-        Order order = orderEntityMapper.mapToApiModelWithoutCustomer(orderEntity);
-
-        // then
-        assertThat(order.getId()).isEqualTo(orderEntity.getId());
-        assertThat(order.getSenderAddress()).isEqualTo(orderEntity.getSenderAddress());
-        assertThat(order.getReceiverAddress()).isEqualTo(orderEntity.getReceiverAddress());
-        assertThat(order.getPackageType()).isEqualTo(orderEntity.getPackageType());
-        assertThat(order.getPackageSize()).isEqualTo(orderEntity.getPackageSize());
-
-        assertThat(order.getCustomer()).isNull();
-    }
-
-    @Test
-    @DisplayName("should map Order to OrderEntity with ignored Customer field, method can be used in other mappers," +
-            " to avoid cycle dependencies")
-    public void shouldMapToEntityWithoutCustomer() {
-        // given
-        Order order = prepareOrder();
-
-        // when
-        OrderEntity orderEntity = orderEntityMapper.mapToApiEntityWithoutCustomer(order);
-
-        // then
-        assertThat(orderEntity.getId()).isEqualTo(order.getId());
-        assertThat(orderEntity.getSenderAddress()).isEqualTo(order.getSenderAddress());
-        assertThat(orderEntity.getReceiverAddress()).isEqualTo(order.getReceiverAddress());
-        assertThat(orderEntity.getPackageType()).isEqualTo(order.getPackageType());
-        assertThat(orderEntity.getPackageSize()).isEqualTo(order.getPackageSize());
-
-        assertThat(orderEntity.getUuid()).isNotNull();
-        assertThat(orderEntity.getCustomer()).isNull();
-    }
 }
