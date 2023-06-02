@@ -69,6 +69,7 @@ class CourierEntityMapperTest {
     @Test
     @DisplayName("should map from CourierEntity to Courier with ignored" +
             " DeliveryList.Courier field to avoid cycle dependencies")
+
     void mapToApiModel() {
         // given
         CourierEntity courierEntity = prepareCourierEntity();

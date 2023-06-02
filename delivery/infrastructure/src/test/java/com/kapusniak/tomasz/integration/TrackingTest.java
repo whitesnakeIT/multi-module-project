@@ -62,6 +62,7 @@ public class TrackingTest {
                 mockMvc.perform(get(
                         "/api/v1/tracking/" + trackingId));
 
+
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

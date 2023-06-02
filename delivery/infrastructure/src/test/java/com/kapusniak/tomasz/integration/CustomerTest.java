@@ -3,6 +3,7 @@ package com.kapusniak.tomasz.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.service.CustomerService;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class CustomerTest {
         ResultActions result =
                 mockMvc.perform(get(
                         "/api/v1/customers/" + customerId));
+
 
         // then
         result.andExpect(status().isOk())
@@ -128,7 +130,6 @@ public class CustomerTest {
 
     @Test
     @DisplayName("should save Customer to database after executing method" +
-
             " from controller")
     void createCustomer() throws Exception {
         // given

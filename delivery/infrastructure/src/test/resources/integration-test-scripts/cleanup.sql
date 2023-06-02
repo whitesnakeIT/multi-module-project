@@ -9,3 +9,4 @@ ALTER SEQUENCE "delivery_integration_tests".customers_customer_id_seq RESTART WI
 ALTER SEQUENCE "delivery_integration_tests".deliveries_delivery_id_seq RESTART WITH 3;
 ALTER SEQUENCE "delivery_integration_tests".orders_order_id_seq RESTART WITH 3;
 ALTER SEQUENCE "delivery_integration_tests".tracking_tracking_id_seq RESTART WITH 3;
+

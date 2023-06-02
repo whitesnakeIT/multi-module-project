@@ -20,6 +20,7 @@ public interface DeliveryEntityMapper {
     )
     DeliveryEntity mapToEntity(Delivery delivery);
 
+
     @Mapping(
             target = "courier.deliveryList",
             ignore = true

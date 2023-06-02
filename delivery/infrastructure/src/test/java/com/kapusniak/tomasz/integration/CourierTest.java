@@ -61,6 +61,7 @@ public class CourierTest {
                 mockMvc.perform(get(
                         "/api/v1/couriers/" + courierId));
 
+
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

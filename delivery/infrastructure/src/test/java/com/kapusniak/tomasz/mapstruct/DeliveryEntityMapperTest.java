@@ -107,7 +107,6 @@ class DeliveryEntityMapperTest {
         return orderEntity;
     }
 
-
     @Test
     @DisplayName("should map Delivery to DeliveryEntity with null Courier.DeliveryList" +
             " and ignored Order.Customer.Orders fields to avoid cycle dependencies")
@@ -125,6 +124,7 @@ class DeliveryEntityMapperTest {
 
         assertThat(deliveryEntity.getCourier().getUuid()).isNotNull();
         assertThat(deliveryEntity.getCourier().getId()).isEqualTo(delivery.getCourier().getId());
+
         assertThat(deliveryEntity.getCourier().getDeliveryList()).isNull();
         assertThat(deliveryEntity.getOrder().getCustomer().getOrders()).isNull();
     }

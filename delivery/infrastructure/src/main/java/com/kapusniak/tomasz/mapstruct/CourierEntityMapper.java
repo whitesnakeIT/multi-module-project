@@ -23,5 +23,5 @@ public interface CourierEntityMapper {
             ignore = true
     )
     Courier mapToApiModel(CourierEntity courierEntity);
-
+  
 }

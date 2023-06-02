@@ -32,6 +32,7 @@ public class BaseEntityTest {
     @DisplayName("should check if ConcreteEntity is extending Base entity" +
             " then UUID number is generating correctly")
     public void compareWithDifferentUuid() {
+
         //given
         BaseEntity entity1 = new ConcreteEntity();
         BaseEntity entity2 = new ConcreteEntity();
