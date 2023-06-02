@@ -32,7 +32,7 @@ CREATE TABLE orders
     uuid                    VARCHAR(255),
     preferred_delivery_date DATE,
     customer_id             BIGINT NOT NULL,
-    CONSTRAINT FK_CustomerOrder
+    CONSTRAINT FK_Customer_Order
         FOREIGN KEY (customer_id)
             REFERENCES customers (customer_id)
             ON DELETE CASCADE

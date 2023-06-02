@@ -10,10 +10,11 @@ import org.mapstruct.Named;
 public interface OrderEntityMapper {
 
     @Named("OrderEntityWithCustomerWithoutOrderList")
-    @Mapping(
-            target = "customer.orders",
-            expression = "java(null)"
-    )
+//    @Mapping(
+//            target = "customer.orders",
+//            expression = "java(null)"
+//            ignore = true
+//    )
     OrderEntity mapToEntity(Order order);
 
     @Named("OrderWithCustomerWithoutOrderList")
@@ -35,6 +36,6 @@ public interface OrderEntityMapper {
             target = "customer",
             ignore = true
     )
-    OrderEntity mapToApiEntityWithoutCustomer(Order order);
+    OrderEntity mapToEntityWithoutCustomer(Order order);
 
 }

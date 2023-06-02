@@ -204,7 +204,7 @@ public class CustomerTest {
         // and
         customerBeforeEdit.setFirstName(newFirstName);
         customerBeforeEdit.setLastName(newLastName);
-        customerBeforeEdit.getOrders().forEach(order -> order.setCustomer(customerBeforeEdit));
+//        customerBeforeEdit.getOrders().forEach(order -> order.setCustomer(customerBeforeEdit));
 
 // when
         ResultActions result = mockMvc
