@@ -5,7 +5,7 @@ import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.service.OrderService;
-import org.junit.jupiter.api.Disabled;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class OrderTest {
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/orders/1"));
+                        "/api/v1/orders/" + orderId));
 
         // then
         result.andExpect(status().isOk())
@@ -130,7 +130,6 @@ public class OrderTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("should save Order to database after executing method" +
             " from controller")
     void createOrder() throws Exception {
@@ -196,7 +195,6 @@ public class OrderTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("should save edited Order to database after executing method" +
             " from controller")
     void updateOrder() throws Exception {

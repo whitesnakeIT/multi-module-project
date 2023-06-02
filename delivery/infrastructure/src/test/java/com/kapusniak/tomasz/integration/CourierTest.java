@@ -59,7 +59,7 @@ public class CourierTest {
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/couriers/1"));
+                        "/api/v1/couriers/" + courierId));
 
         // then
         result.andExpect(status().isOk())

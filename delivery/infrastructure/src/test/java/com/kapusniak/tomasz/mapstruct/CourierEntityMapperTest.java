@@ -46,7 +46,7 @@ class CourierEntityMapperTest {
 
     @Test
     @DisplayName("should map from Courier to CourierEntity with ignored" +
-            " DeliveryList.Delivery.Courier field to avoid cycle dependencies")
+            " DeliveryList.Courier field to avoid cycle dependencies")
     void mapToEntity() {
         // given
         Courier courier = prepareCourier();
@@ -68,7 +68,7 @@ class CourierEntityMapperTest {
 
     @Test
     @DisplayName("should map from CourierEntity to Courier with ignored" +
-            " DeliveryList.Delivery.Courier field to avoid cycle dependencies")
+            " DeliveryList.Courier field to avoid cycle dependencies")
     void mapToApiModel() {
         // given
         CourierEntity courierEntity = prepareCourierEntity();

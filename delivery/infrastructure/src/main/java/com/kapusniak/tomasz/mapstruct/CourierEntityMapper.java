@@ -9,21 +9,19 @@ import org.mapstruct.Mapping;
         componentModel = "spring",
         uses = {
                 DeliveryEntityMapper.class,
-                OrderEntityMapper.class
         }
 )
 public interface CourierEntityMapper {
     @Mapping(
-            target = "deliveryList",
-            qualifiedByName = "DeliveryEntityWithoutCourier"
+            target = "deliveryList.courier",
+            ignore = true
     )
     CourierEntity mapToEntity(Courier courier);
 
     @Mapping(
-            target = "deliveryList",
-            qualifiedByName = "DeliveryWithoutCourier"
+            target = "deliveryList.courier",
+            ignore = true
     )
     Courier mapToApiModel(CourierEntity courierEntity);
-
 
 }
