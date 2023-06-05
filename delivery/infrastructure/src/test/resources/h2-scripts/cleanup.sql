@@ -25,3 +25,4 @@ ALTER TABLE orders
     ALTER COLUMN order_id RESTART WITH 3;
 ALTER TABLE tracking
     ALTER COLUMN tracking_id RESTART WITH 3;
+

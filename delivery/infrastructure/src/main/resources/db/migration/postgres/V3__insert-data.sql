@@ -39,3 +39,4 @@ VALUES (default, 'Location 1', 0, '97e37668-b355-4ecd-83be-dbc9cf56d8c0'),
        (default, 'Location 3', 0, '9d615769-c925-4790-bb6d-69ad31daf07e'),
        (default, 'Location 4', 0, '44ca6b9c-a5cb-43a4-ad7e-51563f96d581'),
        (default, 'Location 5', 0, '670950c2-8dba-4c4b-a334-a9df91a485cb');
+
