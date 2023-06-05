@@ -42,7 +42,7 @@ class TrackingServiceTest {
     @BeforeEach
     void setup() {
         tracking.setId(1L);
-        tracking.localization("testLocalization");
+        tracking.setLocalization("testLocalization");
 
         trackingList.add(tracking);
         trackingList.add(tracking);

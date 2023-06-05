@@ -48,6 +48,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
       responses:
         "200":
           description: Customer found
@@ -68,6 +69,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
       requestBody:
         description: Customer object that needs to be updated
         required: true
@@ -94,6 +96,7 @@ paths:
           required: true
           schema:
             type: integer
+            minimum: 1
             format: int64
       responses:
         "204":
@@ -140,6 +143,7 @@ paths:
           required: true
           schema:
             type: integer
+            minimum: 1
             format: int64
       responses:
         '200':
@@ -158,6 +162,7 @@ paths:
           required: true
           schema:
             type: integer
+            minimum: 1
             format: int64
       requestBody:
         required: true
@@ -183,6 +188,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
       responses:
         '204':
           description: No Content
@@ -225,6 +231,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the delivery to get
       responses:
@@ -245,6 +252,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the delivery to update
       requestBody:
@@ -271,6 +279,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the delivery to delete
       responses:
@@ -315,6 +324,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the order to get
       responses:
@@ -335,6 +345,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the order to update
       requestBody:
@@ -361,6 +372,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the order to delete
       responses:
@@ -405,6 +417,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the tracking to get
       responses:
@@ -425,6 +438,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the tracking to update
       requestBody:
@@ -451,6 +465,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
           required: true
           description: ID of the tracking to delete
       responses:
