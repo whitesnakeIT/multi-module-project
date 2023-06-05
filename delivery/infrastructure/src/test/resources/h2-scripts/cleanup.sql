@@ -1,12 +1,27 @@
 use test;
 
+SET REFERENTIAL_INTEGRITY FALSE;
+
 DELETE
-FROM couriers;
+FROM couriers CASCADE;
 DELETE
-FROM customers;
+FROM customers CASCADE;
 DELETE
-FROM deliveries;
+FROM deliveries CASCADE;
 DELETE
-FROM orders;
+FROM orders CASCADE;
 DELETE
-FROM tracking;
+FROM tracking CASCADE;
+
+SET REFERENTIAL_INTEGRITY TRUE;
+
+ALTER TABLE couriers
+    ALTER COLUMN courier_id RESTART WITH 3;
+ALTER TABLE customers
+    ALTER COLUMN customer_id RESTART WITH 3;
+ALTER TABLE deliveries
+    ALTER COLUMN delivery_id RESTART WITH 3;
+ALTER TABLE orders
+    ALTER COLUMN order_id RESTART WITH 3;
+ALTER TABLE tracking
+    ALTER COLUMN tracking_id RESTART WITH 3;

@@ -22,7 +22,7 @@ public class TrackingController implements TrackingApi {
     private final TrackingService trackingService;
 
     @Override
-    public ResponseEntity<Tracking> createTracking(@RequestBody @Min(1) @Valid Tracking tracking) {
+    public ResponseEntity<Tracking> createTracking(@RequestBody @Valid Tracking tracking) {
         Tracking save = trackingService.save(tracking);
 
         return ResponseEntity.status(201).body(save);

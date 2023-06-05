@@ -1,5 +1,6 @@
 package com.kapusniak.tomasz.repository;
 
+import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
@@ -14,10 +15,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
+import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -39,6 +46,22 @@ class OrderJpaRepositoryTest {
 
     @Autowired
     private DeliveryJpaRepository deliveryRepository;
+
+    OrderEntity prepareOrderEntity() {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
+        orderEntity.setPackageSize(LARGE);
+        orderEntity.setPackageType(DOCUMENT);
+        orderEntity.setSenderAddress("test sender address");
+        orderEntity.setReceiverAddress("test receiver address");
+
+        CustomerEntity customerEntity = new CustomerEntity();
+
+        customerEntity.setId(1L);
+        orderEntity.setCustomer(customerEntity);
+
+        return orderEntity;
+    }
 
     @Test
     @DisplayName("should return list of orders with correct size based on package type")
@@ -130,5 +153,32 @@ class OrderJpaRepositoryTest {
         // then
         then(ordersByCustomerId)
                 .isEmpty();
+    }
+
+    @Test
+    @DisplayName("should correctly set version number after saving " +
+            "or editing an Order entity")
+    @Transactional(propagation = NOT_SUPPORTED)
+    void versionChecking() {
+        // given
+        OrderEntity orderEntity = prepareOrderEntity();
+
+        // when
+        OrderEntity savedOrder = orderRepository.save(orderEntity);
+
+        // and
+        savedOrder.setSenderAddress("new sender address");
+        savedOrder.setReceiverAddress("new receiver address");
+
+        OrderEntity editedOrder = orderRepository.save(savedOrder);
+
+        // then
+        assertThat(orderEntity.getVersion()).isEqualTo(0);
+
+        assertThat(savedOrder.getId()).isNotNull();
+        assertThat(savedOrder.getVersion()).isEqualTo(0);
+
+        assertThat(editedOrder.getId()).isEqualTo(savedOrder.getId());
+        assertThat(editedOrder.getVersion()).isEqualTo(savedOrder.getVersion() + 1);
     }
 }
