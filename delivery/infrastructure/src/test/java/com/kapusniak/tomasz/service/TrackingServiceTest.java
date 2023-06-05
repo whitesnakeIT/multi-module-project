@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.TrackingEntity;
-import com.kapusniak.tomasz.mapstruct.TrackingEntityMapper;
+import com.kapusniak.tomasz.mapper.TrackingEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import org.junit.jupiter.api.BeforeEach;

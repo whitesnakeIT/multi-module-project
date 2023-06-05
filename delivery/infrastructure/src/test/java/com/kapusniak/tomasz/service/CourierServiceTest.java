@@ -2,7 +2,7 @@ package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
-import com.kapusniak.tomasz.mapstruct.CourierEntityMapper;
+import com.kapusniak.tomasz.mapper.CourierEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import com.kapusniak.tomasz.openapi.model.Delivery;

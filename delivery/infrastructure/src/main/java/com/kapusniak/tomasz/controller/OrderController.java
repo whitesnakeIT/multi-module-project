@@ -4,6 +4,7 @@ import com.kapusniak.tomasz.openapi.api.OrdersApi;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.service.OrderService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteOrder(@PathVariable("id") Long orderId) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable("id") @Min(1) Long orderId) {
         orderService.delete(orderId);
 
         return ResponseEntity
@@ -44,14 +45,14 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<Order> getOrder(@PathVariable("id") Long orderId) {
+    public ResponseEntity<Order> getOrder(@PathVariable("id") @Min(1) Long orderId) {
         Order order = orderService.findById(orderId);
 
         return ResponseEntity.ok(order);
     }
 
     @Override
-    public ResponseEntity<Order> updateOrder(@PathVariable("id") Long orderId, @RequestBody @Valid Order order) {
+    public ResponseEntity<Order> updateOrder(@PathVariable("id") @Min(1) Long orderId, @RequestBody @Valid Order order) {
         Order update = orderService.update(orderId, order);
 
         return ResponseEntity.ok(update);

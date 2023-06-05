@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.mapstruct;
+package com.kapusniak.tomasz.mapper;
 
 import com.kapusniak.tomasz.entity.TrackingEntity;
 import com.kapusniak.tomasz.openapi.model.Tracking;
