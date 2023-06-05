@@ -4,6 +4,7 @@ import com.kapusniak.tomasz.openapi.api.TrackingApi;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +22,14 @@ public class TrackingController implements TrackingApi {
     private final TrackingService trackingService;
 
     @Override
-    public ResponseEntity<Tracking> createTracking(@RequestBody @Valid Tracking tracking) {
+    public ResponseEntity<Tracking> createTracking(@RequestBody @Min(1) @Valid Tracking tracking) {
         Tracking save = trackingService.save(tracking);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteTracking(@PathVariable("id") Long trackingId) {
+    public ResponseEntity<Void> deleteTracking(@PathVariable("id") @Min(1) Long trackingId) {
         trackingService.delete(trackingId);
 
         return ResponseEntity
@@ -44,14 +45,14 @@ public class TrackingController implements TrackingApi {
     }
 
     @Override
-    public ResponseEntity<Tracking> getTracking(@PathVariable("id") Long trackingId) {
+    public ResponseEntity<Tracking> getTracking(@PathVariable("id") @Min(1) Long trackingId) {
         Tracking tracking = trackingService.findById(trackingId);
 
         return ResponseEntity.ok(tracking);
     }
 
     @Override
-    public ResponseEntity<Tracking> updateTracking(@PathVariable("id") Long trackingId, @RequestBody @Valid Tracking tracking) {
+    public ResponseEntity<Tracking> updateTracking(@PathVariable("id") @Min(1) Long trackingId, @RequestBody @Valid Tracking tracking) {
         Tracking update = trackingService.update(trackingId, tracking);
 
         return ResponseEntity.ok(update);

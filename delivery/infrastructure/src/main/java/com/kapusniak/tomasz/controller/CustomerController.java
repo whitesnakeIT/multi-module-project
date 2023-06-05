@@ -4,6 +4,7 @@ import com.kapusniak.tomasz.openapi.api.CustomersApi;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.service.CustomerService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") Long customerId) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") @Min(1) Long customerId) {
         customerService.delete(customerId);
 
         return ResponseEntity
@@ -44,14 +45,14 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long customerId) {
+    public ResponseEntity<Customer> getCustomer(@PathVariable("id") @Min(1) Long customerId) {
         Customer customer = customerService.findById(customerId);
 
         return ResponseEntity.ok(customer);
     }
 
     @Override
-    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") Long customerId, @RequestBody @Valid Customer customer) {
+    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") @Min(1) Long customerId, @RequestBody @Valid Customer customer) {
         Customer update = customerService.update(customerId, customer);
 
         return ResponseEntity.ok(update);

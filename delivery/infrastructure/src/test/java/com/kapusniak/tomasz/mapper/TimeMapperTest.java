@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.mapstruct;
+package com.kapusniak.tomasz.mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

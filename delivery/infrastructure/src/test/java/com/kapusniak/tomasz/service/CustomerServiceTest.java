@@ -2,7 +2,7 @@ package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.mapstruct.CustomerEntityMapper;
+import com.kapusniak.tomasz.mapper.CustomerEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;

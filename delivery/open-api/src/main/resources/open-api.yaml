@@ -511,7 +511,6 @@ components:
         order:
           $ref: '#/components/schemas/Order'
     Order:
-      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIgnoreProperties({"customer"})'
       type: object
       properties:
         id:
