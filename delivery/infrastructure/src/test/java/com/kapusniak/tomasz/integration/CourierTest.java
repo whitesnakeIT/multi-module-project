@@ -2,6 +2,7 @@ package com.kapusniak.tomasz.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import com.kapusniak.tomasz.service.CourierService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.UUID;
 
+import static com.kapusniak.tomasz.openapi.model.CourierCompany.FEDEX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.hasSize;
@@ -39,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class CourierTest {
 
+    private static final UUID UUID_COURIER_1 = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+
     @Autowired
     private CourierService courierService;
 
@@ -48,37 +53,54 @@ public class CourierTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
+    private Courier prepareCourier() {
+        Courier courier = new Courier();
+        UUID courierUuid = UUID_COURIER_1;
+        String firstName = "testFirstName";
+        String lastName = "testLastName";
+        CourierCompany courierCompany = FEDEX;
+
+        courier.setUuid(courierUuid);
+        courier.setFirstName(firstName);
+        courier.setLastName(lastName);
+
+        courier.setCourierCompany(courierCompany);
+
+        return courier;
+    }
+
     @Test
     @DisplayName("should correctly get Courier from database and verify" +
             " properties with Courier from controller method")
     void getCourierExisting() throws Exception {
         // given
-        Long courierId = 1L;
-        Courier courier = courierService.findById(courierId);
+        UUID courierUuid = UUID_COURIER_1;
+        Courier courier = courierService.findByUuid(courierUuid);
 
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/couriers/" + courierId));
+                        "/api/v1/couriers/" + courierUuid));
 
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(courier.getId()));
+                .andExpect(jsonPath("$.uuid").value(courier.getUuid().toString()));
     }
 
     @Test
-    @DisplayName("should throw an exception when provided courier id is not existing" +
+    @DisplayName("should throw an exception when provided courier uuid is not existing" +
             " in database for searching")
     void getCourierNonExisting() {
         // given
-        Long courierId = 3L;
+        UUID courierUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/couriers/" + courierId)
+                        "/api/v1/couriers/" + courierUuid)
                 )
         );
 
@@ -103,10 +125,10 @@ public class CourierTest {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id")
-                        .value(courierList.get(0).getId()))
-                .andExpect(jsonPath("$[1].id")
-                        .value(courierList.get(1).getId()));
+                .andExpect(jsonPath("$[0].uuid")
+                        .value(courierList.get(0).getUuid().toString()))
+                .andExpect(jsonPath("$[1].uuid")
+                        .value(courierList.get(1).getUuid().toString()));
 
 
     }
@@ -132,8 +154,7 @@ public class CourierTest {
             " from controller")
     void createCourier() throws Exception {
         // given
-        Courier courier = new Courier();
-        courier.setFirstName("tom");
+        Courier courier = prepareCourier();
 
         // when
         ResultActions result = mockMvc
@@ -144,7 +165,7 @@ public class CourierTest {
         // then
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.uuid").isNotEmpty())
                 .andExpect(jsonPath("$.firstName").value(courier.getFirstName()));
     }
 
@@ -153,13 +174,13 @@ public class CourierTest {
             " method from controller")
     void deleteCourierExisting() throws Exception {
         // given
-        Long courierId = 1L;
+        UUID courierUuid = UUID_COURIER_1;
         int sizeBeforeDeleting = courierService.findAll().size();
 
         // when
         ResultActions result =
                 mockMvc.perform(delete(
-                        "/api/v1/couriers/" + courierId));
+                        "/api/v1/couriers/" + courierUuid));
 
         // then
         result.andExpect(status().isNoContent());
@@ -171,16 +192,16 @@ public class CourierTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided courier id is not existing" +
+    @DisplayName("should throw an exception when provided courier uuid is not existing" +
             " in database for deleting")
     void deleteCourierNonExisting() {
         // given
-        Long courierId = 3L;
+        UUID courierUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/couriers/" + courierId)
+                        "/api/v1/couriers/" + courierUuid)
                 )
         );
 
@@ -194,8 +215,8 @@ public class CourierTest {
             " from controller")
     void updateCourier() throws Exception {
         // given
-        Long courierId = 1L;
-        Courier courierBeforeEdit = courierService.findById(courierId);
+        UUID courierUuid = UUID_COURIER_1;
+        Courier courierBeforeEdit = courierService.findByUuid(courierUuid);
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
 
@@ -205,19 +226,19 @@ public class CourierTest {
 
         // when
         ResultActions result = mockMvc
-                .perform(put("/api/v1/couriers/" + courierId)
+                .perform(put("/api/v1/couriers/" + courierUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courierBeforeEdit)));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(courierBeforeEdit.getId()))
+                .andExpect(jsonPath("$.uuid").value(courierBeforeEdit.getUuid().toString()))
                 .andExpect(jsonPath("$.firstName").value(newFirstName))
                 .andExpect(jsonPath("$.lastName").value(newLastName));
 
         // and
-        Courier courierAfterEdit = courierService.findById(courierId);
+        Courier courierAfterEdit = courierService.findByUuid(courierUuid);
         assertThat(courierAfterEdit.getFirstName()).isEqualTo(newFirstName);
         assertThat(courierAfterEdit.getLastName()).isEqualTo(newLastName);
     }

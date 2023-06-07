@@ -15,8 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,6 +40,9 @@ public class CustomerControllerTest {
         Customer customer1 = new Customer();
         customer1.setId(1L);
         customer1.setFirstName("John");
+        customer1.setLastName("Wick");
+        customer1.setUuid(UUID.randomUUID());
+        customer1.setEmail("john@o2.pl");
 
         return customer1;
     }
@@ -47,6 +52,7 @@ public class CustomerControllerTest {
         Customer customer1 = new Customer();
         customer1.setId(1L);
         customer1.setFirstName("John");
+
         Customer customer2 = new Customer();
         customer2.setId(2L);
         customer2.setFirstName("Tom");
@@ -82,14 +88,16 @@ public class CustomerControllerTest {
 
     @Test
     @DisplayName("should correctly return customer based on customer id")
-    public void getCustomerById() throws Exception {
+    public void getCustomerByUuid() throws Exception {
         // given
         Customer customer = getCustomer();
-        when(customerService.findById(1L))
+        UUID customerUuid = customer.getUuid();
+
+        when(customerService.findByUuid(customerUuid))
                 .thenReturn(customer);
 
         // when
-        mockMvc.perform(get("/api/v1/customers/1"))
+        mockMvc.perform(get("/api/v1/customers/" + customerUuid))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
@@ -98,7 +106,7 @@ public class CustomerControllerTest {
         // then
         verify(customerService,
                 times(1))
-                .findById(1L);
+                .findByUuid(customerUuid);
         verifyNoMoreInteractions(customerService);
     }
 
@@ -132,12 +140,14 @@ public class CustomerControllerTest {
     public void updateCustomer() throws Exception {
         // given
         Customer customer = getCustomer();
-        when(customerService.update(anyLong(),
+        UUID customerUuid = customer.getUuid();
+
+        when(customerService.update(any(UUID.class),
                 any(Customer.class)))
                 .thenReturn(customer);
 
         // when
-        mockMvc.perform(put("/api/v1/customers/1")
+        mockMvc.perform(put("/api/v1/customers/" + customerUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customer)))
                 .andExpect(status().isOk())
@@ -148,21 +158,25 @@ public class CustomerControllerTest {
         // then
         verify(customerService,
                 times(1))
-                .update(eq(1L), any(Customer.class));
+                .update(eq(customerUuid), any(Customer.class));
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
     @DisplayName("should return no content after deleting customer")
     public void deleteCustomer() throws Exception {
+        // given
+        Customer customer = getCustomer();
+        UUID customerUuid = customer.getUuid();
+
         // when
-        mockMvc.perform(delete("/api/v1/customers/1"))
+        mockMvc.perform(delete("/api/v1/customers/" + customerUuid))
                 .andExpect(status().isNoContent());
 
         // then
         verify(customerService,
                 times(1))
-                .delete(1L);
+                .delete(customerUuid);
         verifyNoMoreInteractions(customerService);
     }
 }

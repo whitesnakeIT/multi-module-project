@@ -82,7 +82,7 @@ class OrderEntityMapperTest {
         OrderEntity orderEntity = orderEntityMapper.mapToEntity(order);
 
         // then
-        assertThat(orderEntity.getId()).isEqualTo(order.getId());
+        assertThat(orderEntity.getUuid()).isEqualTo(order.getUuid());
         assertThat(orderEntity.getSenderAddress()).isEqualTo(order.getSenderAddress());
         assertThat(orderEntity.getReceiverAddress()).isEqualTo(order.getReceiverAddress());
         assertThat(orderEntity.getPackageType()).isEqualTo(order.getPackageType());
@@ -104,7 +104,7 @@ class OrderEntityMapperTest {
         Order order = orderEntityMapper.mapToApiModel(orderEntity);
 
         // then
-        assertThat(order.getId()).isEqualTo(orderEntity.getId());
+        assertThat(order.getUuid()).isEqualTo(orderEntity.getUuid());
         assertThat(order.getSenderAddress()).isEqualTo(orderEntity.getSenderAddress());
         assertThat(order.getReceiverAddress()).isEqualTo(orderEntity.getReceiverAddress());
         assertThat(order.getPackageType()).isEqualTo(orderEntity.getPackageType());

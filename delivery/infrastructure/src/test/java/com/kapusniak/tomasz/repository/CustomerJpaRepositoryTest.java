@@ -63,10 +63,10 @@ public class CustomerJpaRepositoryTest {
         // then
         assertThat(customerEntity.getVersion()).isEqualTo(0);
 
-        assertThat(savedCustomer.getId()).isNotNull();
+        assertThat(savedCustomer.getUuid()).isNotNull();
         assertThat(savedCustomer.getVersion()).isEqualTo(0);
 
-        assertThat(editedCustomer.getId()).isEqualTo(savedCustomer.getId());
+        assertThat(editedCustomer.getUuid()).isEqualTo(savedCustomer.getUuid());
         assertThat(editedCustomer.getVersion()).isEqualTo(savedCustomer.getVersion() + 1);
     }
 }

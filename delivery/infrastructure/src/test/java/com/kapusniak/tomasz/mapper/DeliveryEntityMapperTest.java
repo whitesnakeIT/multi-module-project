@@ -118,12 +118,12 @@ class DeliveryEntityMapperTest {
         DeliveryEntity deliveryEntity = deliveryEntityMapper.mapToEntity(delivery);
 
         // then
-        assertThat(deliveryEntity.getId()).isEqualTo(delivery.getId());
+        assertThat(deliveryEntity.getUuid()).isEqualTo(delivery.getUuid());
         assertThat(deliveryEntity.getPrice()).isEqualTo(BigDecimal.valueOf(delivery.getPrice()));
         assertThat(deliveryEntity.getDeliveryStatus()).isEqualTo(delivery.getDeliveryStatus());
 
         assertThat(deliveryEntity.getCourier().getUuid()).isNotNull();
-        assertThat(deliveryEntity.getCourier().getId()).isEqualTo(delivery.getCourier().getId());
+        assertThat(deliveryEntity.getCourier().getUuid()).isEqualTo(delivery.getCourier().getUuid());
 
         assertThat(deliveryEntity.getCourier().getDeliveryList()).isNull();
         assertThat(deliveryEntity.getOrder().getCustomer().getOrders()).isNull();
@@ -140,12 +140,12 @@ class DeliveryEntityMapperTest {
         Delivery delivery = deliveryEntityMapper.mapToApiModel(deliveryEntity);
 
         // then
-        assertThat(delivery.getId()).isEqualTo(deliveryEntity.getId());
+        assertThat(delivery.getUuid()).isEqualTo(deliveryEntity.getUuid());
         assertThat(delivery.getPrice()).isEqualTo(deliveryEntity.getPrice().doubleValue());
         assertThat(delivery.getDeliveryStatus()).isEqualTo(deliveryEntity.getDeliveryStatus());
 
         assertThat(delivery.getCourier().getDeliveryList()).isNull();
-        assertThat(delivery.getCourier().getId()).isEqualTo(deliveryEntity.getCourier().getId());
+        assertThat(delivery.getCourier().getUuid()).isEqualTo(deliveryEntity.getCourier().getUuid());
         assertThat(delivery.getOrder().getCustomer().getOrders()).isNull();
     }
 

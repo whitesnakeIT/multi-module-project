@@ -62,10 +62,10 @@ public class CourierJpaRepositoryTest {
         // then
         assertThat(courierEntity.getVersion()).isEqualTo(0);
 
-        assertThat(savedCourier.getId()).isNotNull();
+        assertThat(savedCourier.getUuid()).isNotNull();
         assertThat(savedCourier.getVersion()).isEqualTo(0);
 
-        assertThat(editedCourier.getId()).isEqualTo(savedCourier.getId());
+        assertThat(editedCourier.getUuid()).isEqualTo(savedCourier.getUuid());
         assertThat(editedCourier.getVersion()).isEqualTo(savedCourier.getVersion() + 1);
     }
 }

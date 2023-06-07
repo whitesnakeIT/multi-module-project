@@ -75,7 +75,7 @@ class CustomerEntityMapperTest {
         CustomerEntity customerEntity = customerEntityMapper.mapToEntity(customer);
 
         // then
-        assertThat(customerEntity.getId()).isEqualTo(customer.getId());
+        assertThat(customerEntity.getUuid()).isEqualTo(customer.getUuid());
         assertThat(customerEntity.getFirstName()).isEqualTo(customer.getFirstName());
         assertThat(customerEntity.getLastName()).isEqualTo(customer.getLastName());
         assertThat(customerEntity.getEmail()).isEqualTo(customer.getEmail());
@@ -101,7 +101,7 @@ class CustomerEntityMapperTest {
         Customer customer = customerEntityMapper.mapToApiModel(customerEntity);
 
         // then
-        assertThat(customer.getId()).isEqualTo(customerEntity.getId());
+        assertThat(customer.getUuid()).isEqualTo(customerEntity.getUuid());
         assertThat(customer.getFirstName()).isEqualTo(customerEntity.getFirstName());
         assertThat(customer.getLastName()).isEqualTo(customerEntity.getLastName());
         assertThat(customer.getEmail()).isEqualTo(customerEntity.getEmail());

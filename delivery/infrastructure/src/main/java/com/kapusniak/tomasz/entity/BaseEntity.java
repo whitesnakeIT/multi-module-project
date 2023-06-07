@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 public abstract class BaseEntity {
 
-    private String uuid = UUID.randomUUID().toString();
+    private UUID uuid = UUID.randomUUID();
 
     @Version
     private int version;

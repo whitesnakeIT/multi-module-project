@@ -55,7 +55,7 @@ class CourierEntityMapperTest {
         CourierEntity courierEntity = courierEntityMapper.mapToEntity(courier);
 
         // then
-        assertThat(courierEntity.getId()).isEqualTo(courier.getId());
+        assertThat(courierEntity.getUuid()).isEqualTo(courier.getUuid());
         assertThat(courierEntity.getFirstName()).isEqualTo(courier.getFirstName());
         assertThat(courierEntity.getLastName()).isEqualTo(courier.getLastName());
         assertThat(courierEntity.getCourierCompany()).isEqualTo(courier.getCourierCompany());
@@ -78,7 +78,7 @@ class CourierEntityMapperTest {
         Courier courier = courierEntityMapper.mapToApiModel(courierEntity);
 
         // then
-        assertThat(courier.getId()).isEqualTo(courierEntity.getId());
+        assertThat(courier.getUuid()).isEqualTo(courierEntity.getUuid());
         assertThat(courier.getFirstName()).isEqualTo(courierEntity.getFirstName());
         assertThat(courier.getLastName()).isEqualTo(courierEntity.getLastName());
         assertThat(courier.getCourierCompany()).isEqualTo(courierEntity.getCourierCompany());

@@ -18,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.CourierCompany.DHL;
 import static com.kapusniak.tomasz.openapi.model.CourierCompany.FEDEX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 
@@ -134,32 +134,32 @@ class CourierServiceTest {
 
     @Test
     @DisplayName("should return courier based on courier id")
-    void findById() {
+    void findByUuid() {
 
         // given
-        given(courierRepository.findById(
-                anyLong()))
+        given(courierRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(courierEntity));
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
-        Courier courierById = courierService.findById(courierId);
+        Courier courierByUuid = courierService.findByUuid(courierUuid);
 
         // then
-        assertThat(courierById.getId())
+        assertThat(courierByUuid.getUuid())
                 .isNotNull();
     }
 
     @Test
     @DisplayName("should throw an exception when courier id is null")
-    void findByIdNull() {
+    void findByUuidNull() {
 
         // given
-        Long courierId = null;
+        UUID courierUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                courierService.findById(courierId));
+                courierService.findByUuid(courierUuid));
 
         // then
         assertThat(throwable)
@@ -176,13 +176,13 @@ class CourierServiceTest {
     void delete() {
 
         // given
-        given(courierRepository.findById(
-                anyLong()))
+        given(courierRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(courierEntity));
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
-        courierService.delete(courierId);
+        courierService.delete(courierUuid);
 
         // then
         then(courierRepository)
@@ -194,11 +194,11 @@ class CourierServiceTest {
     @DisplayName("should throw an exception when courier id is null")
     void deleteNull() {
         // given
-        Long courierId = null;
+        UUID courierUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                courierService.delete(courierId));
+                courierService.delete(courierUuid));
 
         // then
         assertThat(throwable)
@@ -208,13 +208,13 @@ class CourierServiceTest {
 
     @Test
     @DisplayName("should throw an exception when id is null")
-    void updateNullId() {
+    void updateNullUuid() {
         // given
-        Long courierId = null;
+        UUID courierUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                courierService.update(courierId, courier));
+                courierService.update(courierUuid, courier));
 
         // then
         assertThat(throwable)
@@ -226,12 +226,12 @@ class CourierServiceTest {
     @DisplayName("should throw an exception when courier is null")
     void updateNullCourier() {
         // given
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
         Courier courier = null;
 
         // when
         Throwable thrown = catchThrowable(() ->
-                courierService.update(courierId, courier));
+                courierService.update(courierUuid, courier));
 
         // then
         assertThat(thrown)
@@ -244,16 +244,17 @@ class CourierServiceTest {
     void updateIdMissMatch() {
         // given
         Courier newCourier = new Courier();
-        Long oldId = 1L;
-        Long newId = 2L;
-        newCourier.setId(newId);
+
+        UUID oldUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID newUuid = UUID.fromString("7ded2601-a101-4958-8924-130a17278a20");
+        newCourier.setUuid(newUuid);
 
         // and
-        when(courierRepository.findById(anyLong()))
+        when(courierRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(courierEntity));
         // when
         Throwable throwable = catchThrowable(() ->
-                courierService.update(oldId, newCourier));
+                courierService.update(oldUuid, newCourier));
 
         // then
         assertThat(throwable)
@@ -265,12 +266,12 @@ class CourierServiceTest {
     @DisplayName("should correctly update courier when valid id and courier are provided")
     void shouldUpdateCourier() {
         // given
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
         Courier changedCourier = prepareCourierToEdit();
         CourierEntity changedCourierEntity = prepareCourierEntityToEdit();
 
         // and
-        when(courierRepository.findById(anyLong()))
+        when(courierRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(courierEntity));
         when(courierRepository.save(any(CourierEntity.class)))
                 .thenReturn(changedCourierEntity);
@@ -281,16 +282,16 @@ class CourierServiceTest {
                 .thenReturn(changedCourier);
 
         // when
-        Courier updatedCourier = courierService.update(courierId, changedCourier);
+        Courier updatedCourier = courierService.update(courierUuid, changedCourier);
 
         // then
         assertThat(updatedCourier).isNotNull();
-        assertThat(updatedCourier.getId()).isEqualTo(courierId);
+        assertThat(updatedCourier.getUuid()).isEqualTo(courierUuid);
         assertThat(updatedCourier.getFirstName()).isEqualTo(changedCourier.getFirstName());
         assertThat(updatedCourier.getLastName()).isEqualTo(changedCourier.getLastName());
         assertThat(updatedCourier.getCourierCompany()).isEqualTo(changedCourier.getCourierCompany());
-        assertThat(updatedCourier.getDeliveryList().get(0).getId()).isEqualTo(changedCourier.getDeliveryList().get(0).getId());
-        assertThat(updatedCourier.getDeliveryList().get(1).getId()).isEqualTo(changedCourier.getDeliveryList().get(1).getId());
+        assertThat(updatedCourier.getDeliveryList().get(0).getUuid()).isEqualTo(changedCourier.getDeliveryList().get(0).getUuid());
+        assertThat(updatedCourier.getDeliveryList().get(1).getUuid()).isEqualTo(changedCourier.getDeliveryList().get(1).getUuid());
 
         // verify
         then(courierRepository)
@@ -299,24 +300,29 @@ class CourierServiceTest {
     }
 
     private CourierEntity prepareCourierEntityToEdit() {
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         CourierCompany newCourierCompany = FEDEX;
 
+        UUID newDelivery1Uuid = UUID.fromString("31822712-94b3-43ed-9aac-24613948ca79");
+        UUID newDelivery2Uuid = UUID.fromString("1f263424-a92a-49a6-b38f-eaa2861ab332");
+
         Long newDelivery1Id = 3L;
-        Long newDelivery2Id = 3L;
+        Long newDelivery2Id = 4L;
 
         CourierEntity changedCourierEntity = new CourierEntity();
-        changedCourierEntity.setId(courierId);
+        changedCourierEntity.setUuid(courierUuid);
         changedCourierEntity.setFirstName(newFirstName);
         changedCourierEntity.setLastName(newLastName);
         changedCourierEntity.setCourierCompany(newCourierCompany);
 
         DeliveryEntity newDeliveryEntity1 = new DeliveryEntity();
         newDeliveryEntity1.setId(newDelivery1Id);
+        newDeliveryEntity1.setUuid(newDelivery1Uuid);
         DeliveryEntity newDeliveryEntity2 = new DeliveryEntity();
         newDeliveryEntity2.setId(newDelivery2Id);
+        newDeliveryEntity2.setUuid(newDelivery2Uuid);
 
         changedCourierEntity.setDeliveryList(List.of(newDeliveryEntity1, newDeliveryEntity2));
 
@@ -324,24 +330,24 @@ class CourierServiceTest {
     }
 
     private Courier prepareCourierToEdit() {
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         CourierCompany newCourierCompany = FEDEX;
 
-        Long newDelivery1Id = 3L;
-        Long newDelivery2Id = 3L;
+        UUID newDelivery1Uuid = UUID.fromString("31822712-94b3-43ed-9aac-24613948ca79");
+        UUID newDelivery2Uuid = UUID.fromString("1f263424-a92a-49a6-b38f-eaa2861ab332");
 
         Courier changedCourier = new Courier();
-        changedCourier.setId(courierId);
+        changedCourier.setUuid(courierUuid);
         changedCourier.setFirstName(newFirstName);
         changedCourier.setLastName(newLastName);
         changedCourier.setCourierCompany(newCourierCompany);
 
         Delivery newDelivery1 = new Delivery();
-        newDelivery1.setId(newDelivery1Id);
+        newDelivery1.setUuid(newDelivery1Uuid);
         Delivery newDelivery2 = new Delivery();
-        newDelivery2.setId(newDelivery2Id);
+        newDelivery2.setUuid(newDelivery2Uuid);
 
         changedCourier.setDeliveryList(List.of(newDelivery1, newDelivery2));
 

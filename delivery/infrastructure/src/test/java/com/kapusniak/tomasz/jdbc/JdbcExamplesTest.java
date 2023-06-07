@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,6 +54,7 @@ class JdbcExamplesTest {
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setEmail("testEmail");
+        customer.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
 
         courier = new CourierEntity();
         courier.setId(1L);
@@ -60,6 +62,8 @@ class JdbcExamplesTest {
         courier.setLastName("courierLastName");
         courier.setCourierCompany(CourierCompany.DPD);
         courier.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
+        courier.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+
     }
 
     @Test
@@ -91,7 +95,7 @@ class JdbcExamplesTest {
 
     @Test
     @DisplayName("should return courier if exist based on courier id")
-    void getCourierById() {
+    void getCourierByUuid() {
 
         // given
         given(jdbcTemplate.queryForObject(
@@ -100,25 +104,25 @@ class JdbcExamplesTest {
                 any(CourierRowMapper.class)))
                 .willReturn(courier);
 
-        Long courierId = 1L;
+        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
-        CourierEntity courierById = jdbcExamples.getCourierById(courierId);
+        CourierEntity courierByUuid = jdbcExamples.getCourierByUuid(courierUuid);
 
         // then
-        assertThat(courierById.getId()).isNotNull();
+        assertThat(courierByUuid.getUuid()).isNotNull();
 
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .queryForObject("SELECT * FROM COURIERS WHERE COURIER_ID = ?",
-                        new Object[]{courierId},
+                .queryForObject("SELECT * FROM COURIERS WHERE UUID = ?",
+                        new Object[]{courierUuid},
                         courierRowMapper);
     }
 
     @Test
     @DisplayName("should return customer if exist (with orders), based on customer id")
-    void getCustomerById() {
+    void getCustomerByUuid() {
 
         // given
         given(jdbcTemplate.queryForObject(
@@ -132,19 +136,19 @@ class JdbcExamplesTest {
                 any(OrderRowMapper.class)))
                 .willReturn(List.of(new OrderEntity()));
 
-        Long customerId = 1L;
+        UUID customerUuid = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
 
         // when
-        CustomerEntity customerById = jdbcExamples.getCustomerById(customerId);
+        CustomerEntity customerByUuid = jdbcExamples.getCustomerByUuid(customerUuid);
 
         // then
-        assertThat(customerById.getId()).isNotNull();
+        assertThat(customerByUuid.getUuid()).isNotNull();
 
         // verify
         then(jdbcTemplate)
                 .should(times(1))
                 .queryForObject("SELECT CUSTOMERS.* FROM CUSTOMERS WHERE CUSTOMER_ID = ?",
-                        new Object[]{customerId},
+                        new Object[]{customerUuid},
                         customerRowMapper);
 
         then(jdbcTemplate)
@@ -189,13 +193,13 @@ class JdbcExamplesTest {
     @Test
     @DisplayName("should return null instead of throwing an exception " +
             "when can't find customer by customer id ")
-    void getCustomerByNonExistingId() {
+    void getCustomerByNonExistingUuid() {
 
         // given
-        Long notExistingCustomerId = 1_000_000L;
+        UUID notExistingCustomerUuid = UUID.randomUUID();
 
         // when
-        CustomerEntity customerNull = jdbcExamples.getCustomerById(notExistingCustomerId);
+        CustomerEntity customerNull = jdbcExamples.getCustomerByUuid(notExistingCustomerUuid);
 
         //then
         assertThat(customerNull)
@@ -253,14 +257,14 @@ class JdbcExamplesTest {
     void getCustomerOrderList() {
 
         // given
-        Long customerId = 1L;
+        UUID customerUuid = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
         given(jdbcTemplate.query(
                 any(String.class),
                 any(OrderRowMapper.class)))
                 .willReturn(List.of(new OrderEntity(), new OrderEntity()));
 
         // when
-        List<OrderEntity> customerOrderList = jdbcExamples.getCustomerOrderList(customerId);
+        List<OrderEntity> customerOrderList = jdbcExamples.getCustomerOrderList(customerUuid);
 
         // then
         assertThat(customerOrderList.size()).isEqualTo(2);
@@ -268,17 +272,17 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerId,
+                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerUuid,
                         orderRowMapper);
 
     }
 
     @Test
     @DisplayName("should return order if exist based on order id ")
-    void getOrderById() {
+    void getOrderByUuid() {
 
         // given
-        Long orderId = 1L;
+        UUID orderUuid = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
 
 
         given(jdbcTemplate.queryForObject(
@@ -288,16 +292,16 @@ class JdbcExamplesTest {
                 .willReturn(new OrderEntity());
 
         // when
-        OrderEntity orderById = jdbcExamples.getOrderById(orderId);
+        OrderEntity orderByUuid = jdbcExamples.getOrderByUuid(orderUuid);
 
         // then
-        assertThat(orderById).isNotNull();
+        assertThat(orderByUuid).isNotNull();
 
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .queryForObject("SELECT * FROM ORDERS WHERE ORDER_ID = ?",
-                        new Object[]{1L},
+                .queryForObject("SELECT * FROM ORDERS WHERE UUID = ?",
+                        new Object[]{UUID.fromString("29755321-c483-4a12-9f64-30a132038b70")},
                         orderRowMapper);
 
 

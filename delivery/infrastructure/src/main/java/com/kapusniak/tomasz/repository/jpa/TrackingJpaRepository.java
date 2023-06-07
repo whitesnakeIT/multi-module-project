@@ -2,11 +2,14 @@ package com.kapusniak.tomasz.repository.jpa;
 
 
 import com.kapusniak.tomasz.entity.TrackingEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.kapusniak.tomasz.repository.UuidRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Repository
 @Transactional(readOnly = true)
-public interface TrackingJpaRepository extends JpaRepository<TrackingEntity, Long> {
+public interface TrackingJpaRepository extends UuidRepository<TrackingEntity, UUID> {
+
 }

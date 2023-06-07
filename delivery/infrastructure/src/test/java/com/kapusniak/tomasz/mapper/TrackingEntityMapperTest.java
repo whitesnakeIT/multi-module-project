@@ -30,7 +30,7 @@ class TrackingEntityMapperTest {
 
         // then
         assertThat(trackingEntity).isNotNull();
-        assertThat(tracking.getId()).isEqualTo(trackingEntity.getId());
+        assertThat(tracking.getUuid()).isEqualTo(trackingEntity.getUuid());
         assertThat(tracking.getLocalization()).isEqualTo(trackingEntity.getLocalization());
         assertThat(trackingEntity.getUuid()).isNotNull();
     }
@@ -48,7 +48,7 @@ class TrackingEntityMapperTest {
 
         // then
         assertThat(tracking).isNotNull();
-        assertThat(entity.getId()).isEqualTo(tracking.getId());
+        assertThat(entity.getUuid()).isEqualTo(tracking.getUuid());
         assertThat(entity.getLocalization()).isEqualTo(tracking.getLocalization());
     }
 }
