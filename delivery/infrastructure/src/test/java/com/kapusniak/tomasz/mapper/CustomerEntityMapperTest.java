@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.mapstruct;
+package com.kapusniak.tomasz.mapper;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +35,7 @@ class CustomerEntityMapperTest {
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setEmail("test@test.com");
+        customer.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
 
         List<Order> orders = prepareOrderList();
         orders.forEach(order -> order.setCustomer(customer));
@@ -56,6 +58,7 @@ class CustomerEntityMapperTest {
         customerEntity.setFirstName("testFirstName");
         customerEntity.setLastName("testLastName");
         customerEntity.setEmail("test@test.com");
+        customerEntity.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
 
         List<OrderEntity> orderEntities = prepareOrderEntityList();
         orderEntities.forEach(orderEntity -> orderEntity.setCustomer(customerEntity));
@@ -75,7 +78,7 @@ class CustomerEntityMapperTest {
         CustomerEntity customerEntity = customerEntityMapper.mapToEntity(customer);
 
         // then
-        assertThat(customerEntity.getId()).isEqualTo(customer.getId());
+        assertThat(customerEntity.getUuid()).isEqualTo(customer.getUuid());
         assertThat(customerEntity.getFirstName()).isEqualTo(customer.getFirstName());
         assertThat(customerEntity.getLastName()).isEqualTo(customer.getLastName());
         assertThat(customerEntity.getEmail()).isEqualTo(customer.getEmail());
@@ -101,7 +104,7 @@ class CustomerEntityMapperTest {
         Customer customer = customerEntityMapper.mapToApiModel(customerEntity);
 
         // then
-        assertThat(customer.getId()).isEqualTo(customerEntity.getId());
+        assertThat(customer.getUuid()).isEqualTo(customerEntity.getUuid());
         assertThat(customer.getFirstName()).isEqualTo(customerEntity.getFirstName());
         assertThat(customer.getLastName()).isEqualTo(customerEntity.getLastName());
         assertThat(customer.getEmail()).isEqualTo(customerEntity.getEmail());

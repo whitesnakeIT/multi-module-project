@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.mapstruct;
+package com.kapusniak.tomasz.mapper;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.entity.CustomerEntity;
@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.CourierCompany.DPD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +40,7 @@ class DeliveryEntityMapperTest {
         delivery.setDeliveryTime(offsetDeliveryTime);
         delivery.setCourier(prepareCourier());
         delivery.setOrder(prepareOrder());
-
+        delivery.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
         return delivery;
     }
 
@@ -53,6 +54,7 @@ class DeliveryEntityMapperTest {
         deliveryEntity.setDeliveryTime(localDeliveryTime);
         deliveryEntity.setCourier(prepareCourierEntity());
         deliveryEntity.setOrder(prepareOrderEntity());
+        deliveryEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
 
         return deliveryEntity;
     }
@@ -64,6 +66,7 @@ class DeliveryEntityMapperTest {
         courier.setLastName("testLastName");
         courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
         courier.setCourierCompany(DPD);
+        courier.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
 
         return courier;
     }
@@ -75,6 +78,7 @@ class DeliveryEntityMapperTest {
         courierEntity.setLastName("testLastName");
         courierEntity.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
         courierEntity.setCourierCompany(DPD);
+        courierEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
 
         return courierEntity;
     }
@@ -118,12 +122,12 @@ class DeliveryEntityMapperTest {
         DeliveryEntity deliveryEntity = deliveryEntityMapper.mapToEntity(delivery);
 
         // then
-        assertThat(deliveryEntity.getId()).isEqualTo(delivery.getId());
+        assertThat(deliveryEntity.getUuid()).isEqualTo(delivery.getUuid());
         assertThat(deliveryEntity.getPrice()).isEqualTo(BigDecimal.valueOf(delivery.getPrice()));
         assertThat(deliveryEntity.getDeliveryStatus()).isEqualTo(delivery.getDeliveryStatus());
 
         assertThat(deliveryEntity.getCourier().getUuid()).isNotNull();
-        assertThat(deliveryEntity.getCourier().getId()).isEqualTo(delivery.getCourier().getId());
+        assertThat(deliveryEntity.getCourier().getUuid()).isEqualTo(delivery.getCourier().getUuid());
 
         assertThat(deliveryEntity.getCourier().getDeliveryList()).isNull();
         assertThat(deliveryEntity.getOrder().getCustomer().getOrders()).isNull();
@@ -140,12 +144,12 @@ class DeliveryEntityMapperTest {
         Delivery delivery = deliveryEntityMapper.mapToApiModel(deliveryEntity);
 
         // then
-        assertThat(delivery.getId()).isEqualTo(deliveryEntity.getId());
+        assertThat(delivery.getUuid()).isEqualTo(deliveryEntity.getUuid());
         assertThat(delivery.getPrice()).isEqualTo(deliveryEntity.getPrice().doubleValue());
         assertThat(delivery.getDeliveryStatus()).isEqualTo(deliveryEntity.getDeliveryStatus());
 
         assertThat(delivery.getCourier().getDeliveryList()).isNull();
-        assertThat(delivery.getCourier().getId()).isEqualTo(deliveryEntity.getCourier().getId());
+        assertThat(delivery.getCourier().getUuid()).isEqualTo(deliveryEntity.getCourier().getUuid());
         assertThat(delivery.getOrder().getCustomer().getOrders()).isNull();
     }
 

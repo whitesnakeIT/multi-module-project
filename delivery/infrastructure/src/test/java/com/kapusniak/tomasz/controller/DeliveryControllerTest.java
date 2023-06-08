@@ -13,12 +13,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.CREATED;
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.DELIVERED;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class DeliveryControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,6 +46,11 @@ public class DeliveryControllerTest {
         Delivery delivery1 = new Delivery();
         delivery1.setId(1L);
         delivery1.setDeliveryStatus(CREATED);
+        delivery1.setUuid(UUID.randomUUID());
+        LocalDateTime deliveryLocalDateTime = LocalDateTime.of(2023, 6, 7, 22, 30, 0);
+        OffsetDateTime deliveryOffsetDateTime = deliveryLocalDateTime.atOffset(ZoneOffset.UTC);
+        delivery1.setDeliveryTime(deliveryOffsetDateTime);
+        delivery1.setPrice(50.55);
 
         return delivery1;
     }
@@ -82,14 +93,16 @@ public class DeliveryControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return delivery based on delivery id")
-    public void getDeliveryById() throws Exception {
+    @DisplayName("should correctly return delivery based on delivery uuid")
+    public void getDeliveryByUuid() throws Exception {
         // given
         Delivery delivery = getDelivery();
-        when(deliveryService.findById(1L)).thenReturn(delivery);
+        UUID deliveryUuid = delivery.getUuid();
+
+        when(deliveryService.findByUuid(deliveryUuid)).thenReturn(delivery);
 
         // when
-        mockMvc.perform(get("/api/v1/deliveries/1"))
+        mockMvc.perform(get("/api/v1/deliveries/" + deliveryUuid))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
@@ -98,7 +111,7 @@ public class DeliveryControllerTest {
         // then
         verify(deliveryService,
                 times(1))
-                .findById(1L);
+                .findByUuid(deliveryUuid);
         verifyNoMoreInteractions(deliveryService);
     }
 
@@ -132,11 +145,13 @@ public class DeliveryControllerTest {
     public void updateDelivery() throws Exception {
         // given
         Delivery delivery = getDelivery();
-        when(deliveryService.update(anyLong(),
+        UUID deliveryUuid = delivery.getUuid();
+
+        when(deliveryService.update(any(UUID.class),
                 any(Delivery.class))).thenReturn(delivery);
 
         // when
-        mockMvc.perform(put("/api/v1/deliveries/1")
+        mockMvc.perform(put("/api/v1/deliveries/" + deliveryUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(delivery)))
                 .andExpect(status().isOk())
@@ -147,21 +162,25 @@ public class DeliveryControllerTest {
         // then
         verify(deliveryService,
                 times(1))
-                .update(eq(1L), any(Delivery.class));
+                .update(eq(deliveryUuid), any(Delivery.class));
         verifyNoMoreInteractions(deliveryService);
     }
 
     @Test
     @DisplayName("should return no content after deleting delivery")
     public void deleteDelivery() throws Exception {
+        // given
+        Delivery delivery = getDelivery();
+        UUID deliveryUuid = delivery.getUuid();
+
         // when
-        mockMvc.perform(delete("/api/v1/deliveries/1"))
+        mockMvc.perform(delete("/api/v1/deliveries/" + deliveryUuid))
                 .andExpect(status().isNoContent());
 
         // then
         verify(deliveryService,
                 times(1))
-                .delete(1L);
+                .delete(deliveryUuid);
         verifyNoMoreInteractions(deliveryService);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Component
 public class CourierRowMapper implements RowMapper<CourierEntity> {
@@ -19,6 +20,7 @@ public class CourierRowMapper implements RowMapper<CourierEntity> {
         courier.setFirstName(rs.getString("FIRST_NAME"));
         courier.setLastName(rs.getString("LAST_NAME"));
         courier.setCourierCompany(CourierCompany.valueOf(rs.getString("COURIER_COMPANY")));
+        courier.setUuid(UUID.fromString(rs.getString("UUID")));
 
         return courier;
     }

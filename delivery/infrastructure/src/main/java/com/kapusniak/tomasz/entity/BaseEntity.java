@@ -1,6 +1,7 @@
 package com.kapusniak.tomasz.entity;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +14,8 @@ import java.util.UUID;
 @Setter
 public abstract class BaseEntity {
 
-    private String uuid = UUID.randomUUID().toString();
+    private UUID uuid = UUID.randomUUID();
+
+    @Version
+    private int version;
 }

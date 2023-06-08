@@ -13,7 +13,7 @@ public class BaseEntityTest {
     @DisplayName("should check if equals method of uuid is working correctly")
     public void compareWithSameUuid() {
         //given
-        String uuid = UUID.randomUUID().toString();
+        UUID uuid = UUID.randomUUID();
 
         BaseEntity entity1 = new ConcreteEntity();
         BaseEntity entity2 = new ConcreteEntity();

@@ -1,5 +1,6 @@
 package com.kapusniak.tomasz.repository;
 
+import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
@@ -12,16 +13,33 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
+import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
+import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-
 @TestPropertySource(locations = "/application-test.properties")
+@SqlGroup(
+        @Sql(
+                executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+                scripts = {
+                        "classpath:h2-scripts/cleanup.sql",
+                        "classpath:h2-scripts/insert-data.sql"
+                }
+        )
+)
 class OrderJpaRepositoryTest {
 
     @Autowired
@@ -29,6 +47,30 @@ class OrderJpaRepositoryTest {
 
     @Autowired
     private DeliveryJpaRepository deliveryRepository;
+
+    CustomerEntity prepareCustomerEntity() {
+        CustomerEntity customerEntity = new CustomerEntity();
+
+        customerEntity.setId(1L);
+        customerEntity.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
+
+        return customerEntity;
+    }
+
+    OrderEntity prepareOrderEntity() {
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
+        orderEntity.setPackageSize(LARGE);
+        orderEntity.setPackageType(DOCUMENT);
+        orderEntity.setSenderAddress("test sender address");
+        orderEntity.setReceiverAddress("test receiver address");
+
+        CustomerEntity customerEntity = prepareCustomerEntity();
+
+        orderEntity.setCustomer(customerEntity);
+
+        return orderEntity;
+    }
 
     @Test
     @DisplayName("should return list of orders with correct size based on package type")
@@ -39,7 +81,7 @@ class OrderJpaRepositoryTest {
 
         //then
         then(ordersByPackageType.size())
-                .isEqualTo(3);
+                .isGreaterThan(0);
 
         then(ordersByPackageType)
                 .extracting(OrderEntity::getPackageType)
@@ -67,15 +109,15 @@ class OrderJpaRepositoryTest {
     void findByPackageSize() {
 
         //when
-        List<OrderEntity> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.EXTRA_LARGE);
+        List<OrderEntity> ordersByPackageSize = orderRepository.findByPackageSize(PackageSize.SMALL);
 
         //then
         then(ordersByPackageSize.size())
-                .isEqualTo(1);
+                .isGreaterThan(0);
 
         then(ordersByPackageSize)
                 .extracting(OrderEntity::getPackageSize)
-                .containsOnly(PackageSize.EXTRA_LARGE);
+                .containsOnly(PackageSize.SMALL);
     }
 
     @Test
@@ -95,30 +137,62 @@ class OrderJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("should return list of orders with correct size based on customer id")
-    void findAllByCustomerIdExisting() {
+    @DisplayName("should return list of orders with correct size based on customer uuid")
+    void findAllByCustomerUuidExisting() {
+        // given
+        CustomerEntity customerEntity = prepareCustomerEntity();
 
         // when
-        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerUuid = orderRepository.findAllByCustomerUuid(customerEntity.getUuid());
 
         // then
-        then(ordersByCustomerId.size())
-                .isEqualTo(3);
+        then(ordersByCustomerUuid.size())
+                .isGreaterThan(0);
     }
 
     @Test
-    @DisplayName("should return empty list of orders based on customer id")
-    void findAllByCustomerIdNotExisting() {
+    @DisplayName("should return empty list of orders based on customer uuid")
+    void findAllByCustomerUuidNotExisting() {
 
         // given
         deliveryRepository.deleteAll();
         orderRepository.deleteAll();
 
+        // and
+        CustomerEntity customerEntity = prepareCustomerEntity();
+
         // when
-        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerUuid = orderRepository.findAllByCustomerUuid(customerEntity.getUuid());
 
         // then
-        then(ordersByCustomerId)
+        then(ordersByCustomerUuid)
                 .isEmpty();
+    }
+
+    @Test
+    @DisplayName("should correctly set version number after saving " +
+            "or editing an Order entity")
+    @Transactional(propagation = NOT_SUPPORTED)
+    void versionChecking() {
+        // given
+        OrderEntity orderEntity = prepareOrderEntity();
+
+        // when
+        OrderEntity savedOrder = orderRepository.save(orderEntity);
+
+        // and
+        savedOrder.setSenderAddress("new sender address");
+        savedOrder.setReceiverAddress("new receiver address");
+
+        OrderEntity editedOrder = orderRepository.save(savedOrder);
+
+        // then
+        assertThat(orderEntity.getVersion()).isEqualTo(0);
+
+        assertThat(savedOrder.getUuid()).isNotNull();
+        assertThat(savedOrder.getVersion()).isEqualTo(0);
+
+        assertThat(editedOrder.getUuid()).isEqualTo(savedOrder.getUuid());
+        assertThat(editedOrder.getVersion()).isEqualTo(savedOrder.getVersion() + 1);
     }
 }

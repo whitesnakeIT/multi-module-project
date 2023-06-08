@@ -1,11 +1,14 @@
-FROM tomcat:latest
+FROM openjdk:17-jdk-slim
 
 LABEL authors="tomasz"
 
-COPY target/delivery.war /usr/local/tomcat/webapps/ROOT.war
+RUN mkdir /app
 
-WORKDIR /usr/local/tomcat
+WORKDIR /app
+
+COPY target/delivery.jar /app
+
 
 EXPOSE 8080
 
-CMD ["bin/catalina.sh", "run"]
+CMD ["java", "-jar", "delivery.jar"]

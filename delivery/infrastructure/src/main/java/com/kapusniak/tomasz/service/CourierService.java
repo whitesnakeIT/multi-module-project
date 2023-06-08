@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
-import com.kapusniak.tomasz.mapstruct.CourierEntityMapper;
+import com.kapusniak.tomasz.mapper.CourierEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,34 +39,34 @@ public class CourierService {
                 .toList();
     }
 
-    public Courier findById(Long courierId) {
-        if (courierId == null) {
-            throw new RuntimeException("Searching for courier failed. Courier id is null.");
+    public Courier findByUuid(UUID courierUuid) {
+        if (courierUuid == null) {
+            throw new RuntimeException("Searching for courier failed. Courier uuid is null.");
         }
-        return courierEntityMapper.mapToApiModel(courierRepository.findById(courierId)
+        return courierEntityMapper.mapToApiModel(courierRepository.findByUuid(courierUuid)
                 .orElseThrow(RuntimeException::new));
     }
 
     @Transactional
-    public void delete(Long courierId) {
-        if (courierId == null) {
-            throw new RuntimeException("Deleting courier failed. Courier id is null.");
+    public void delete(UUID courierUuid) {
+        if (courierUuid == null) {
+            throw new RuntimeException("Deleting courier failed. Courier uuid is null.");
         }
-        Courier courier = findById(courierId);
+        Courier courier = findByUuid(courierUuid);
 
         courierRepository.delete(courierEntityMapper.mapToEntity(courier));
     }
 
     @Transactional
-    public Courier update(Long id, Courier courier) {
-        if (id == null) {
-            throw new RuntimeException("Updating courier failed. Courier id is null.");
+    public Courier update(UUID uuid, Courier courier) {
+        if (uuid == null) {
+            throw new RuntimeException("Updating courier failed. Courier uuid is null.");
         }
         if (courier == null) {
             throw new RuntimeException("Updating courier failed. Courier is null.");
         }
 
-        Courier courierFromDb = findById(id);
+        Courier courierFromDb = findByUuid(uuid);
 
         Courier updatedCourier = updateFields(courierFromDb, courier);
 
@@ -76,11 +77,11 @@ public class CourierService {
     }
 
     private Courier updateFields(Courier courierFromDb, Courier newCourier) {
-        if (newCourier.getId() == null) {
-            newCourier.setId(courierFromDb.getId());
+        if (newCourier.getUuid() == null) {
+            newCourier.setUuid(courierFromDb.getUuid());
         }
-        if (!newCourier.getId().equals(courierFromDb.getId())) {
-            throw new RuntimeException("Updating courier fields failed. Different id's");
+        if (!newCourier.getUuid().equals(courierFromDb.getUuid())) {
+            throw new RuntimeException("Updating courier fields failed. Different uuid's");
         }
         return newCourier;
     }

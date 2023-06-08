@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,8 +29,8 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteOrder(@PathVariable("id") Long orderId) {
-        orderService.delete(orderId);
+    public ResponseEntity<Void> deleteOrder(@PathVariable("uuid") UUID orderUuid) {
+        orderService.delete(orderUuid);
 
         return ResponseEntity
                 .noContent()
@@ -44,15 +45,15 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<Order> getOrder(@PathVariable("id") Long orderId) {
-        Order order = orderService.findById(orderId);
+    public ResponseEntity<Order> getOrder(@PathVariable("uuid") UUID orderUuid) {
+        Order order = orderService.findByUuid(orderUuid);
 
         return ResponseEntity.ok(order);
     }
 
     @Override
-    public ResponseEntity<Order> updateOrder(@PathVariable("id") Long orderId, @RequestBody @Valid Order order) {
-        Order update = orderService.update(orderId, order);
+    public ResponseEntity<Order> updateOrder(@PathVariable("uuid") UUID orderUuid, @RequestBody @Valid Order order) {
+        Order update = orderService.update(orderUuid, order);
 
         return ResponseEntity.ok(update);
     }

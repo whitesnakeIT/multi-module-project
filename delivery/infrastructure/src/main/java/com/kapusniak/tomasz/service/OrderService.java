@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.mapstruct.OrderEntityMapper;
+import com.kapusniak.tomasz.mapper.OrderEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,34 +41,34 @@ public class OrderService {
                 .toList();
     }
 
-    public Order findById(Long orderId) {
-        if (orderId == null) {
-            throw new RuntimeException("Searching for order failed. Order id is null.");
+    public Order findByUuid(UUID orderUuid) {
+        if (orderUuid == null) {
+            throw new RuntimeException("Searching for order failed. Order uuid is null.");
         }
-        return orderEntityMapper.mapToApiModel(orderRepository.findById(orderId)
+        return orderEntityMapper.mapToApiModel(orderRepository.findByUuid(orderUuid)
                 .orElseThrow(RuntimeException::new));
     }
 
     @Transactional
-    public void delete(Long orderId) {
-        if (orderId == null) {
-            throw new RuntimeException("Deleting order failed. Order id is null.");
+    public void delete(UUID orderUuid) {
+        if (orderUuid == null) {
+            throw new RuntimeException("Deleting order failed. Order uuid is null.");
         }
-        Order order = findById(orderId);
+        Order order = findByUuid(orderUuid);
 
         orderRepository.delete(orderEntityMapper.mapToEntity(order));
     }
 
     @Transactional
-    public Order update(Long id, Order order) {
-        if (id == null) {
-            throw new RuntimeException("Updating order failed. Order id is null.");
+    public Order update(UUID uuid, Order order) {
+        if (uuid == null) {
+            throw new RuntimeException("Updating order failed. Order uuid is null.");
         }
         if (order == null) {
             throw new RuntimeException("Updating order failed. Order is null.");
         }
 
-        Order orderFromDb = findById(id);
+        Order orderFromDb = findByUuid(uuid);
 
         Order updatedOrder = updateFields(orderFromDb, order);
 
@@ -78,11 +79,11 @@ public class OrderService {
     }
 
     private Order updateFields(Order orderFromDb, Order newOrder) {
-        if (newOrder.getId() == null) {
-            newOrder.setId(orderFromDb.getId());
+        if (newOrder.getUuid() == null) {
+            newOrder.setUuid(orderFromDb.getUuid());
         }
-        if (!newOrder.getId().equals(orderFromDb.getId())) {
-            throw new RuntimeException("Updating order fields failed. Different id's");
+        if (!newOrder.getUuid().equals(orderFromDb.getUuid())) {
+            throw new RuntimeException("Updating order fields failed. Different uuid's");
         }
         return newOrder;
     }
@@ -109,13 +110,13 @@ public class OrderService {
                 .toList();
     }
 
-    public List<Order> findAllByCustomerId(Long customerId) {
-        if (customerId == null) {
-            throw new RuntimeException("Searching for customer orders failed. Customer id is null.");
+    public List<Order> findAllByCustomerUuid(UUID customerUuid) {
+        if (customerUuid == null) {
+            throw new RuntimeException("Searching for customer orders failed. Customer uuid is null.");
         }
 
         return orderRepository
-                .findAllByCustomerId(customerId)
+                .findAllByCustomerUuid(customerUuid)
                 .stream().map(orderEntityMapper::mapToApiModel)
                 .toList();
     }

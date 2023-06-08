@@ -2,8 +2,9 @@ package com.kapusniak.tomasz.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
+import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.service.CustomerService;
-
+import com.kapusniak.tomasz.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -40,46 +42,78 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class CustomerTest {
 
+    private static final UUID UUID_CUSTOMER_1 = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
+    private static final UUID ORDER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+
+
     @Autowired
     private CustomerService customerService;
-
+    @Autowired
+    private OrderService orderService;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
+
+    private Customer prepareCustomer() {
+        Customer customer = new Customer();
+        Long testId = 1L;
+        String testEmail = "test@email.com";
+        String testFirstName = "testFirstName";
+        String testLastName = "testLastName";
+        customer.setId(testId);
+        customer.setEmail(testEmail);
+        customer.setFirstName(testFirstName);
+        customer.setLastName(testLastName);
+        customer.setUuid(UUID_CUSTOMER_1);
+
+        Order order = orderService.findByUuid(ORDER_UUID_1);
+//        order.setPreferredDeliveryDate(LocalDate.of(2023, 6, 7));
+//        order.setPackageSize(LARGE);
+//        order.setPackageType(DOCUMENT);
+//        order.setSenderAddress("test sender address");
+//        order.setReceiverAddress("test receiver address");
+//        order.setUuid(UUID.randomUUID());
+//        order.setId(1L);
+//        order.setCustomer(customer);
+
+        customer.addOrdersItem(order);
+
+
+        return customer;
+    }
 
     @Test
     @DisplayName("should correctly get Customer from database and verify" +
             " properties with Customer from controller method")
     void getCustomerExisting() throws Exception {
         // given
-        Long customerId = 1L;
-        Customer customer = customerService.findById(customerId);
+        UUID customerUuid = UUID_CUSTOMER_1;
+        Customer customer = customerService.findByUuid(customerUuid);
 
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/customers/" + customerId));
+                        "/api/v1/customers/" + customerUuid));
 
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(customer.getId()));
+                .andExpect(jsonPath("$.uuid").value(customer.getUuid().toString()));
     }
 
     @Test
-    @DisplayName("should throw an exception when provided customer id is not existing" +
+    @DisplayName("should throw an exception when provided customer uuid is not existing" +
             " in database for searching")
     void getCustomerNonExisting() {
         // given
-        Long customerId = 3L;
+        UUID customerUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/customers/" + customerId)
+                        "/api/v1/customers/" + customerUuid)
                 )
         );
 
@@ -104,10 +138,10 @@ public class CustomerTest {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id")
-                        .value(customerList.get(0).getId()))
-                .andExpect(jsonPath("$[1].id")
-                        .value(customerList.get(1).getId()));
+                .andExpect(jsonPath("$[0].uuid")
+                        .value(customerList.get(0).getUuid().toString()))
+                .andExpect(jsonPath("$[1].uuid")
+                        .value(customerList.get(1).getUuid().toString()));
 
 
     }
@@ -133,8 +167,7 @@ public class CustomerTest {
             " from controller")
     void createCustomer() throws Exception {
         // given
-        Customer customer = new Customer();
-        customer.setFirstName("tom");
+        Customer customer = prepareCustomer();
 
         // when
         ResultActions result = mockMvc
@@ -145,7 +178,7 @@ public class CustomerTest {
         // then
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.uuid").isNotEmpty())
                 .andExpect(jsonPath("$.firstName").value(customer.getFirstName()));
     }
 
@@ -154,13 +187,13 @@ public class CustomerTest {
             " method from controller")
     void deleteCustomerExisting() throws Exception {
         // given
-        Long customerId = 1L;
+        UUID customerUuid = UUID_CUSTOMER_1;
         int sizeBeforeDeleting = customerService.findAll().size();
 
         // when
         ResultActions result =
                 mockMvc.perform(delete(
-                        "/api/v1/customers/" + customerId));
+                        "/api/v1/customers/" + customerUuid));
 
         // then
         result.andExpect(status().isNoContent());
@@ -172,16 +205,16 @@ public class CustomerTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided customer id is not existing" +
+    @DisplayName("should throw an exception when provided customer uuid is not existing" +
             " in database for deleting")
     void deleteCustomerNonExisting() {
         // given
-        Long customerId = 3L;
+        UUID customerUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/customers/" + customerId)
+                        "/api/v1/customers/" + customerUuid)
                 )
         );
 
@@ -195,8 +228,8 @@ public class CustomerTest {
             " from controller")
     void updateCustomer() throws Exception {
         // given
-        Long customerId = 1L;
-        Customer customerBeforeEdit = customerService.findById(customerId);
+        UUID customerUuid = UUID_CUSTOMER_1;
+        Customer customerBeforeEdit = customerService.findByUuid(customerUuid);
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
 
@@ -207,19 +240,19 @@ public class CustomerTest {
 
         // when
         ResultActions result = mockMvc
-                .perform(put("/api/v1/customers/" + customerId)
+                .perform(put("/api/v1/customers/" + customerUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerBeforeEdit)));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(customerBeforeEdit.getId()))
+                .andExpect(jsonPath("$.uuid").value(customerBeforeEdit.getUuid().toString()))
                 .andExpect(jsonPath("$.firstName").value(newFirstName))
                 .andExpect(jsonPath("$.lastName").value(newLastName));
 
         // and
-        Customer customerAfterEdit = customerService.findById(customerId);
+        Customer customerAfterEdit = customerService.findByUuid(customerUuid);
         assertThat(customerAfterEdit.getFirstName()).isEqualTo(newFirstName);
         assertThat(customerAfterEdit.getLastName()).isEqualTo(newLastName);
     }

@@ -13,7 +13,8 @@ CREATE TABLE couriers
     courier_company VARCHAR(255),
     first_name      VARCHAR(255),
     last_name       VARCHAR(255),
-    uuid            VARCHAR(255)
+    version         INT,
+    uuid UUID
 );
 
 CREATE TABLE customers
@@ -22,7 +23,8 @@ CREATE TABLE customers
     first_name  VARCHAR(255),
     last_name   VARCHAR(255),
     email       VARCHAR(255),
-    uuid        VARCHAR(255)
+    version     INT,
+    uuid UUID
 );
 
 
@@ -33,8 +35,9 @@ CREATE TABLE orders
     receiver_address        VARCHAR(255),
     package_type            VARCHAR(255),
     package_size            VARCHAR(255),
-    uuid                    VARCHAR(255),
     preferred_delivery_date DATE,
+    version                 INT,
+    uuid UUID,
     customer_id             BIGINT NOT NULL,
     CONSTRAINT FK_CustomerOrder
         FOREIGN KEY (customer_id)
@@ -46,7 +49,8 @@ CREATE TABLE tracking
 (
     tracking_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
     localization VARCHAR(255),
-    uuid         VARCHAR(255)
+    version      INT,
+    uuid UUID
 );
 
 CREATE TABLE deliveries
@@ -55,7 +59,8 @@ CREATE TABLE deliveries
     delivery_status VARCHAR(255),
     delivery_time   TIMESTAMP(6),
     price           NUMERIC(38, 2),
-    uuid            VARCHAR(255),
+    version         INT,
+    uuid UUID,
     courier_id      BIGINT,
     order_id        BIGINT,
     CONSTRAINT FK_Delivery_Courier
@@ -64,5 +69,4 @@ CREATE TABLE deliveries
     CONSTRAINT FK_Delivery_Order
         FOREIGN KEY (order_id)
             REFERENCES orders (order_id)
-
 );

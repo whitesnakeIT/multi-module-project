@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.mapstruct;
+package com.kapusniak.tomasz.mapper;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.CourierCompany.DPD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,7 @@ class CourierEntityMapperTest {
         courier.setLastName("testLastName");
         courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
         courier.setCourierCompany(DPD);
+        courier.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
 
         return courier;
     }
@@ -40,6 +42,8 @@ class CourierEntityMapperTest {
         courierEntity.setLastName("testLastName");
         courierEntity.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
         courierEntity.setCourierCompany(DPD);
+        courierEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+
 
         return courierEntity;
     }
@@ -55,7 +59,7 @@ class CourierEntityMapperTest {
         CourierEntity courierEntity = courierEntityMapper.mapToEntity(courier);
 
         // then
-        assertThat(courierEntity.getId()).isEqualTo(courier.getId());
+        assertThat(courierEntity.getUuid()).isEqualTo(courier.getUuid());
         assertThat(courierEntity.getFirstName()).isEqualTo(courier.getFirstName());
         assertThat(courierEntity.getLastName()).isEqualTo(courier.getLastName());
         assertThat(courierEntity.getCourierCompany()).isEqualTo(courier.getCourierCompany());
@@ -78,7 +82,7 @@ class CourierEntityMapperTest {
         Courier courier = courierEntityMapper.mapToApiModel(courierEntity);
 
         // then
-        assertThat(courier.getId()).isEqualTo(courierEntity.getId());
+        assertThat(courier.getUuid()).isEqualTo(courierEntity.getUuid());
         assertThat(courier.getFirstName()).isEqualTo(courierEntity.getFirstName());
         assertThat(courier.getLastName()).isEqualTo(courierEntity.getLastName());
         assertThat(courier.getCourierCompany()).isEqualTo(courierEntity.getCourierCompany());

@@ -2,7 +2,7 @@ package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.mapstruct.CustomerEntityMapper;
+import com.kapusniak.tomasz.mapper.CustomerEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
@@ -14,14 +14,13 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -31,12 +30,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 class CustomerServiceTest {
 
-    Customer customer = new Customer();
-    CustomerEntity customerEntity = new CustomerEntity();
-
-    List<Customer> customerList = new ArrayList<>();
-    List<CustomerEntity> customerEntityList = new ArrayList<>();
-
+    private static final UUID CUSTOMER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
     @Mock
     private CustomerJpaRepository customerRepository;
 
@@ -45,37 +39,59 @@ class CustomerServiceTest {
     @InjectMocks
     private CustomerService customerService;
 
-    @BeforeEach
-    void setup() {
+    private Customer prepareCustomer() {
+        Customer customer = new Customer();
         customer.setId(1L);
-        customer.setEmail("testEmail");
+        customer.setEmail("test@email.com");
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
+        customer.setUuid(CUSTOMER_UUID_1);
 
-        customerList.add(customer);
-        customerList.add(customer);
+        return customer;
+    }
 
+    private CustomerEntity prepareCustomerEntity() {
+        CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setId(1L);
-        customerEntity.setEmail("testEmail");
+        customerEntity.setEmail("test@email.com");
         customerEntity.setFirstName("testFirstName");
         customerEntity.setLastName("testLastName");
+        customerEntity.setUuid(CUSTOMER_UUID_1);
 
-        customerEntityList.add(customerEntity);
-        customerEntityList.add(customerEntity);
 
+        return customerEntity;
+    }
+
+    private List<Customer> prepareCustomerList() {
+
+        return List.of(prepareCustomer(), prepareCustomer());
+    }
+
+    private List<CustomerEntity> prepareCustomerEntityList() {
+
+        return List.of(prepareCustomerEntity(), prepareCustomerEntity());
+
+    }
+
+    @BeforeEach
+    void setup() {
         when(customerEntityMapper
                 .mapToEntity(any(Customer.class)))
-                .thenReturn(customerEntity);
+                .thenReturn(prepareCustomerEntity());
         when(customerEntityMapper
                 .mapToApiModel(any(CustomerEntity.class)))
-                .thenReturn(customer);
+                .thenReturn(prepareCustomer());
     }
 
     @Test
     @DisplayName("should correctly save an Customer entity exactly once")
     void save() {
 
-        //given
+        // given
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        Customer customer = prepareCustomer();
+
+        // and
         when(customerRepository
                 .save(any(CustomerEntity.class)))
                 .thenReturn(customerEntity);
@@ -97,7 +113,7 @@ class CustomerServiceTest {
     void saveNull() {
 
         // given
-        customer = null;
+        Customer customer = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -117,6 +133,9 @@ class CustomerServiceTest {
     void findAll() {
 
         // given
+        List<CustomerEntity> customerEntityList = prepareCustomerEntityList();
+
+        // and
         given(customerRepository.findAll())
                 .willReturn(customerEntityList);
 
@@ -134,38 +153,41 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should return customer based on customer id")
-    void findById() {
+    @DisplayName("should return customer based on customer uuid")
+    void findByUuid() {
 
         // given
-        given(customerRepository.findById(
-                anyLong()))
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
+        // and
+        given(customerRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(customerEntity));
-        Long customerId = 1L;
 
         // when
-        Customer customerById = customerService.findById(customerId);
+        Customer customerByUuid = customerService.findByUuid(customerUuid);
 
         // then
-        assertThat(customerById.getId())
+        assertThat(customerByUuid.getUuid())
                 .isNotNull();
     }
 
     @Test
-    @DisplayName("should throw an exception when customer id is null")
-    void findByIdNull() {
+    @DisplayName("should throw an exception when customer uuid is null")
+    void findByUuidNull() {
 
         // given
-        Long customerId = null;
+        UUID customerUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                customerService.findById(customerId));
+                customerService.findByUuid(customerUuid));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for customer failed. Customer id is null.");
+                .hasMessage("Searching for customer failed. Customer uuid is null.");
 
         // verify
         then(customerRepository)
@@ -173,17 +195,21 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an customer based on customer id")
+    @DisplayName("should delete an customer based on customer uuid")
     void delete() {
 
         // given
-        given(customerRepository.findById(
-                anyLong()))
+        CustomerEntity customerEntity = new CustomerEntity();
+        Customer customer = new Customer();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
+        // and
+        given(customerRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(customerEntity));
-        Long customerId = 1L;
 
         // when
-        customerService.delete(customerId);
+        customerService.delete(customerUuid);
 
         // then
         then(customerRepository)
@@ -192,47 +218,48 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when customer id is null")
+    @DisplayName("should throw an exception when customer uuid is null")
     void deleteNull() {
         // given
-        Long customerId = null;
+        UUID customerUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                customerService.delete(customerId));
+                customerService.delete(customerUuid));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting customer failed. Customer id is null.");
+                .hasMessage("Deleting customer failed. Customer uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
-    void updateNullId() {
+    @DisplayName("should throw an exception when uuid is null")
+    void updateNullUuid() {
         // given
-        Long customerId = null;
+        Customer customer = new Customer();
+        UUID customerUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                customerService.update(customerId, customer));
+                customerService.update(customerUuid, customer));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating customer failed. Customer id is null.");
+                .hasMessage("Updating customer failed. Customer uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when customer is null")
     void updateNullCustomer() {
         // given
-        Long customerId = 1L;
+        UUID customerUuid = CUSTOMER_UUID_1;
         Customer customer = null;
 
         // when
         Throwable thrown = catchThrowable(() ->
-                customerService.update(customerId, customer));
+                customerService.update(customerUuid, customer));
 
         // then
         assertThat(thrown)
@@ -241,37 +268,41 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newCustomer's id doesn't match customerFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newCustomer's uuid doesn't match customerFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        CustomerEntity customerEntity = new CustomerEntity();
+        UUID oldUuid = CUSTOMER_UUID_1;
+
         Customer newCustomer = new Customer();
-        Long oldId = 1L;
-        Long newId = 2L;
-        newCustomer.setId(newId);
+        UUID newUuid = UUID.randomUUID();
+        newCustomer.setUuid(newUuid);
 
         // and
-        when(customerRepository.findById(anyLong()))
+        when(customerRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(customerEntity));
         // when
         Throwable throwable = catchThrowable(() ->
-                customerService.update(oldId, newCustomer));
+                customerService.update(oldUuid, newCustomer));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating customer fields failed. Different id's");
+                .hasMessage("Updating customer fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update customer when valid id and customer are provided")
+    @DisplayName("should correctly update customer when valid uuid and customer are provided")
     void shouldUpdateCustomer() {
         // given
-        Long customerId = 1L;
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
         Customer changedCustomer = prepareCustomerToEdit();
         CustomerEntity changedCustomerEntity = prepareCustomerEntityToEdit();
 
         // and
-        when(customerRepository.findById(anyLong()))
+        when(customerRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(customerEntity));
         when(customerRepository.save(any(CustomerEntity.class)))
                 .thenReturn(changedCustomerEntity);
@@ -282,17 +313,17 @@ class CustomerServiceTest {
                 .thenReturn(changedCustomer);
 
         // when
-        Customer updatedCustomer = customerService.update(customerId, changedCustomer);
+        Customer updatedCustomer = customerService.update(customerUuid, changedCustomer);
 
         // then
         assertThat(updatedCustomer).isNotNull();
-        assertThat(updatedCustomer.getId()).isEqualTo(changedCustomer.getId());
+        assertThat(updatedCustomer.getUuid()).isEqualTo(changedCustomer.getUuid());
         assertThat(updatedCustomer.getFirstName()).isEqualTo(changedCustomer.getFirstName());
         assertThat(updatedCustomer.getLastName()).isEqualTo(changedCustomer.getLastName());
         assertThat(updatedCustomer.getEmail()).isEqualTo(changedCustomer.getEmail());
 
-        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
-        assertThat(updatedCustomer.getOrders().get(1).getId()).isEqualTo(changedCustomer.getOrders().get(1).getId());
+        assertThat(updatedCustomer.getOrders().get(1).getUuid()).isEqualTo(changedCustomer.getOrders().get(1).getUuid());
+        assertThat(updatedCustomer.getOrders().get(1).getUuid()).isEqualTo(changedCustomer.getOrders().get(1).getUuid());
 
         // verify
         then(customerRepository)
@@ -301,23 +332,23 @@ class CustomerServiceTest {
     }
 
     private Customer prepareCustomerToEdit() {
-        Long customerId = 1L;
+        UUID customerUuid = CUSTOMER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         String newEmail = "newEmail";
-        Long newOrder1Id = 3L;
-        Long newOrder2Id = 3L;
+        UUID newOrder1Uuid = UUID.randomUUID();
+        UUID newOrder2Uuid = UUID.randomUUID();
 
         Customer changedCustomer = new Customer();
-        changedCustomer.setId(customerId);
+        changedCustomer.setUuid(customerUuid);
         changedCustomer.setFirstName(newFirstName);
         changedCustomer.setLastName(newLastName);
         changedCustomer.setEmail(newEmail);
 
         Order newOrder1 = new Order();
-        newOrder1.setId(newOrder1Id);
+        newOrder1.setUuid(newOrder1Uuid);
         Order newOrder2 = new Order();
-        newOrder2.setId(newOrder2Id);
+        newOrder2.setUuid(newOrder2Uuid);
 
         changedCustomer.setOrders(List.of(newOrder1, newOrder2));
 
@@ -325,22 +356,22 @@ class CustomerServiceTest {
     }
 
     private CustomerEntity prepareCustomerEntityToEdit() {
-        Long customerId = 1L;
+        UUID customerUuid = CUSTOMER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         String newEmail = "newEmail";
-        Long newOrder1Id = 3L;
-        Long newOrder2Id = 3L;
+        UUID newOrder1Uuid = UUID.randomUUID();
+        UUID newOrder2Uuid = UUID.randomUUID();
 
         CustomerEntity changedCustomerEntity = new CustomerEntity();
-        changedCustomerEntity.setId(customerId);
+        changedCustomerEntity.setUuid(customerUuid);
         changedCustomerEntity.setFirstName(newFirstName);
         changedCustomerEntity.setLastName(newLastName);
         changedCustomerEntity.setEmail(newEmail);
         OrderEntity newOrderEntity1 = new OrderEntity();
-        newOrderEntity1.setId(newOrder1Id);
+        newOrderEntity1.setUuid(newOrder1Uuid);
         OrderEntity newOrderEntity2 = new OrderEntity();
-        newOrderEntity2.setId(newOrder2Id);
+        newOrderEntity2.setUuid(newOrder2Uuid);
 
         changedCustomerEntity.setOrders(List.of(newOrderEntity1, newOrderEntity2));
 

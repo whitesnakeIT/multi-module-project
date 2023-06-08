@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Component
 public class CustomerRowMapper implements RowMapper<CustomerEntity> {
@@ -18,6 +19,8 @@ public class CustomerRowMapper implements RowMapper<CustomerEntity> {
         customer.setFirstName(rs.getString("FIRST_NAME"));
         customer.setLastName(rs.getString("LAST_NAME"));
         customer.setEmail(rs.getString("EMAIL"));
+        customer.setUuid(UUID.fromString(rs.getString("UUID")));
+
 
         return customer;
     }

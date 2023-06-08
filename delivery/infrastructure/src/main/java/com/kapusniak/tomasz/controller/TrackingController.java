@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,8 +29,8 @@ public class TrackingController implements TrackingApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteTracking(@PathVariable("id") Long trackingId) {
-        trackingService.delete(trackingId);
+    public ResponseEntity<Void> deleteTracking(@PathVariable("uuid") UUID trackingUuid) {
+        trackingService.delete(trackingUuid);
 
         return ResponseEntity
                 .noContent()
@@ -44,15 +45,15 @@ public class TrackingController implements TrackingApi {
     }
 
     @Override
-    public ResponseEntity<Tracking> getTracking(@PathVariable("id") Long trackingId) {
-        Tracking tracking = trackingService.findById(trackingId);
+    public ResponseEntity<Tracking> getTracking(@PathVariable("uuid") UUID trackingUuid) {
+        Tracking tracking = trackingService.findByUuid(trackingUuid);
 
         return ResponseEntity.ok(tracking);
     }
 
     @Override
-    public ResponseEntity<Tracking> updateTracking(@PathVariable("id") Long trackingId, @RequestBody @Valid Tracking tracking) {
-        Tracking update = trackingService.update(trackingId, tracking);
+    public ResponseEntity<Tracking> updateTracking(@PathVariable("uuid") UUID trackingUuid, @RequestBody @Valid Tracking tracking) {
+        Tracking update = trackingService.update(trackingUuid, tracking);
 
         return ResponseEntity.ok(update);
     }

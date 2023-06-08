@@ -1,7 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.TrackingEntity;
-import com.kapusniak.tomasz.mapstruct.TrackingEntityMapper;
+import com.kapusniak.tomasz.mapper.TrackingEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,34 +39,34 @@ public class TrackingService {
                 .toList();
     }
 
-    public Tracking findById(Long trackingId) {
-        if (trackingId == null) {
-            throw new RuntimeException("Searching for tracking failed. Tracking id is null.");
+    public Tracking findByUuid(UUID trackingUuid) {
+        if (trackingUuid == null) {
+            throw new RuntimeException("Searching for tracking failed. Tracking uuid is null.");
         }
-        return trackingEntityMapper.mapToApiModel(trackingRepository.findById(trackingId)
+        return trackingEntityMapper.mapToApiModel(trackingRepository.findByUuid(trackingUuid)
                 .orElseThrow(RuntimeException::new));
     }
 
     @Transactional
-    public void delete(Long trackingId) {
-        if (trackingId == null) {
-            throw new RuntimeException("Deleting tracking failed. Tracking id is null.");
+    public void delete(UUID trackingUuid) {
+        if (trackingUuid == null) {
+            throw new RuntimeException("Deleting tracking failed. Tracking uuid is null.");
         }
-        Tracking tracking = findById(trackingId);
+        Tracking tracking = findByUuid(trackingUuid);
 
         trackingRepository.delete(trackingEntityMapper.mapToEntity(tracking));
     }
 
     @Transactional
-    public Tracking update(Long id, Tracking tracking) {
-        if (id == null) {
-            throw new RuntimeException("Updating tracking failed. Tracking id is null.");
+    public Tracking update(UUID uuid, Tracking tracking) {
+        if (uuid == null) {
+            throw new RuntimeException("Updating tracking failed. Tracking uuid is null.");
         }
         if (tracking == null) {
             throw new RuntimeException("Updating tracking failed. Tracking is null.");
         }
 
-        Tracking trackingFromDb = findById(id);
+        Tracking trackingFromDb = findByUuid(uuid);
 
         Tracking updatedTracking = updateFields(trackingFromDb, tracking);
 
@@ -76,11 +77,11 @@ public class TrackingService {
     }
 
     private Tracking updateFields(Tracking trackingFromDb, Tracking newTracking) {
-        if (newTracking.getId() == null) {
-            newTracking.setId(trackingFromDb.getId());
+        if (newTracking.getUuid() == null) {
+            newTracking.setUuid(trackingFromDb.getUuid());
         }
-        if (!newTracking.getId().equals(trackingFromDb.getId())) {
-            throw new RuntimeException("Updating tracking fields failed. Different id's");
+        if (!newTracking.getUuid().equals(trackingFromDb.getUuid())) {
+            throw new RuntimeException("Updating tracking fields failed. Different uuid's");
         }
         return newTracking;
     }

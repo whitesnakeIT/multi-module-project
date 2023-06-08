@@ -3,7 +3,7 @@ package com.kapusniak.tomasz.service;
 import com.kapusniak.tomasz.entity.CourierEntity;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.entity.OrderEntity;
-import com.kapusniak.tomasz.mapstruct.DeliveryEntityMapper;
+import com.kapusniak.tomasz.mapper.DeliveryEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
@@ -21,16 +21,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.CREATED;
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.IN_TRANSIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -39,13 +38,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 class DeliveryServiceTest {
-
-    Delivery delivery = new Delivery();
-    DeliveryEntity deliveryEntity = new DeliveryEntity();
-
-    List<Delivery> deliveryList = new ArrayList<>();
-    List<DeliveryEntity> deliveryEntityList = new ArrayList<>();
-
+    private static final UUID DELIVERY_UUID_1 = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
     @Mock
     private DeliveryJpaRepository deliveryRepository;
 
@@ -54,41 +47,62 @@ class DeliveryServiceTest {
     @InjectMocks
     private DeliveryService deliveryService;
 
-    @BeforeEach
-    void setup() {
-        delivery.setId(1L);
+    private Delivery prepareDelivery() {
+        Delivery delivery = new Delivery();
         delivery.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0).atOffset(ZoneOffset.UTC));
         delivery.setDeliveryStatus(CREATED);
         delivery.setPrice(50.00);
+        delivery.setUuid(DELIVERY_UUID_1);
 
-        deliveryList.add(delivery);
-        deliveryList.add(delivery);
+        return delivery;
+    }
 
+    private DeliveryEntity prepareDeliveryEntity() {
+        DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setId(1L);
         deliveryEntity.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0));
         deliveryEntity.setDeliveryStatus(CREATED);
         deliveryEntity.setPrice(BigDecimal.valueOf(50.00));
+        deliveryEntity.setUuid(DELIVERY_UUID_1);
 
-        deliveryEntityList.add(deliveryEntity);
-        deliveryEntityList.add(deliveryEntity);
+
+        return deliveryEntity;
+    }
+
+    private List<Delivery> prepareDeliveryList() {
+
+        return List.of(prepareDelivery(), prepareDelivery());
+    }
+
+    private List<DeliveryEntity> prepareDeliveryEntityList() {
+
+        return List.of(prepareDeliveryEntity(), prepareDeliveryEntity());
+    }
+
+    @BeforeEach
+    void setup() {
 
         when(deliveryEntityMapper
                 .mapToEntity(any(Delivery.class)))
-                .thenReturn(deliveryEntity);
+                .thenReturn(prepareDeliveryEntity());
         when(deliveryEntityMapper
                 .mapToApiModel(any(DeliveryEntity.class)))
-                .thenReturn(delivery);
+                .thenReturn(prepareDelivery());
     }
 
     @Test
     @DisplayName("should correctly save an Delivery entity exactly once")
     void save() {
 
-        //given
+        // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        Delivery delivery = prepareDelivery();
+
+        // and
         when(deliveryRepository
                 .save(any(DeliveryEntity.class)))
                 .thenReturn(deliveryEntity);
@@ -111,7 +125,7 @@ class DeliveryServiceTest {
     void saveNull() {
 
         // given
-        delivery = null;
+        Delivery delivery = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -131,6 +145,9 @@ class DeliveryServiceTest {
     void findAll() {
 
         // given
+        List<DeliveryEntity> deliveryEntityList = prepareDeliveryEntityList();
+
+        // and
         given(deliveryRepository.findAll())
                 .willReturn(deliveryEntityList);
 
@@ -148,38 +165,41 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should return delivery based on delivery id")
-    void findById() {
+    @DisplayName("should return delivery based on delivery uuid")
+    void findByUuid() {
 
         // given
-        given(deliveryRepository.findById(
-                anyLong()))
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
+
+        // and
+        given(deliveryRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(deliveryEntity));
-        Long deliveryId = 1L;
 
         // when
-        Delivery deliveryById = deliveryService.findById(deliveryId);
+        Delivery deliveryByUuid = deliveryService.findByUuid(deliveryUuid);
 
         // then
-        assertThat(deliveryById.getId())
+        assertThat(deliveryByUuid.getUuid())
                 .isNotNull();
     }
 
     @Test
-    @DisplayName("should throw an exception when delivery id is null")
-    void findByIdNull() {
+    @DisplayName("should throw an exception when delivery uuid is null")
+    void findByUuidNull() {
 
         // given
-        Long deliveryId = null;
+        UUID deliveryUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                deliveryService.findById(deliveryId));
+                deliveryService.findByUuid(deliveryUuid));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for delivery failed. Delivery id is null.");
+                .hasMessage("Searching for delivery failed. Delivery uuid is null.");
 
         // verify
         then(deliveryRepository)
@@ -187,17 +207,20 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an delivery based on delivery id")
+    @DisplayName("should delete an delivery based on delivery uuid")
     void delete() {
 
         // given
-        given(deliveryRepository.findById(
-                anyLong()))
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
+
+        // and
+        given(deliveryRepository.findByUuid(
+                any(UUID.class)))
                 .willReturn(Optional.of(deliveryEntity));
-        Long deliveryId = 1L;
 
         // when
-        deliveryService.delete(deliveryId);
+        deliveryService.delete(deliveryUuid);
 
         // then
         then(deliveryRepository)
@@ -206,47 +229,48 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when delivery id is null")
+    @DisplayName("should throw an exception when delivery uuid is null")
     void deleteNull() {
         // given
-        Long deliveryId = null;
+        UUID deliveryUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                deliveryService.delete(deliveryId));
+                deliveryService.delete(deliveryUuid));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting delivery failed. Delivery id is null.");
+                .hasMessage("Deleting delivery failed. Delivery uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
-    void updateNullId() {
+    @DisplayName("should throw an exception when uuid is null")
+    void updateNullUuid() {
         // given
-        Long deliveryId = null;
+        Delivery delivery = prepareDelivery();
+        UUID deliveryUuid = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
-                deliveryService.update(deliveryId, delivery));
+                deliveryService.update(deliveryUuid, delivery));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating delivery failed. Delivery id is null.");
+                .hasMessage("Updating delivery failed. Delivery uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when delivery is null")
     void updateNullDelivery() {
         // given
-        Long deliveryId = 1L;
+        UUID deliveryUuid = DELIVERY_UUID_1;
         Delivery delivery = null;
 
         // when
         Throwable thrown = catchThrowable(() ->
-                deliveryService.update(deliveryId, delivery));
+                deliveryService.update(deliveryUuid, delivery));
 
         // then
         assertThat(thrown)
@@ -255,39 +279,42 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newDelivery's id doesn't match deliveryFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newDelivery's uuid doesn't match deliveryFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID oldUuid = DELIVERY_UUID_1;
+
         Delivery newDelivery = new Delivery();
-        Long oldId = 1L;
-        Long newId = 2L;
-        newDelivery.setId(newId);
+        UUID newUuid = UUID.randomUUID();
+        newDelivery.setUuid(newUuid);
 
         // and
-        when(deliveryRepository.findById(anyLong()))
+        when(deliveryRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(deliveryEntity));
         // when
         Throwable throwable = catchThrowable(() ->
-                deliveryService.update(oldId, newDelivery));
+                deliveryService.update(oldUuid, newDelivery));
 
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating delivery fields failed. Different id's");
+                .hasMessage("Updating delivery fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update delivery when valid id and delivery are provided")
+    @DisplayName("should correctly update delivery when valid uuid and delivery are provided")
     void shouldUpdateDelivery() {
         // given
-        Long deliveryId = 1L;
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
 
         // and
         Delivery changedDelivery = prepareDeliveryForEdit();
         DeliveryEntity changedDeliveryEntity = prepareDeliveryEntityForEdit();
 
         // and
-        when(deliveryRepository.findById(anyLong()))
+        when(deliveryRepository.findByUuid(any(UUID.class)))
                 .thenReturn(Optional.of(deliveryEntity));
         when(deliveryRepository.save(any(DeliveryEntity.class)))
                 .thenReturn(changedDeliveryEntity);
@@ -298,17 +325,18 @@ class DeliveryServiceTest {
                 .thenReturn(changedDelivery);
 
         // when
-        Delivery updatedDelivery = deliveryService.update(deliveryId, changedDelivery);
+        Delivery updatedDelivery = deliveryService.update(deliveryUuid, changedDelivery);
 
         // then
         assertThat(updatedDelivery).isNotNull();
         assertThat(updatedDelivery.getId()).isEqualTo(changedDelivery.getId());
+        assertThat(updatedDelivery.getUuid()).isEqualTo(changedDelivery.getUuid());
         assertThat(updatedDelivery.getDeliveryTime()).isEqualTo(changedDelivery.getDeliveryTime());
         assertThat(updatedDelivery.getPrice()).isEqualTo(changedDelivery.getPrice());
         assertThat(updatedDelivery.getDeliveryStatus()).isEqualTo(changedDelivery.getDeliveryStatus());
 
-        assertThat(updatedDelivery.getOrder().getId()).isEqualTo(changedDelivery.getOrder().getId());
-        assertThat(updatedDelivery.getCourier().getId()).isEqualTo(changedDelivery.getCourier().getId());
+        assertThat(updatedDelivery.getOrder().getUuid()).isEqualTo(changedDelivery.getOrder().getUuid());
+        assertThat(updatedDelivery.getCourier().getUuid()).isEqualTo(changedDelivery.getCourier().getUuid());
 
         // verify
         then(deliveryRepository)
@@ -318,23 +346,30 @@ class DeliveryServiceTest {
 
     private Delivery prepareDeliveryForEdit() {
         Long deliveryId = 1L;
+        UUID deliveryUuid = DELIVERY_UUID_1;
         Double newPrice = 40.50D;
         LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
         OffsetDateTime newDeliveryOffsetDateTime = newDeliveryLocalDateTime.atOffset(ZoneOffset.UTC);
         DeliveryStatus newDeliveryStatus = IN_TRANSIT;
+        UUID newOrderUuid = UUID.randomUUID();
+        UUID newCourierUuid = UUID.randomUUID();
+
         Long newOrderId = 3L;
         Long newCourierId = 3L;
-
         Delivery changedDelivery = new Delivery();
         changedDelivery.setId(deliveryId);
         changedDelivery.setPrice(newPrice);
         changedDelivery.setDeliveryTime(newDeliveryOffsetDateTime);
         changedDelivery.setDeliveryStatus(newDeliveryStatus);
+        changedDelivery.setUuid(deliveryUuid);
 
         Order newOrder = new Order();
         newOrder.setId(newOrderId);
+        newOrder.setUuid(newOrderUuid);
+
         Courier newCourier = new Courier();
         newCourier.setId(newCourierId);
+        newCourier.setUuid(newCourierUuid);
 
         changedDelivery.setOrder(newOrder);
         changedDelivery.setCourier(newCourier);
@@ -343,23 +378,23 @@ class DeliveryServiceTest {
     }
 
     private DeliveryEntity prepareDeliveryEntityForEdit() {
-        Long deliveryId = 1L;
+        UUID deliveryUuid = DELIVERY_UUID_1;
         BigDecimal newPrice = BigDecimal.valueOf(40.50D);
         LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
         DeliveryStatus newDeliveryStatus = IN_TRANSIT;
-        Long newOrderId = 3L;
-        Long newCourierId = 3L;
+        UUID newOrderUuid = UUID.randomUUID();
+        UUID newCourierUuid = UUID.randomUUID();
 
         DeliveryEntity changedDeliveryEntity = new DeliveryEntity();
-        changedDeliveryEntity.setId(deliveryId);
+        changedDeliveryEntity.setUuid(deliveryUuid);
         changedDeliveryEntity.setPrice(newPrice);
         changedDeliveryEntity.setDeliveryTime(newDeliveryLocalDateTime);
         changedDeliveryEntity.setDeliveryStatus(newDeliveryStatus);
 
         OrderEntity newOrderEntity = new OrderEntity();
-        newOrderEntity.setId(newOrderId);
+        newOrderEntity.setUuid(newOrderUuid);
         CourierEntity newCourierEntity = new CourierEntity();
-        newCourierEntity.setId(newCourierId);
+        newCourierEntity.setUuid(newCourierUuid);
 
         changedDeliveryEntity.setOrder(newOrderEntity);
         changedDeliveryEntity.setCourier(newCourierEntity);

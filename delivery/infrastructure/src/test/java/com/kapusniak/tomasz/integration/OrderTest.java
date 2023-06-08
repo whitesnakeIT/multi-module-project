@@ -5,7 +5,6 @@ import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.service.OrderService;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,12 @@ import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
+import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
+import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.hasSize;
@@ -42,6 +45,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class OrderTest {
 
+    private static final UUID ORDER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+
     @Autowired
     private OrderService orderService;
 
@@ -51,36 +56,54 @@ public class OrderTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Order prepareOrder() {
+        Order order = new Order();
+        order.setPreferredDeliveryDate(LocalDate.of(2023, 6, 7));
+        order.setPackageSize(LARGE);
+        order.setPackageType(DOCUMENT);
+        order.setSenderAddress("test sender address");
+        order.setReceiverAddress("test receiver address");
+        order.setUuid(ORDER_UUID_1);
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setEmail("test@email.com");
+        customer.setFirstName("testFirstName");
+        customer.setLastName("testLastName");
+        order.setCustomer(customer);
+
+        return order;
+    }
+
     @Test
     @DisplayName("should correctly get Order from database and verify" +
             " properties with Order from controller method")
     void getOrderExisting() throws Exception {
         // given
-        Long orderId = 1L;
-        Order order = orderService.findById(orderId);
+        UUID orderUuid = ORDER_UUID_1;
+        Order order = orderService.findByUuid(orderUuid);
 
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/orders/" + orderId));
+                        "/api/v1/orders/" + orderUuid));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(order.getId()));
+                .andExpect(jsonPath("$.uuid").value(order.getUuid().toString()));
     }
 
     @Test
-    @DisplayName("should throw an exception when provided order id is not existing" +
+    @DisplayName("should throw an exception when provided order uuid is not existing" +
             " in database for searching")
     void getOrderNonExisting() {
         // given
-        Long orderId = 3L;
+        UUID orderUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/orders/" + orderId)
+                        "/api/v1/orders/" + orderUuid)
                 )
         );
 
@@ -105,10 +128,10 @@ public class OrderTest {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id")
-                        .value(orderList.get(0).getId()))
-                .andExpect(jsonPath("$[1].id")
-                        .value(orderList.get(1).getId()));
+                .andExpect(jsonPath("$[0].uuid")
+                        .value(orderList.get(0).getUuid().toString()))
+                .andExpect(jsonPath("$[1].uuid")
+                        .value(orderList.get(1).getUuid().toString()));
 
 
     }
@@ -134,11 +157,7 @@ public class OrderTest {
             " from controller")
     void createOrder() throws Exception {
         // given
-        Order order = new Order();
-        order.setPackageType(PackageType.PARCEL);
-        Customer customer = new Customer();
-        customer.setId(1L);
-        order.setCustomer(customer);
+        Order order = prepareOrder();
 
         // when
         ResultActions result = mockMvc
@@ -149,7 +168,7 @@ public class OrderTest {
         // then
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.uuid").isNotEmpty())
                 .andExpect(jsonPath("$.packageType").value(order.getPackageType().toString()));
     }
 
@@ -158,13 +177,13 @@ public class OrderTest {
             " method from controller")
     void deleteOrderExisting() throws Exception {
         // given
-        Long orderId = 1L;
+        UUID orderUuid = ORDER_UUID_1;
         int sizeBeforeDeleting = orderService.findAll().size();
 
         // when
         ResultActions result =
                 mockMvc.perform(delete(
-                        "/api/v1/orders/" + orderId));
+                        "/api/v1/orders/" + orderUuid));
 
         // then
         result.andExpect(status().isNoContent());
@@ -176,16 +195,16 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided order id is not existing" +
+    @DisplayName("should throw an exception when provided order uuid is not existing" +
             " in database for deleting")
     void deleteOrderNonExisting() {
         // given
-        Long orderId = 3L;
+        UUID orderUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/orders/" + orderId)
+                        "/api/v1/orders/" + orderUuid)
                 )
         );
 
@@ -199,8 +218,8 @@ public class OrderTest {
             " from controller")
     void updateOrder() throws Exception {
         // given
-        Long orderId = 1L;
-        Order orderBeforeEdit = orderService.findById(orderId);
+        UUID orderUuid = ORDER_UUID_1;
+        Order orderBeforeEdit = orderService.findByUuid(orderUuid);
         PackageType newPackageType = PackageType.DOCUMENT;
 
         // and
@@ -208,18 +227,18 @@ public class OrderTest {
 
         // when
         ResultActions result = mockMvc
-                .perform(put("/api/v1/orders/" + orderId)
+                .perform(put("/api/v1/orders/" + orderUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderBeforeEdit)));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(orderBeforeEdit.getId()))
+                .andExpect(jsonPath("$.uuid").value(orderBeforeEdit.getUuid().toString()))
                 .andExpect(jsonPath("$.packageType").value(newPackageType.toString()));
 
         // and
-        Order orderAfterEdit = orderService.findById(orderId);
+        Order orderAfterEdit = orderService.findByUuid(orderUuid);
         assertThat(orderAfterEdit.getPackageType()).isEqualTo(newPackageType);
     }
 }
