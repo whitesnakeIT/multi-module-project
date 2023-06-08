@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -33,9 +34,9 @@ public class JdbcExamples {
         return jdbcTemplate.query(query, orderRowMapper);
     }
 
-    public OrderEntity getOrderById(Long orderId) {
-        String query = "SELECT * FROM ORDERS WHERE ORDER_ID = ?";
-        return jdbcTemplate.queryForObject(query, new Object[]{orderId}, orderRowMapper);
+    public OrderEntity getOrderByUuid(UUID orderUuid) {
+        String query = "SELECT * FROM ORDERS WHERE UUID = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{orderUuid}, orderRowMapper);
     }
 
     public int insertCustomer(String firstName, String lastName, String email) {
@@ -44,17 +45,17 @@ public class JdbcExamples {
                 firstName, lastName, email);
     }
 
-    public CustomerEntity getCustomerById(Long customerId) {
+    public CustomerEntity getCustomerByUuid(UUID customerUuid) {
         String query = "SELECT CUSTOMERS.* " +
                 "FROM CUSTOMERS " +
-                "WHERE CUSTOMER_ID = ?";
+                "WHERE UUID = ?";
 
         CustomerEntity customer = null;
         try {
             customer = jdbcTemplate.
-                    queryForObject(query, new Object[]{customerId}, customerRowMapper);
+                    queryForObject(query, new Object[]{customerUuid}, customerRowMapper);
             if (customer != null) {
-                customer.setOrders(getCustomerOrderList(customerId));
+                customer.setOrders(getCustomerOrderList(customer.getId()));
             }
 
         } catch (EmptyResultDataAccessException ex) {
@@ -64,11 +65,11 @@ public class JdbcExamples {
         return customer;
     }
 
-    public CourierEntity getCourierById(Long courierId) {
-        String query = "SELECT * FROM COURIERS WHERE COURIER_ID = ?";
+    public CourierEntity getCourierByUuid(UUID courierUuid) {
+        String query = "SELECT * FROM COURIERS WHERE UUID = ?";
 
         return jdbcTemplate.
-                queryForObject(query, new Object[]{courierId}, courierRowMapper);
+                queryForObject(query, new Object[]{courierUuid}, courierRowMapper);
     }
 
 

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -17,20 +19,36 @@ class TrackingEntityMapperTest {
     @Autowired
     private TrackingEntityMapper trackingEntityMapper;
 
+    private Tracking prepareTracking() {
+        Tracking tracking = new Tracking();
+        tracking.setId(1L);
+        tracking.setLocalization("testLocalization");
+        tracking.setUuid(UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0"));
+
+        return tracking;
+    }
+
+    private TrackingEntity prepareTrackingEntity() {
+        TrackingEntity trackingEntity = new TrackingEntity();
+        trackingEntity.setId(1L);
+        trackingEntity.setLocalization("123456789");
+        trackingEntity.setUuid(UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0"));
+
+        return trackingEntity;
+    }
+
     @Test
     @DisplayName("should map Tracking to TrackingEntity")
     public void mapToEntity() {
         // given
-        Tracking tracking = new Tracking();
-        tracking.setId(1L);
-        tracking.setLocalization("testLocalization");
+        Tracking tracking = prepareTracking();
 
         // when
         TrackingEntity trackingEntity = trackingEntityMapper.mapToEntity(tracking);
 
         // then
         assertThat(trackingEntity).isNotNull();
-        assertThat(tracking.getId()).isEqualTo(trackingEntity.getId());
+        assertThat(tracking.getUuid()).isEqualTo(trackingEntity.getUuid());
         assertThat(tracking.getLocalization()).isEqualTo(trackingEntity.getLocalization());
         assertThat(trackingEntity.getUuid()).isNotNull();
     }
@@ -39,16 +57,14 @@ class TrackingEntityMapperTest {
     @DisplayName("should map TrackingEntity to Tracking")
     public void mapToApiModel() {
         // given
-        TrackingEntity entity = new TrackingEntity();
-        entity.setId(1L);
-        entity.setLocalization("123456789");
+        TrackingEntity trackingEntity = prepareTrackingEntity();
 
         // when
-        Tracking tracking = trackingEntityMapper.mapToApiModel(entity);
+        Tracking tracking = trackingEntityMapper.mapToApiModel(trackingEntity);
 
         // then
         assertThat(tracking).isNotNull();
-        assertThat(entity.getId()).isEqualTo(tracking.getId());
-        assertThat(entity.getLocalization()).isEqualTo(tracking.getLocalization());
+        assertThat(trackingEntity.getUuid()).isEqualTo(tracking.getUuid());
+        assertThat(trackingEntity.getLocalization()).isEqualTo(tracking.getLocalization());
     }
 }

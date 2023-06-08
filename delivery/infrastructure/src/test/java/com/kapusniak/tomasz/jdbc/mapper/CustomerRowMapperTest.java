@@ -34,6 +34,7 @@ class CustomerRowMapperTest {
         when(resultSet.getString("FIRST_NAME")).thenReturn("John");
         when(resultSet.getString("LAST_NAME")).thenReturn("Doe");
         when(resultSet.getString("EMAIL")).thenReturn("john.doe@example.com");
+        when(resultSet.getString("UUID")).thenReturn("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
     }
 
     @Test
@@ -49,5 +50,6 @@ class CustomerRowMapperTest {
         assertEquals("John", customer.getFirstName());
         assertEquals("Doe", customer.getLastName());
         assertEquals("john.doe@example.com", customer.getEmail());
+        assertEquals("28f60dc1-993a-4d08-ac54-850a1fefb6a3", customer.getUuid().toString());
     }
 }

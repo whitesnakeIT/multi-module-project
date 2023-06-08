@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
 import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
@@ -47,6 +48,15 @@ class OrderJpaRepositoryTest {
     @Autowired
     private DeliveryJpaRepository deliveryRepository;
 
+    CustomerEntity prepareCustomerEntity() {
+        CustomerEntity customerEntity = new CustomerEntity();
+
+        customerEntity.setId(1L);
+        customerEntity.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
+
+        return customerEntity;
+    }
+
     OrderEntity prepareOrderEntity() {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
@@ -55,9 +65,8 @@ class OrderJpaRepositoryTest {
         orderEntity.setSenderAddress("test sender address");
         orderEntity.setReceiverAddress("test receiver address");
 
-        CustomerEntity customerEntity = new CustomerEntity();
+        CustomerEntity customerEntity = prepareCustomerEntity();
 
-        customerEntity.setId(1L);
         orderEntity.setCustomer(customerEntity);
 
         return orderEntity;
@@ -128,30 +137,35 @@ class OrderJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("should return list of orders with correct size based on customer id")
-    void findAllByCustomerIdExisting() {
+    @DisplayName("should return list of orders with correct size based on customer uuid")
+    void findAllByCustomerUuidExisting() {
+        // given
+        CustomerEntity customerEntity = prepareCustomerEntity();
 
         // when
-        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerUuid = orderRepository.findAllByCustomerUuid(customerEntity.getUuid());
 
         // then
-        then(ordersByCustomerId.size())
+        then(ordersByCustomerUuid.size())
                 .isGreaterThan(0);
     }
 
     @Test
-    @DisplayName("should return empty list of orders based on customer id")
-    void findAllByCustomerIdNotExisting() {
+    @DisplayName("should return empty list of orders based on customer uuid")
+    void findAllByCustomerUuidNotExisting() {
 
         // given
         deliveryRepository.deleteAll();
         orderRepository.deleteAll();
 
+        // and
+        CustomerEntity customerEntity = prepareCustomerEntity();
+
         // when
-        List<OrderEntity> ordersByCustomerId = orderRepository.findAllByCustomerId(1L);
+        List<OrderEntity> ordersByCustomerUuid = orderRepository.findAllByCustomerUuid(customerEntity.getUuid());
 
         // then
-        then(ordersByCustomerId)
+        then(ordersByCustomerUuid)
                 .isEmpty();
     }
 
@@ -175,10 +189,10 @@ class OrderJpaRepositoryTest {
         // then
         assertThat(orderEntity.getVersion()).isEqualTo(0);
 
-        assertThat(savedOrder.getId()).isNotNull();
+        assertThat(savedOrder.getUuid()).isNotNull();
         assertThat(savedOrder.getVersion()).isEqualTo(0);
 
-        assertThat(editedOrder.getId()).isEqualTo(savedOrder.getId());
+        assertThat(editedOrder.getUuid()).isEqualTo(savedOrder.getUuid());
         assertThat(editedOrder.getVersion()).isEqualTo(savedOrder.getVersion() + 1);
     }
 }

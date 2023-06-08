@@ -60,10 +60,10 @@ public class TrackingJpaRepositoryTest {
         // then
         assertThat(trackingEntity.getVersion()).isEqualTo(0);
 
-        assertThat(savedTracking.getId()).isNotNull();
+        assertThat(savedTracking.getUuid()).isNotNull();
         assertThat(savedTracking.getVersion()).isEqualTo(0);
 
-        assertThat(editedTracking.getId()).isEqualTo(savedTracking.getId());
+        assertThat(editedTracking.getUuid()).isEqualTo(savedTracking.getUuid());
         assertThat(editedTracking.getVersion()).isEqualTo(savedTracking.getVersion() + 1);
     }
 }

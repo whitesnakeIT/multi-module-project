@@ -2,6 +2,7 @@ package com.kapusniak.tomasz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
+import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import com.kapusniak.tomasz.service.CourierService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class CourierControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,6 +42,9 @@ public class CourierControllerTest {
         Courier courier1 = new Courier();
         courier1.setId(1L);
         courier1.setFirstName("John");
+        courier1.setLastName("Wick");
+        courier1.setCourierCompany(CourierCompany.DHL);
+        courier1.setUuid(UUID.randomUUID());
 
         return courier1;
     }
@@ -80,15 +87,17 @@ public class CourierControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return courier based on courier id")
-    public void getCourierById() throws Exception {
+    @DisplayName("should correctly return courier based on courier uuid")
+    public void getCourierByUuid() throws Exception {
         // given
         Courier courier = getCourier();
-        when(courierService.findById(1L))
+        UUID courierUuid = courier.getUuid();
+
+        when(courierService.findByUuid(any()))
                 .thenReturn(courier);
 
         // when
-        mockMvc.perform(get("/api/v1/couriers/1"))
+        mockMvc.perform(get("/api/v1/couriers/" + courierUuid))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
@@ -97,7 +106,7 @@ public class CourierControllerTest {
         // then
         verify(courierService,
                 times(1))
-                .findById(1L);
+                .findByUuid(courierUuid);
         verifyNoMoreInteractions(courierService);
     }
 
@@ -131,11 +140,13 @@ public class CourierControllerTest {
     public void updateCourier() throws Exception {
         // given
         Courier courier = getCourier();
-        when(courierService.update(anyLong(),
+        UUID courierUuid = courier.getUuid();
+
+        when(courierService.update(any(UUID.class),
                 any(Courier.class))).thenReturn(courier);
 
         // when
-        mockMvc.perform(put("/api/v1/couriers/1")
+        mockMvc.perform(put("/api/v1/couriers/" + courierUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courier)))
                 .andExpect(status().isOk())
@@ -146,21 +157,25 @@ public class CourierControllerTest {
         // then
         verify(courierService,
                 times(1))
-                .update(eq(1L), any(Courier.class));
+                .update(eq(courierUuid), any(Courier.class));
         verifyNoMoreInteractions(courierService);
     }
 
     @Test
     @DisplayName("should return no content after deleting courier")
     public void deleteCourier() throws Exception {
+        // given
+        Courier courier = getCourier();
+        UUID courierUuid = courier.getUuid();
+
         // when
-        mockMvc.perform(delete("/api/v1/couriers/1"))
+        mockMvc.perform(delete("/api/v1/couriers/" + courierUuid))
                 .andExpect(status().isNoContent());
 
         // then
         verify(courierService,
                 times(1))
-                .delete(1L);
+                .delete(courierUuid);
         verifyNoMoreInteractions(courierService);
     }
 }

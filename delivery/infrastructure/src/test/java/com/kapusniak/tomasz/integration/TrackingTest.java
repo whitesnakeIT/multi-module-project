@@ -3,7 +3,6 @@ package com.kapusniak.tomasz.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -40,6 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class TrackingTest {
 
+    private static final UUID TRACKING_UUID_1 = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
+
     @Autowired
     private TrackingService trackingService;
 
@@ -54,32 +56,32 @@ public class TrackingTest {
             " properties with Tracking from controller method")
     void getTrackingExisting() throws Exception {
         // given
-        Long trackingId = 1L;
-        Tracking tracking = trackingService.findById(trackingId);
+        UUID trackingUuid = TRACKING_UUID_1;
+        Tracking tracking = trackingService.findByUuid(trackingUuid);
 
         // when
         ResultActions result =
                 mockMvc.perform(get(
-                        "/api/v1/tracking/" + trackingId));
+                        "/api/v1/tracking/" + trackingUuid));
 
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(tracking.getId()));
+                .andExpect(jsonPath("$.uuid").value(tracking.getUuid().toString()));
     }
 
     @Test
-    @DisplayName("should throw an exception when provided tracking id is not existing" +
+    @DisplayName("should throw an exception when provided tracking uuid is not existing" +
             " in database for searching")
     void getTrackingNonExisting() {
         // given
-        Long trackingId = 3L;
+        UUID trackingUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/tracking/" + trackingId)
+                        "/api/v1/tracking/" + trackingUuid)
                 )
         );
 
@@ -104,10 +106,10 @@ public class TrackingTest {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id")
-                        .value(trackingList.get(0).getId()))
-                .andExpect(jsonPath("$[1].id")
-                        .value(trackingList.get(1).getId()));
+                .andExpect(jsonPath("$[0].uuid")
+                        .value(trackingList.get(0).getUuid().toString()))
+                .andExpect(jsonPath("$[1].uuid")
+                        .value(trackingList.get(1).getUuid().toString()));
 
 
     }
@@ -154,13 +156,13 @@ public class TrackingTest {
             " method from controller")
     void deleteTrackingExisting() throws Exception {
         // given
-        Long trackingId = 1L;
+        UUID trackingUuid = TRACKING_UUID_1;
         int sizeBeforeDeleting = trackingService.findAll().size();
 
         // when
         ResultActions result =
                 mockMvc.perform(delete(
-                        "/api/v1/tracking/" + trackingId));
+                        "/api/v1/tracking/" + trackingUuid));
 
         // then
         result.andExpect(status().isNoContent());
@@ -172,16 +174,16 @@ public class TrackingTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided tracking id is not existing" +
+    @DisplayName("should throw an exception when provided tracking uuid is not existing" +
             " in database for deleting")
     void deleteTrackingNonExisting() {
         // given
-        Long trackingId = 3L;
+        UUID trackingUuid = UUID.randomUUID();
 
         // when
         Throwable throwable = catchThrowable(
                 () -> mockMvc.perform(get(
-                        "/api/v1/tracking/" + trackingId)
+                        "/api/v1/tracking/" + trackingUuid)
                 )
         );
 
@@ -195,8 +197,8 @@ public class TrackingTest {
             " from controller")
     void updateTracking() throws Exception {
         // given
-        Long trackingId = 1L;
-        Tracking trackingBeforeEdit = trackingService.findById(trackingId);
+        UUID trackingUuid = TRACKING_UUID_1;
+        Tracking trackingBeforeEdit = trackingService.findByUuid(trackingUuid);
         String newLocalization = "newLocalization";
 
         // and
@@ -204,18 +206,18 @@ public class TrackingTest {
 
         // when
         ResultActions result = mockMvc
-                .perform(put("/api/v1/tracking/" + trackingId)
+                .perform(put("/api/v1/tracking/" + trackingUuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(trackingBeforeEdit)));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(trackingBeforeEdit.getId()))
+                .andExpect(jsonPath("$.uuid").value(trackingBeforeEdit.getUuid().toString()))
                 .andExpect(jsonPath("$.localization").value(newLocalization));
 
         // and
-        Tracking trackingAfterEdit = trackingService.findById(trackingId);
+        Tracking trackingAfterEdit = trackingService.findByUuid(trackingUuid);
         assertThat(trackingAfterEdit.getLocalization()).isEqualTo(newLocalization);
     }
 }

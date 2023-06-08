@@ -4,7 +4,6 @@ import com.kapusniak.tomasz.openapi.api.DeliveriesApi;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.service.DeliveryService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,8 +29,8 @@ public class DeliveryController implements DeliveriesApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteDelivery(@PathVariable("id") @Min(1) Long deliveryId) {
-        deliveryService.delete(deliveryId);
+    public ResponseEntity<Void> deleteDelivery(@PathVariable("uuid") UUID deliveryUuid) {
+        deliveryService.delete(deliveryUuid);
 
         return ResponseEntity
                 .noContent()
@@ -45,15 +45,15 @@ public class DeliveryController implements DeliveriesApi {
     }
 
     @Override
-    public ResponseEntity<Delivery> getDelivery(@PathVariable("id") @Min(1) Long deliveryId) {
-        Delivery delivery = deliveryService.findById(deliveryId);
+    public ResponseEntity<Delivery> getDelivery(@PathVariable("uuid") UUID deliveryUuid) {
+        Delivery delivery = deliveryService.findByUuid(deliveryUuid);
 
         return ResponseEntity.ok(delivery);
     }
 
     @Override
-    public ResponseEntity<Delivery> updateDelivery(@PathVariable("id") @Min(1) Long deliveryId, @RequestBody @Valid Delivery delivery) {
-        Delivery update = deliveryService.update(deliveryId, delivery);
+    public ResponseEntity<Delivery> updateDelivery(@PathVariable("uuid") UUID deliveryUuid, @RequestBody @Valid Delivery delivery) {
+        Delivery update = deliveryService.update(deliveryUuid, delivery);
 
         return ResponseEntity.ok(update);
     }

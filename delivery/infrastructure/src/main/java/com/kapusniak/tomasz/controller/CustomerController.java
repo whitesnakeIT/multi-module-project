@@ -4,7 +4,6 @@ import com.kapusniak.tomasz.openapi.api.CustomersApi;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.service.CustomerService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,8 +29,8 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") @Min(1) Long customerId) {
-        customerService.delete(customerId);
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("uuid") UUID customerUuid) {
+        customerService.delete(customerUuid);
 
         return ResponseEntity
                 .noContent()
@@ -45,15 +45,15 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<Customer> getCustomer(@PathVariable("id") @Min(1) Long customerId) {
-        Customer customer = customerService.findById(customerId);
+    public ResponseEntity<Customer> getCustomer(@PathVariable("uuid") UUID customerUuid) {
+        Customer customer = customerService.findByUuid(customerUuid);
 
         return ResponseEntity.ok(customer);
     }
 
     @Override
-    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") @Min(1) Long customerId, @RequestBody @Valid Customer customer) {
-        Customer update = customerService.update(customerId, customer);
+    public ResponseEntity<Customer> updateCustomer(@PathVariable("uuid") UUID customerUuid, @RequestBody @Valid Customer customer) {
+        Customer update = customerService.update(customerUuid, customer);
 
         return ResponseEntity.ok(update);
     }

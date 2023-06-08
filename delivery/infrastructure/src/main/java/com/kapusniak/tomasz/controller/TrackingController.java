@@ -4,7 +4,6 @@ import com.kapusniak.tomasz.openapi.api.TrackingApi;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.service.TrackingService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,15 +22,15 @@ public class TrackingController implements TrackingApi {
     private final TrackingService trackingService;
 
     @Override
-    public ResponseEntity<Tracking> createTracking(@RequestBody @Min(1) @Valid Tracking tracking) {
+    public ResponseEntity<Tracking> createTracking(@RequestBody @Valid Tracking tracking) {
         Tracking save = trackingService.save(tracking);
 
         return ResponseEntity.status(201).body(save);
     }
 
     @Override
-    public ResponseEntity<Void> deleteTracking(@PathVariable("id") @Min(1) Long trackingId) {
-        trackingService.delete(trackingId);
+    public ResponseEntity<Void> deleteTracking(@PathVariable("uuid") UUID trackingUuid) {
+        trackingService.delete(trackingUuid);
 
         return ResponseEntity
                 .noContent()
@@ -45,15 +45,15 @@ public class TrackingController implements TrackingApi {
     }
 
     @Override
-    public ResponseEntity<Tracking> getTracking(@PathVariable("id") @Min(1) Long trackingId) {
-        Tracking tracking = trackingService.findById(trackingId);
+    public ResponseEntity<Tracking> getTracking(@PathVariable("uuid") UUID trackingUuid) {
+        Tracking tracking = trackingService.findByUuid(trackingUuid);
 
         return ResponseEntity.ok(tracking);
     }
 
     @Override
-    public ResponseEntity<Tracking> updateTracking(@PathVariable("id") @Min(1) Long trackingId, @RequestBody @Valid Tracking tracking) {
-        Tracking update = trackingService.update(trackingId, tracking);
+    public ResponseEntity<Tracking> updateTracking(@PathVariable("uuid") UUID trackingUuid, @RequestBody @Valid Tracking tracking) {
+        Tracking update = trackingService.update(trackingUuid, tracking);
 
         return ResponseEntity.ok(update);
     }

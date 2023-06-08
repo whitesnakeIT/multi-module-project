@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,34 +39,34 @@ public class CustomerService {
                 .toList();
     }
 
-    public Customer findById(Long customerId) {
-        if (customerId == null) {
-            throw new RuntimeException("Searching for customer failed. Customer id is null.");
+    public Customer findByUuid(UUID customerUuid) {
+        if (customerUuid == null) {
+            throw new RuntimeException("Searching for customer failed. Customer uuid is null.");
         }
-        return customerEntityMapper.mapToApiModel(customerRepository.findById(customerId)
+        return customerEntityMapper.mapToApiModel(customerRepository.findByUuid(customerUuid)
                 .orElseThrow(RuntimeException::new));
     }
 
     @Transactional
-    public void delete(Long customerId) {
-        if (customerId == null) {
-            throw new RuntimeException("Deleting customer failed. Customer id is null.");
+    public void delete(UUID customerUuid) {
+        if (customerUuid == null) {
+            throw new RuntimeException("Deleting customer failed. Customer uuid is null.");
         }
-        Customer customer = findById(customerId);
+        Customer customer = findByUuid(customerUuid);
 
         customerRepository.delete(customerEntityMapper.mapToEntity(customer));
     }
 
     @Transactional
-    public Customer update(Long id, Customer customer) {
-        if (id == null) {
-            throw new RuntimeException("Updating customer failed. Customer id is null.");
+    public Customer update(UUID uuid, Customer customer) {
+        if (uuid == null) {
+            throw new RuntimeException("Updating customer failed. Customer uuid is null.");
         }
         if (customer == null) {
             throw new RuntimeException("Updating customer failed. Customer is null.");
         }
 
-        Customer customerFromDb = findById(id);
+        Customer customerFromDb = findByUuid(uuid);
 
         Customer updatedCustomer = updateFields(customerFromDb, customer);
 
@@ -76,11 +77,11 @@ public class CustomerService {
     }
 
     private Customer updateFields(Customer customerFromDb, Customer newCustomer) {
-        if (newCustomer.getId() == null) {
-            newCustomer.setId(customerFromDb.getId());
+        if (newCustomer.getUuid() == null) {
+            newCustomer.setUuid(customerFromDb.getUuid());
         }
-        if (!newCustomer.getId().equals(customerFromDb.getId())) {
-            throw new RuntimeException("Updating customer fields failed. Different id's");
+        if (!newCustomer.getUuid().equals(customerFromDb.getUuid())) {
+            throw new RuntimeException("Updating customer fields failed. Different uuid's");
         }
         return newCustomer;
     }

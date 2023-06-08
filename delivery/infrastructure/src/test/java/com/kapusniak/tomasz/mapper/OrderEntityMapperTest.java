@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,6 +55,7 @@ class OrderEntityMapperTest {
         order.setPackageSize(PackageSize.SMALL);
         Customer customer = prepareCustomer();
         order.setCustomer(customer);
+        order.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
 
         return order;
     }
@@ -67,6 +69,7 @@ class OrderEntityMapperTest {
         orderEntity.setPackageSize(PackageSize.SMALL);
         CustomerEntity customerEntity = prepareCustomerEntity();
         orderEntity.setCustomer(customerEntity);
+        orderEntity.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
 
         return orderEntity;
     }
@@ -82,7 +85,7 @@ class OrderEntityMapperTest {
         OrderEntity orderEntity = orderEntityMapper.mapToEntity(order);
 
         // then
-        assertThat(orderEntity.getId()).isEqualTo(order.getId());
+        assertThat(orderEntity.getUuid()).isEqualTo(order.getUuid());
         assertThat(orderEntity.getSenderAddress()).isEqualTo(order.getSenderAddress());
         assertThat(orderEntity.getReceiverAddress()).isEqualTo(order.getReceiverAddress());
         assertThat(orderEntity.getPackageType()).isEqualTo(order.getPackageType());
@@ -104,7 +107,7 @@ class OrderEntityMapperTest {
         Order order = orderEntityMapper.mapToApiModel(orderEntity);
 
         // then
-        assertThat(order.getId()).isEqualTo(orderEntity.getId());
+        assertThat(order.getUuid()).isEqualTo(orderEntity.getUuid());
         assertThat(order.getSenderAddress()).isEqualTo(orderEntity.getSenderAddress());
         assertThat(order.getReceiverAddress()).isEqualTo(orderEntity.getReceiverAddress());
         assertThat(order.getPackageType()).isEqualTo(orderEntity.getPackageType());

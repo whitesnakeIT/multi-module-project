@@ -76,10 +76,10 @@ public class DeliveryJpaRepositoryTest {
         // then
         assertThat(deliveryEntity.getVersion()).isEqualTo(0);
 
-        assertThat(savedDelivery.getId()).isNotNull();
+        assertThat(savedDelivery.getUuid()).isNotNull();
         assertThat(savedDelivery.getVersion()).isEqualTo(0);
 
-        assertThat(editedDelivery.getId()).isEqualTo(savedDelivery.getId());
+        assertThat(editedDelivery.getUuid()).isEqualTo(savedDelivery.getUuid());
         assertThat(editedDelivery.getVersion()).isEqualTo(savedDelivery.getVersion() + 1);
     }
 }
