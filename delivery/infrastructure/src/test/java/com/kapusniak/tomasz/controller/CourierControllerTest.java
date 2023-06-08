@@ -87,7 +87,7 @@ public class CourierControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return courier based on courier id")
+    @DisplayName("should correctly return courier based on courier uuid")
     public void getCourierByUuid() throws Exception {
         // given
         Courier courier = getCourier();

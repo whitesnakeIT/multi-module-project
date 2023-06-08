@@ -2,7 +2,9 @@ package com.kapusniak.tomasz.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
+import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.service.CustomerService;
+import com.kapusniak.tomasz.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +43,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CustomerTest {
 
     private static final UUID UUID_CUSTOMER_1 = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
+    private static final UUID ORDER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+
 
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private OrderService orderService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -51,11 +57,27 @@ public class CustomerTest {
 
     private Customer prepareCustomer() {
         Customer customer = new Customer();
-        customer.setId(1L);
-        customer.setEmail("test@email.com");
-        customer.setFirstName("testFirstName");
-        customer.setLastName("testLastName");
+        Long testId = 1L;
+        String testEmail = "test@email.com";
+        String testFirstName = "testFirstName";
+        String testLastName = "testLastName";
+        customer.setId(testId);
+        customer.setEmail(testEmail);
+        customer.setFirstName(testFirstName);
+        customer.setLastName(testLastName);
         customer.setUuid(UUID_CUSTOMER_1);
+
+        Order order = orderService.findByUuid(ORDER_UUID_1);
+//        order.setPreferredDeliveryDate(LocalDate.of(2023, 6, 7));
+//        order.setPackageSize(LARGE);
+//        order.setPackageType(DOCUMENT);
+//        order.setSenderAddress("test sender address");
+//        order.setReceiverAddress("test receiver address");
+//        order.setUuid(UUID.randomUUID());
+//        order.setId(1L);
+//        order.setCustomer(customer);
+
+        customer.addOrdersItem(order);
 
 
         return customer;
@@ -146,7 +168,6 @@ public class CustomerTest {
     void createCustomer() throws Exception {
         // given
         Customer customer = prepareCustomer();
-
 
         // when
         ResultActions result = mockMvc

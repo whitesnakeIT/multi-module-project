@@ -29,8 +29,8 @@ public class JdbcExamples {
         return jdbcTemplate.query(query, orderRowMapper);
     }
 
-    public List<OrderEntity> getCustomerOrderList(UUID customerUuid) {
-        String query = "SELECT * FROM ORDERS WHERE UUID = " + customerUuid;
+    public List<OrderEntity> getCustomerOrderList(Long customerId) {
+        String query = "SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerId;
         return jdbcTemplate.query(query, orderRowMapper);
     }
 
@@ -55,7 +55,7 @@ public class JdbcExamples {
             customer = jdbcTemplate.
                     queryForObject(query, new Object[]{customerUuid}, customerRowMapper);
             if (customer != null) {
-                customer.setOrders(getCustomerOrderList(customerUuid));
+                customer.setOrders(getCustomerOrderList(customer.getId()));
             }
 
         } catch (EmptyResultDataAccessException ex) {
@@ -82,7 +82,7 @@ public class JdbcExamples {
             customers.forEach(
                     customer -> customer.setOrders(
                             getCustomerOrderList(
-                                    customer.getUuid())));
+                                    customer.getId())));
         }
 
         return customers;

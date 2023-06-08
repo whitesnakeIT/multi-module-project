@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,13 +38,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 class DeliveryServiceTest {
-
-    Delivery delivery = new Delivery();
-    DeliveryEntity deliveryEntity = new DeliveryEntity();
-
-    List<Delivery> deliveryList = new ArrayList<>();
-    List<DeliveryEntity> deliveryEntityList = new ArrayList<>();
-
+    private static final UUID DELIVERY_UUID_1 = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
     @Mock
     private DeliveryJpaRepository deliveryRepository;
 
@@ -54,41 +47,62 @@ class DeliveryServiceTest {
     @InjectMocks
     private DeliveryService deliveryService;
 
-    @BeforeEach
-    void setup() {
-        delivery.setId(1L);
+    private Delivery prepareDelivery() {
+        Delivery delivery = new Delivery();
         delivery.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0).atOffset(ZoneOffset.UTC));
         delivery.setDeliveryStatus(CREATED);
         delivery.setPrice(50.00);
+        delivery.setUuid(DELIVERY_UUID_1);
 
-        deliveryList.add(delivery);
-        deliveryList.add(delivery);
+        return delivery;
+    }
 
+    private DeliveryEntity prepareDeliveryEntity() {
+        DeliveryEntity deliveryEntity = new DeliveryEntity();
         deliveryEntity.setId(1L);
         deliveryEntity.setDeliveryTime(LocalDateTime
                 .of(2023, 5, 3,
                         12, 0, 0));
         deliveryEntity.setDeliveryStatus(CREATED);
         deliveryEntity.setPrice(BigDecimal.valueOf(50.00));
+        deliveryEntity.setUuid(DELIVERY_UUID_1);
 
-        deliveryEntityList.add(deliveryEntity);
-        deliveryEntityList.add(deliveryEntity);
+
+        return deliveryEntity;
+    }
+
+    private List<Delivery> prepareDeliveryList() {
+
+        return List.of(prepareDelivery(), prepareDelivery());
+    }
+
+    private List<DeliveryEntity> prepareDeliveryEntityList() {
+
+        return List.of(prepareDeliveryEntity(), prepareDeliveryEntity());
+    }
+
+    @BeforeEach
+    void setup() {
 
         when(deliveryEntityMapper
                 .mapToEntity(any(Delivery.class)))
-                .thenReturn(deliveryEntity);
+                .thenReturn(prepareDeliveryEntity());
         when(deliveryEntityMapper
                 .mapToApiModel(any(DeliveryEntity.class)))
-                .thenReturn(delivery);
+                .thenReturn(prepareDelivery());
     }
 
     @Test
     @DisplayName("should correctly save an Delivery entity exactly once")
     void save() {
 
-        //given
+        // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        Delivery delivery = prepareDelivery();
+
+        // and
         when(deliveryRepository
                 .save(any(DeliveryEntity.class)))
                 .thenReturn(deliveryEntity);
@@ -111,7 +125,7 @@ class DeliveryServiceTest {
     void saveNull() {
 
         // given
-        delivery = null;
+        Delivery delivery = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -131,6 +145,9 @@ class DeliveryServiceTest {
     void findAll() {
 
         // given
+        List<DeliveryEntity> deliveryEntityList = prepareDeliveryEntityList();
+
+        // and
         given(deliveryRepository.findAll())
                 .willReturn(deliveryEntityList);
 
@@ -148,14 +165,17 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should return delivery based on delivery id")
+    @DisplayName("should return delivery based on delivery uuid")
     void findByUuid() {
 
         // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
+
+        // and
         given(deliveryRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(deliveryEntity));
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
         Delivery deliveryByUuid = deliveryService.findByUuid(deliveryUuid);
@@ -166,7 +186,7 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when delivery id is null")
+    @DisplayName("should throw an exception when delivery uuid is null")
     void findByUuidNull() {
 
         // given
@@ -179,7 +199,7 @@ class DeliveryServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for delivery failed. Delivery id is null.");
+                .hasMessage("Searching for delivery failed. Delivery uuid is null.");
 
         // verify
         then(deliveryRepository)
@@ -187,14 +207,17 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an delivery based on delivery id")
+    @DisplayName("should delete an delivery based on delivery uuid")
     void delete() {
 
         // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
+
+        // and
         given(deliveryRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(deliveryEntity));
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
         deliveryService.delete(deliveryUuid);
@@ -206,7 +229,7 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when delivery id is null")
+    @DisplayName("should throw an exception when delivery uuid is null")
     void deleteNull() {
         // given
         UUID deliveryUuid = null;
@@ -218,13 +241,14 @@ class DeliveryServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting delivery failed. Delivery id is null.");
+                .hasMessage("Deleting delivery failed. Delivery uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
+    @DisplayName("should throw an exception when uuid is null")
     void updateNullUuid() {
         // given
+        Delivery delivery = prepareDelivery();
         UUID deliveryUuid = null;
 
         // when
@@ -234,14 +258,14 @@ class DeliveryServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating delivery failed. Delivery id is null.");
+                .hasMessage("Updating delivery failed. Delivery uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when delivery is null")
     void updateNullDelivery() {
         // given
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID deliveryUuid = DELIVERY_UUID_1;
         Delivery delivery = null;
 
         // when
@@ -255,12 +279,14 @@ class DeliveryServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newDelivery's id doesn't match deliveryFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newDelivery's uuid doesn't match deliveryFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID oldUuid = DELIVERY_UUID_1;
+
         Delivery newDelivery = new Delivery();
-        UUID oldUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
-        UUID newUuid = UUID.fromString("1f263424-a92a-49a6-b38f-eaa2861ab332");
+        UUID newUuid = UUID.randomUUID();
         newDelivery.setUuid(newUuid);
 
         // and
@@ -273,14 +299,15 @@ class DeliveryServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating delivery fields failed. Different id's");
+                .hasMessage("Updating delivery fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update delivery when valid id and delivery are provided")
+    @DisplayName("should correctly update delivery when valid uuid and delivery are provided")
     void shouldUpdateDelivery() {
         // given
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        DeliveryEntity deliveryEntity = prepareDeliveryEntity();
+        UUID deliveryUuid = DELIVERY_UUID_1;
 
         // and
         Delivery changedDelivery = prepareDeliveryForEdit();
@@ -302,6 +329,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(updatedDelivery).isNotNull();
+        assertThat(updatedDelivery.getId()).isEqualTo(changedDelivery.getId());
         assertThat(updatedDelivery.getUuid()).isEqualTo(changedDelivery.getUuid());
         assertThat(updatedDelivery.getDeliveryTime()).isEqualTo(changedDelivery.getDeliveryTime());
         assertThat(updatedDelivery.getPrice()).isEqualTo(changedDelivery.getPrice());
@@ -318,13 +346,13 @@ class DeliveryServiceTest {
 
     private Delivery prepareDeliveryForEdit() {
         Long deliveryId = 1L;
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID deliveryUuid = DELIVERY_UUID_1;
         Double newPrice = 40.50D;
         LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
         OffsetDateTime newDeliveryOffsetDateTime = newDeliveryLocalDateTime.atOffset(ZoneOffset.UTC);
         DeliveryStatus newDeliveryStatus = IN_TRANSIT;
-        UUID newOrderUuid = UUID.fromString("06a4084b-5837-4303-ab5a-8b50fedb3898");
-        UUID newCourierUuid = UUID.fromString("1f263424-a92a-49a6-b38f-eaa2861ab332");
+        UUID newOrderUuid = UUID.randomUUID();
+        UUID newCourierUuid = UUID.randomUUID();
 
         Long newOrderId = 3L;
         Long newCourierId = 3L;
@@ -350,12 +378,12 @@ class DeliveryServiceTest {
     }
 
     private DeliveryEntity prepareDeliveryEntityForEdit() {
-        UUID deliveryUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID deliveryUuid = DELIVERY_UUID_1;
         BigDecimal newPrice = BigDecimal.valueOf(40.50D);
         LocalDateTime newDeliveryLocalDateTime = LocalDateTime.of(2023, 5, 28, 20, 30, 0);
         DeliveryStatus newDeliveryStatus = IN_TRANSIT;
-        UUID newOrderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
-        UUID newCourierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID newOrderUuid = UUID.randomUUID();
+        UUID newCourierUuid = UUID.randomUUID();
 
         DeliveryEntity changedDeliveryEntity = new DeliveryEntity();
         changedDeliveryEntity.setUuid(deliveryUuid);

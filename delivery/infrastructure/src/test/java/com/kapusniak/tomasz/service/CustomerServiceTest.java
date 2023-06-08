@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,12 +30,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 class CustomerServiceTest {
 
-    Customer customer = new Customer();
-    CustomerEntity customerEntity = new CustomerEntity();
-
-    List<Customer> customerList = new ArrayList<>();
-    List<CustomerEntity> customerEntityList = new ArrayList<>();
-
+    private static final UUID CUSTOMER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
     @Mock
     private CustomerJpaRepository customerRepository;
 
@@ -45,37 +39,59 @@ class CustomerServiceTest {
     @InjectMocks
     private CustomerService customerService;
 
-    @BeforeEach
-    void setup() {
+    private Customer prepareCustomer() {
+        Customer customer = new Customer();
         customer.setId(1L);
-        customer.setEmail("testEmail");
+        customer.setEmail("test@email.com");
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
+        customer.setUuid(CUSTOMER_UUID_1);
 
-        customerList.add(customer);
-        customerList.add(customer);
+        return customer;
+    }
 
+    private CustomerEntity prepareCustomerEntity() {
+        CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setId(1L);
-        customerEntity.setEmail("testEmail");
+        customerEntity.setEmail("test@email.com");
         customerEntity.setFirstName("testFirstName");
         customerEntity.setLastName("testLastName");
+        customerEntity.setUuid(CUSTOMER_UUID_1);
 
-        customerEntityList.add(customerEntity);
-        customerEntityList.add(customerEntity);
 
+        return customerEntity;
+    }
+
+    private List<Customer> prepareCustomerList() {
+
+        return List.of(prepareCustomer(), prepareCustomer());
+    }
+
+    private List<CustomerEntity> prepareCustomerEntityList() {
+
+        return List.of(prepareCustomerEntity(), prepareCustomerEntity());
+
+    }
+
+    @BeforeEach
+    void setup() {
         when(customerEntityMapper
                 .mapToEntity(any(Customer.class)))
-                .thenReturn(customerEntity);
+                .thenReturn(prepareCustomerEntity());
         when(customerEntityMapper
                 .mapToApiModel(any(CustomerEntity.class)))
-                .thenReturn(customer);
+                .thenReturn(prepareCustomer());
     }
 
     @Test
     @DisplayName("should correctly save an Customer entity exactly once")
     void save() {
 
-        //given
+        // given
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        Customer customer = prepareCustomer();
+
+        // and
         when(customerRepository
                 .save(any(CustomerEntity.class)))
                 .thenReturn(customerEntity);
@@ -97,7 +113,7 @@ class CustomerServiceTest {
     void saveNull() {
 
         // given
-        customer = null;
+        Customer customer = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -117,6 +133,9 @@ class CustomerServiceTest {
     void findAll() {
 
         // given
+        List<CustomerEntity> customerEntityList = prepareCustomerEntityList();
+
+        // and
         given(customerRepository.findAll())
                 .willReturn(customerEntityList);
 
@@ -134,14 +153,17 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should return customer based on customer id")
+    @DisplayName("should return customer based on customer uuid")
     void findByUuid() {
 
         // given
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
+        // and
         given(customerRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(customerEntity));
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
 
         // when
         Customer customerByUuid = customerService.findByUuid(customerUuid);
@@ -152,7 +174,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when customer id is null")
+    @DisplayName("should throw an exception when customer uuid is null")
     void findByUuidNull() {
 
         // given
@@ -165,7 +187,7 @@ class CustomerServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for customer failed. Customer id is null.");
+                .hasMessage("Searching for customer failed. Customer uuid is null.");
 
         // verify
         then(customerRepository)
@@ -173,14 +195,18 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an customer based on customer id")
+    @DisplayName("should delete an customer based on customer uuid")
     void delete() {
 
         // given
+        CustomerEntity customerEntity = new CustomerEntity();
+        Customer customer = new Customer();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
+        // and
         given(customerRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(customerEntity));
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
 
         // when
         customerService.delete(customerUuid);
@@ -192,7 +218,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when customer id is null")
+    @DisplayName("should throw an exception when customer uuid is null")
     void deleteNull() {
         // given
         UUID customerUuid = null;
@@ -204,13 +230,14 @@ class CustomerServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting customer failed. Customer id is null.");
+                .hasMessage("Deleting customer failed. Customer uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
+    @DisplayName("should throw an exception when uuid is null")
     void updateNullUuid() {
         // given
+        Customer customer = new Customer();
         UUID customerUuid = null;
 
         // when
@@ -220,14 +247,14 @@ class CustomerServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating customer failed. Customer id is null.");
+                .hasMessage("Updating customer failed. Customer uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when customer is null")
     void updateNullCustomer() {
         // given
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID customerUuid = CUSTOMER_UUID_1;
         Customer customer = null;
 
         // when
@@ -241,12 +268,14 @@ class CustomerServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newCustomer's id doesn't match customerFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newCustomer's uuid doesn't match customerFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        CustomerEntity customerEntity = new CustomerEntity();
+        UUID oldUuid = CUSTOMER_UUID_1;
+
         Customer newCustomer = new Customer();
-        UUID oldUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
-        UUID newUuid = UUID.fromString("9137383a-1574-4981-bf7e-3b05182fcf13");
+        UUID newUuid = UUID.randomUUID();
         newCustomer.setUuid(newUuid);
 
         // and
@@ -259,14 +288,16 @@ class CustomerServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating customer fields failed. Different id's");
+                .hasMessage("Updating customer fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update customer when valid id and customer are provided")
+    @DisplayName("should correctly update customer when valid uuid and customer are provided")
     void shouldUpdateCustomer() {
         // given
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        CustomerEntity customerEntity = prepareCustomerEntity();
+        UUID customerUuid = CUSTOMER_UUID_1;
+
         Customer changedCustomer = prepareCustomerToEdit();
         CustomerEntity changedCustomerEntity = prepareCustomerEntityToEdit();
 
@@ -301,12 +332,12 @@ class CustomerServiceTest {
     }
 
     private Customer prepareCustomerToEdit() {
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID customerUuid = CUSTOMER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         String newEmail = "newEmail";
-        UUID newOrder1Uuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
-        UUID newOrder2Uuid = UUID.fromString("9137383a-1574-4981-bf7e-3b05182fcf13");
+        UUID newOrder1Uuid = UUID.randomUUID();
+        UUID newOrder2Uuid = UUID.randomUUID();
 
         Customer changedCustomer = new Customer();
         changedCustomer.setUuid(customerUuid);
@@ -325,12 +356,12 @@ class CustomerServiceTest {
     }
 
     private CustomerEntity prepareCustomerEntityToEdit() {
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID customerUuid = CUSTOMER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         String newEmail = "newEmail";
-        UUID newOrder1Uuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
-        UUID newOrder2Uuid = UUID.fromString("9137383a-1574-4981-bf7e-3b05182fcf13");
+        UUID newOrder1Uuid = UUID.randomUUID();
+        UUID newOrder2Uuid = UUID.randomUUID();
 
         CustomerEntity changedCustomerEntity = new CustomerEntity();
         changedCustomerEntity.setUuid(customerUuid);

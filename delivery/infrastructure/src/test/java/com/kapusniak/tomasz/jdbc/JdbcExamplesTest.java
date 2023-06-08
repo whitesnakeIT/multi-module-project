@@ -94,7 +94,7 @@ class JdbcExamplesTest {
     }
 
     @Test
-    @DisplayName("should return courier if exist based on courier id")
+    @DisplayName("should return courier if exist based on courier uuid")
     void getCourierByUuid() {
 
         // given
@@ -121,7 +121,7 @@ class JdbcExamplesTest {
     }
 
     @Test
-    @DisplayName("should return customer if exist (with orders), based on customer id")
+    @DisplayName("should return customer if exist (with orders), based on customer uuid")
     void getCustomerByUuid() {
 
         // given
@@ -147,7 +147,7 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .queryForObject("SELECT CUSTOMERS.* FROM CUSTOMERS WHERE CUSTOMER_ID = ?",
+                .queryForObject("SELECT CUSTOMERS.* FROM CUSTOMERS WHERE UUID = ?",
                         new Object[]{customerUuid},
                         customerRowMapper);
 
@@ -192,7 +192,7 @@ class JdbcExamplesTest {
 
     @Test
     @DisplayName("should return null instead of throwing an exception " +
-            "when can't find customer by customer id ")
+            "when can't find customer by customer uuid ")
     void getCustomerByNonExistingUuid() {
 
         // given
@@ -257,14 +257,14 @@ class JdbcExamplesTest {
     void getCustomerOrderList() {
 
         // given
-        UUID customerUuid = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
+        Long customerId = 1L;
         given(jdbcTemplate.query(
                 any(String.class),
                 any(OrderRowMapper.class)))
                 .willReturn(List.of(new OrderEntity(), new OrderEntity()));
 
         // when
-        List<OrderEntity> customerOrderList = jdbcExamples.getCustomerOrderList(customerUuid);
+        List<OrderEntity> customerOrderList = jdbcExamples.getCustomerOrderList(customerId);
 
         // then
         assertThat(customerOrderList.size()).isEqualTo(2);
@@ -272,13 +272,13 @@ class JdbcExamplesTest {
         // verify
         then(jdbcTemplate)
                 .should(times(1))
-                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerUuid,
+                .query("SELECT * FROM ORDERS WHERE CUSTOMER_ID = " + customerId,
                         orderRowMapper);
 
     }
 
     @Test
-    @DisplayName("should return order if exist based on order id ")
+    @DisplayName("should return order if exist based on order uuid ")
     void getOrderByUuid() {
 
         // given
@@ -301,7 +301,7 @@ class JdbcExamplesTest {
         then(jdbcTemplate)
                 .should(times(1))
                 .queryForObject("SELECT * FROM ORDERS WHERE UUID = ?",
-                        new Object[]{UUID.fromString("29755321-c483-4a12-9f64-30a132038b70")},
+                        new Object[]{orderUuid},
                         orderRowMapper);
 
 

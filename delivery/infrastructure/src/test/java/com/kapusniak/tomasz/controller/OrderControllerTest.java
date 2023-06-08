@@ -104,7 +104,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return order based on order id")
+    @DisplayName("should correctly return order based on order uuid")
     public void getOrderByUuid() throws Exception {
         // given
         Order order = getOrder();

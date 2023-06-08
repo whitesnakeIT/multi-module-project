@@ -51,6 +51,6 @@ class CourierRowMapperTest {
         assertEquals("testFirstName", courier.getFirstName());
         assertEquals("testLastName", courier.getLastName());
         assertEquals(CourierCompany.DPD, courier.getCourierCompany());
-        assertEquals("fe362772-17c3-4547-b559-ceb13e164e6f", courier.getUuid());
+        assertEquals("fe362772-17c3-4547-b559-ceb13e164e6f", courier.getUuid().toString());
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.CourierCompany.DPD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,7 @@ class CourierEntityMapperTest {
         courier.setLastName("testLastName");
         courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
         courier.setCourierCompany(DPD);
+        courier.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
 
         return courier;
     }
@@ -40,6 +42,8 @@ class CourierEntityMapperTest {
         courierEntity.setLastName("testLastName");
         courierEntity.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
         courierEntity.setCourierCompany(DPD);
+        courierEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+
 
         return courierEntity;
     }

@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,10 +26,7 @@ import static org.mockito.Mockito.times;
 @ActiveProfiles("test")
 class TrackingServiceTest {
 
-    Tracking tracking = new Tracking();
-    TrackingEntity trackingEntity = new TrackingEntity();
-    List<Tracking> trackingList = new ArrayList<>();
-    List<TrackingEntity> trackingEntityList = new ArrayList<>();
+    private static final UUID TRACKING_UUID_1 = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
     @Mock
     private TrackingJpaRepository trackingRepository;
     @Mock
@@ -39,33 +35,56 @@ class TrackingServiceTest {
     @InjectMocks
     private TrackingService trackingService;
 
-    @BeforeEach
-    void setup() {
+    private Tracking prepareTracking() {
+        Tracking tracking = new Tracking();
         tracking.setId(1L);
         tracking.setLocalization("testLocalization");
+        tracking.setUuid(TRACKING_UUID_1);
 
-        trackingList.add(tracking);
-        trackingList.add(tracking);
+        return tracking;
+    }
 
+    private TrackingEntity prepareTrackingEntity() {
+        TrackingEntity trackingEntity = new TrackingEntity();
         trackingEntity.setId(1L);
         trackingEntity.setLocalization("testLocalization");
+        trackingEntity.setUuid(TRACKING_UUID_1);
 
-        trackingEntityList.add(trackingEntity);
-        trackingEntityList.add(trackingEntity);
+
+        return trackingEntity;
+    }
+
+    private List<Tracking> prepareTrackingList() {
+
+        return List.of(prepareTracking(), prepareTracking());
+    }
+
+    private List<TrackingEntity> prepareTrackingEntityList() {
+
+        return List.of(prepareTrackingEntity(), prepareTrackingEntity());
+    }
+
+    @BeforeEach
+    void setup() {
 
         when(trackingEntityMapper
                 .mapToEntity(any(Tracking.class)))
-                .thenReturn(trackingEntity);
+                .thenReturn(prepareTrackingEntity());
         when(trackingEntityMapper
                 .mapToApiModel(any(TrackingEntity.class)))
-                .thenReturn(tracking);
+                .thenReturn(prepareTracking());
     }
 
     @Test
     @DisplayName("should correctly save an Tracking entity exactly once")
     void save() {
 
-        //given
+        // given
+        TrackingEntity trackingEntity = prepareTrackingEntity();
+        Tracking tracking = prepareTracking();
+
+
+        // and
         when(trackingRepository
                 .save(any(TrackingEntity.class)))
                 .thenReturn(trackingEntity);
@@ -87,7 +106,7 @@ class TrackingServiceTest {
     void saveNull() {
 
         // given
-        tracking = null;
+        Tracking tracking = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -107,6 +126,8 @@ class TrackingServiceTest {
     void findAll() {
 
         // given
+        List<TrackingEntity> trackingEntityList = prepareTrackingEntityList();
+
         given(trackingRepository.findAll())
                 .willReturn(trackingEntityList);
 
@@ -124,14 +145,17 @@ class TrackingServiceTest {
     }
 
     @Test
-    @DisplayName("should return tracking based on tracking id")
+    @DisplayName("should return tracking based on tracking uuid")
     void findByUuid() {
 
         // given
+        TrackingEntity trackingEntity = prepareTrackingEntity();
+        UUID trackingUuid = TRACKING_UUID_1;
+
+        // and
         given(trackingRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(trackingEntity));
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
 
         // when
         Tracking trackingByUuid = trackingService.findByUuid(trackingUuid);
@@ -142,7 +166,7 @@ class TrackingServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when tracking id is null")
+    @DisplayName("should throw an exception when tracking uuid is null")
     void findByUuidNull() {
 
         // given
@@ -155,7 +179,7 @@ class TrackingServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for tracking failed. Tracking id is null.");
+                .hasMessage("Searching for tracking failed. Tracking uuid is null.");
 
         // verify
         then(trackingRepository)
@@ -163,14 +187,16 @@ class TrackingServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an tracking based on tracking id")
+    @DisplayName("should delete an tracking based on tracking uuid")
     void delete() {
 
         // given
+        TrackingEntity trackingEntity = prepareTrackingEntity();
+        UUID trackingUuid = TRACKING_UUID_1;
+
         given(trackingRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(trackingEntity));
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
 
         // when
         trackingService.delete(trackingUuid);
@@ -182,7 +208,7 @@ class TrackingServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when tracking id is null")
+    @DisplayName("should throw an exception when tracking uuid is null")
     void deleteNull() {
         // given
         UUID trackingUuid = null;
@@ -194,13 +220,14 @@ class TrackingServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting tracking failed. Tracking id is null.");
+                .hasMessage("Deleting tracking failed. Tracking uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
+    @DisplayName("should throw an exception when uuid is null")
     void updateNullUuid() {
         // given
+        Tracking tracking = prepareTracking();
         UUID trackingUuid = null;
 
         // when
@@ -210,14 +237,14 @@ class TrackingServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating tracking failed. Tracking id is null.");
+                .hasMessage("Updating tracking failed. Tracking uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when tracking is null")
     void updateNullTracking() {
         // given
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
+        UUID trackingUuid = TRACKING_UUID_1;
         Tracking tracking = null;
 
         // when
@@ -231,12 +258,14 @@ class TrackingServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newTracking's id doesn't match trackingFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newTracking's uuid doesn't match trackingFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        TrackingEntity trackingEntity = prepareTrackingEntity();
+        UUID oldUuid = TRACKING_UUID_1;
+
         Tracking newTracking = new Tracking();
-        UUID oldUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
-        UUID newUuid = UUID.fromString("1bfb22e4-2dfa-4b92-a7a3-fe35c948216c");
+        UUID newUuid = UUID.randomUUID();
         newTracking.setUuid(newUuid);
 
         // and
@@ -249,14 +278,16 @@ class TrackingServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating tracking fields failed. Different id's");
+                .hasMessage("Updating tracking fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update tracking when valid id and tracking are provided")
+    @DisplayName("should correctly update tracking when valid uuid and tracking are provided")
     void shouldUpdateTracking() {
         // given
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
+        TrackingEntity trackingEntity = prepareTrackingEntity();
+
+        UUID trackingUuid = TRACKING_UUID_1;
         Tracking changedTracking = prepareTrackingForEdit();
         TrackingEntity changedTrackingEntity = prepareTrackingEntityForEdit();
 
@@ -276,6 +307,7 @@ class TrackingServiceTest {
 
         // then
         assertThat(updatedTracking).isNotNull();
+        assertThat(updatedTracking.getId()).isEqualTo(changedTracking.getId());
         assertThat(updatedTracking.getUuid()).isEqualTo(changedTracking.getUuid());
         assertThat(updatedTracking.getLocalization()).isEqualTo(changedTracking.getLocalization());
 
@@ -287,7 +319,7 @@ class TrackingServiceTest {
 
     private Tracking prepareTrackingForEdit() {
         Long trackingId = 1L;
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
+        UUID trackingUuid = TRACKING_UUID_1;
         String newLocalization = "newLocalization";
 
         Tracking changedTracking = new Tracking();
@@ -300,7 +332,7 @@ class TrackingServiceTest {
 
     private TrackingEntity prepareTrackingEntityForEdit() {
         Long trackingId = 1L;
-        UUID trackingUuid = UUID.fromString("97e37668-b355-4ecd-83be-dbc9cf56d8c0");
+        UUID trackingUuid = TRACKING_UUID_1;
         String newLocalization = "newLocalization";
 
         TrackingEntity changedTrackingEntity = new TrackingEntity();

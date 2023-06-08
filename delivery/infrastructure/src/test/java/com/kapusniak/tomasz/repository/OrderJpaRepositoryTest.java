@@ -137,8 +137,8 @@ class OrderJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("should return list of orders with correct size based on customer id")
-    void findAllByCustomerIdExisting() {
+    @DisplayName("should return list of orders with correct size based on customer uuid")
+    void findAllByCustomerUuidExisting() {
         // given
         CustomerEntity customerEntity = prepareCustomerEntity();
 
@@ -151,8 +151,8 @@ class OrderJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("should return empty list of orders based on customer id")
-    void findAllByCustomerIdNotExisting() {
+    @DisplayName("should return empty list of orders based on customer uuid")
+    void findAllByCustomerUuidNotExisting() {
 
         // given
         deliveryRepository.deleteAll();

@@ -93,7 +93,7 @@ public class DeliveryControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return delivery based on delivery id")
+    @DisplayName("should correctly return delivery based on delivery uuid")
     public void getDeliveryByUuid() throws Exception {
         // given
         Delivery delivery = getDelivery();

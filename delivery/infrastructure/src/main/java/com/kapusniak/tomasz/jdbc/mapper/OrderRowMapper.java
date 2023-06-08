@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Component
 public class OrderRowMapper implements RowMapper<OrderEntity> {
@@ -22,6 +23,7 @@ public class OrderRowMapper implements RowMapper<OrderEntity> {
         order.setSenderAddress(rs.getString("SENDER_ADDRESS"));
         order.setReceiverAddress(rs.getString("RECEIVER_ADDRESS"));
         order.setPreferredDeliveryDate(rs.getDate("PREFERRED_DELIVERY_DATE").toLocalDate());
+        order.setUuid(UUID.fromString(rs.getString("UUID")));
 
         return order;
     }

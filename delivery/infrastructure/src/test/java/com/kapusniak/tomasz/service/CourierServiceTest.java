@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,10 +31,7 @@ import static org.mockito.Mockito.times;
 @ActiveProfiles("test")
 class CourierServiceTest {
 
-    Courier courier = new Courier();
-    CourierEntity courierEntity = new CourierEntity();
-    List<Courier> courierList = new ArrayList<>();
-    List<CourierEntity> courierEntityList = new ArrayList<>();
+    private static final UUID COURIER_UUID_1 = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
     @Mock
     private CourierJpaRepository courierRepository;
     @Mock
@@ -44,37 +40,59 @@ class CourierServiceTest {
     @InjectMocks
     private CourierService courierService;
 
-    @BeforeEach
-    void setup() {
+    private Courier prepareCourier() {
+        Courier courier = new Courier();
         courier.setId(1L);
         courier.setCourierCompany(DHL);
         courier.setFirstName("testFirstName");
         courier.setLastName("testLastName");
+        courier.setUuid(COURIER_UUID_1);
 
-        courierList.add(courier);
-        courierList.add(courier);
+        return courier;
+    }
 
+    private CourierEntity prepareCourierEntity() {
+        CourierEntity courierEntity = new CourierEntity();
         courierEntity.setId(1L);
         courierEntity.setCourierCompany(DHL);
         courierEntity.setFirstName("testFirstName");
         courierEntity.setLastName("testLastName");
+        courierEntity.setUuid(COURIER_UUID_1);
 
-        courierEntityList.add(courierEntity);
-        courierEntityList.add(courierEntity);
+
+        return courierEntity;
+    }
+
+    private List<Courier> prepareCourierList() {
+
+        return List.of(prepareCourier(), prepareCourier());
+    }
+
+    private List<CourierEntity> prepareCourierEntityList() {
+
+        return List.of(prepareCourierEntity(), prepareCourierEntity());
+    }
+
+    @BeforeEach
+    void setup() {
 
         when(courierEntityMapper
                 .mapToEntity(any(Courier.class)))
-                .thenReturn(courierEntity);
+                .thenReturn(prepareCourierEntity());
         when(courierEntityMapper
                 .mapToApiModel(any(CourierEntity.class)))
-                .thenReturn(courier);
+                .thenReturn(prepareCourier());
     }
 
     @Test
     @DisplayName("should correctly save an Courier entity exactly once")
     void save() {
 
-        //given
+        // given
+        Courier courier = prepareCourier();
+        CourierEntity courierEntity = prepareCourierEntity();
+
+        // and
         when(courierRepository
                 .save(any(CourierEntity.class)))
                 .thenReturn(courierEntity);
@@ -96,7 +114,7 @@ class CourierServiceTest {
     void saveNull() {
 
         // given
-        courier = null;
+        Courier courier = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -116,6 +134,8 @@ class CourierServiceTest {
     void findAll() {
 
         // given
+        List<CourierEntity> courierEntityList = prepareCourierEntityList();
+
         given(courierRepository.findAll())
                 .willReturn(courierEntityList);
 
@@ -133,14 +153,17 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("should return courier based on courier id")
+    @DisplayName("should return courier based on courier uuid")
     void findByUuid() {
 
         // given
+        CourierEntity courierEntity = prepareCourierEntity();
+        UUID courierUuid = COURIER_UUID_1;
+
+        // and
         given(courierRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(courierEntity));
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
         Courier courierByUuid = courierService.findByUuid(courierUuid);
@@ -151,7 +174,7 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when courier id is null")
+    @DisplayName("should throw an exception when courier uuid is null")
     void findByUuidNull() {
 
         // given
@@ -164,7 +187,7 @@ class CourierServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for courier failed. Courier id is null.");
+                .hasMessage("Searching for courier failed. Courier uuid is null.");
 
         // verify
         then(courierRepository)
@@ -172,14 +195,17 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("should delete an courier based on courier id")
+    @DisplayName("should delete an courier based on courier uuid")
     void delete() {
 
         // given
+        CourierEntity courierEntity = prepareCourierEntity();
+        UUID courierUuid = COURIER_UUID_1;
+
+        // and
         given(courierRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(courierEntity));
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
 
         // when
         courierService.delete(courierUuid);
@@ -191,9 +217,8 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when courier id is null")
-    void deleteNull() {
-        // given
+    @DisplayName("should throw an exception when courier uuid is null")
+    void deleteNull() {         // given
         UUID courierUuid = null;
 
         // when
@@ -203,13 +228,14 @@ class CourierServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting courier failed. Courier id is null.");
+                .hasMessage("Deleting courier failed. Courier uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
+    @DisplayName("should throw an exception when uuid is null")
     void updateNullUuid() {
         // given
+        Courier courier = prepareCourier();
         UUID courierUuid = null;
 
         // when
@@ -219,14 +245,14 @@ class CourierServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating courier failed. Courier id is null.");
+                .hasMessage("Updating courier failed. Courier uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when courier is null")
     void updateNullCourier() {
         // given
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID courierUuid = COURIER_UUID_1;
         Courier courier = null;
 
         // when
@@ -240,13 +266,14 @@ class CourierServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newCourier's id doesn't match courierFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newCourier's uuid doesn't match courierFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
-        Courier newCourier = new Courier();
+        CourierEntity courierEntity = prepareCourierEntity();
+        UUID oldUuid = COURIER_UUID_1;
 
-        UUID oldUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
-        UUID newUuid = UUID.fromString("7ded2601-a101-4958-8924-130a17278a20");
+        Courier newCourier = new Courier();
+        UUID newUuid = UUID.randomUUID();
         newCourier.setUuid(newUuid);
 
         // and
@@ -259,15 +286,16 @@ class CourierServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating courier fields failed. Different id's");
+                .hasMessage("Updating courier fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update courier when valid id and courier are provided")
+    @DisplayName("should correctly update courier when valid uuid and courier are provided")
     void shouldUpdateCourier() {
         // given
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID courierUuid = COURIER_UUID_1;
         Courier changedCourier = prepareCourierToEdit();
+        CourierEntity courierEntity = prepareCourierEntity();
         CourierEntity changedCourierEntity = prepareCourierEntityToEdit();
 
         // and
@@ -286,7 +314,8 @@ class CourierServiceTest {
 
         // then
         assertThat(updatedCourier).isNotNull();
-        assertThat(updatedCourier.getUuid()).isEqualTo(courierUuid);
+        assertThat(updatedCourier.getId()).isEqualTo(changedCourier.getId());
+        assertThat(updatedCourier.getUuid()).isEqualTo(changedCourier.getUuid());
         assertThat(updatedCourier.getFirstName()).isEqualTo(changedCourier.getFirstName());
         assertThat(updatedCourier.getLastName()).isEqualTo(changedCourier.getLastName());
         assertThat(updatedCourier.getCourierCompany()).isEqualTo(changedCourier.getCourierCompany());
@@ -300,13 +329,13 @@ class CourierServiceTest {
     }
 
     private CourierEntity prepareCourierEntityToEdit() {
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID courierUuid = COURIER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         CourierCompany newCourierCompany = FEDEX;
 
-        UUID newDelivery1Uuid = UUID.fromString("31822712-94b3-43ed-9aac-24613948ca79");
-        UUID newDelivery2Uuid = UUID.fromString("1f263424-a92a-49a6-b38f-eaa2861ab332");
+        UUID newDelivery1Uuid = UUID.randomUUID();
+        UUID newDelivery2Uuid = UUID.randomUUID();
 
         Long newDelivery1Id = 3L;
         Long newDelivery2Id = 4L;
@@ -330,7 +359,7 @@ class CourierServiceTest {
     }
 
     private Courier prepareCourierToEdit() {
-        UUID courierUuid = UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f");
+        UUID courierUuid = COURIER_UUID_1;
         String newFirstName = "newFirstName";
         String newLastName = "newLastName";
         CourierCompany newCourierCompany = FEDEX;

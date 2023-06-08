@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,15 +35,8 @@ import static org.mockito.BDDMockito.*;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class OrderServiceTest {
 
-    Order order = new Order();
-    OrderEntity orderEntity = new OrderEntity();
+    public static final UUID ORDER_UUID_1 = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
 
-    List<Order> orderList = new ArrayList<>();
-    List<OrderEntity> orderEntityList = new ArrayList<>();
-
-    Customer customer = new Customer();
-
-    CustomerEntity customerEntity = new CustomerEntity();
     @Mock
     private OrderJpaRepository orderRepository;
     @Mock
@@ -53,42 +45,60 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    @BeforeEach
-    void setup() {
+    private Order prepareOrder() {
+        Order order = new Order();
         order.setId(1L);
         order.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
         order.setPackageSize(LARGE);
         order.setPackageType(DOCUMENT);
         order.setSenderAddress("new sender address");
         order.setReceiverAddress("new receiver address");
+        order.setUuid(ORDER_UUID_1);
 
-
+        Customer customer = new Customer();
         customer.setId(5L);
         order.setCustomer(customer);
 
-        orderEntityList.add(orderEntity);
-        orderEntityList.add(orderEntity);
+        return order;
+    }
 
+    private OrderEntity prepareOrderEntity() {
+        OrderEntity orderEntity = new OrderEntity();
         orderEntity.setId(1L);
         orderEntity.setPreferredDeliveryDate(LocalDate.of(2023, 5, 4));
         orderEntity.setPackageSize(LARGE);
         orderEntity.setPackageType(DOCUMENT);
         orderEntity.setSenderAddress("new sender address");
         orderEntity.setReceiverAddress("new receiver address");
+        orderEntity.setUuid(ORDER_UUID_1);
 
-
+        CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setId(5L);
-        order.setCustomer(customer);
+        orderEntity.setCustomer(customerEntity);
 
-        orderList.add(order);
-        orderList.add(order);
+        return orderEntity;
+    }
+
+    private List<Order> prepareOrderList() {
+
+        return List.of(prepareOrder(), prepareOrder());
+    }
+
+    private List<OrderEntity> prepareOrderEntityList() {
+
+        return List.of(prepareOrderEntity(), prepareOrderEntity());
+
+    }
+
+    @BeforeEach
+    void setup() {
 
         when(orderEntityMapper
                 .mapToEntity(any(Order.class)))
-                .thenReturn(orderEntity);
+                .thenReturn(prepareOrderEntity());
         when(orderEntityMapper
                 .mapToApiModel(any(OrderEntity.class)))
-                .thenReturn(order);
+                .thenReturn(prepareOrder());
 
     }
 
@@ -96,10 +106,13 @@ class OrderServiceTest {
     @DisplayName("should correctly save an Order entity exactly once")
     void save() {
 
-        //given
+        // given
+        Order order = prepareOrder();
+
+        // and
         when(orderRepository
                 .save(any(OrderEntity.class)))
-                .thenReturn(orderEntity);
+                .thenReturn(prepareOrderEntity());
 
         // when
         Order result = orderService.save(order);
@@ -118,7 +131,7 @@ class OrderServiceTest {
     void saveNull() {
 
         // given
-        order = null;
+        Order order = null;
 
         // when
         Throwable throwable = catchThrowable(() ->
@@ -138,6 +151,7 @@ class OrderServiceTest {
     void findAll() {
 
         // given
+        List<OrderEntity> orderEntityList = prepareOrderEntityList();
         given(orderRepository.findAll())
                 .willReturn(orderEntityList);
 
@@ -155,14 +169,17 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("should return order based on order id")
+    @DisplayName("should return order based on order uuid")
     void findByUuid() {
-
         // given
+        OrderEntity orderEntity = prepareOrderEntity();
+        UUID orderUuid = ORDER_UUID_1;
+
+        // and
         given(orderRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(orderEntity));
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+
 
         // when
         Order orderByUuid = orderService.findByUuid(orderUuid);
@@ -173,9 +190,8 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when order id is null")
+    @DisplayName("should throw an exception when order uuid is null")
     void findByUuidNull() {
-
         // given
         UUID orderUuid = null;
 
@@ -186,7 +202,7 @@ class OrderServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for order failed. Order id is null.");
+                .hasMessage("Searching for order failed. Order uuid is null.");
 
         // verify
         then(orderRepository)
@@ -198,6 +214,9 @@ class OrderServiceTest {
     void findByPackageType() {
 
         // given
+        List<OrderEntity> orderEntityList = prepareOrderEntityList();
+
+        // and
         given(orderRepository.findByPackageType(any()))
                 .willReturn(orderEntityList);
 
@@ -230,6 +249,9 @@ class OrderServiceTest {
     void findByPackageSize() {
 
         // given
+        List<OrderEntity> orderEntityList = prepareOrderEntityList();
+
+        // and
         given(orderRepository.findByPackageSize(any()))
                 .willReturn(orderEntityList);
 
@@ -258,11 +280,14 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("should return list of all customer orders based on customer id")
+    @DisplayName("should return list of all customer orders based on customer uuid")
     void findAllByCustomerUuid() {
 
         // given
-        UUID customerUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        List<OrderEntity> orderEntityList = prepareOrderEntityList();
+        UUID customerUuid = ORDER_UUID_1;
+
+        // and
         given(orderRepository.findAllByCustomerUuid(any()))
                 .willReturn(orderEntityList);
 
@@ -274,7 +299,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when customer id is null")
+    @DisplayName("should throw an exception when customer uuid is null")
     void findAllByCustomerIdNull() {
 
         // given
@@ -287,31 +312,36 @@ class OrderServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Searching for customer orders failed. Customer id is null.");
+                .hasMessage("Searching for customer orders failed. Customer uuid is null.");
     }
 
     @Test
-    @DisplayName("should delete an order based on order id")
+    @DisplayName("should delete an order based on order uuid")
     void delete() {
 
         // given
+        OrderEntity orderEntity = prepareOrderEntity();
+        UUID orderUuid = ORDER_UUID_1;
+
+        // and
         given(orderRepository.findByUuid(
                 any(UUID.class)))
                 .willReturn(Optional.of(orderEntity));
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
 
         // when
         orderService.delete(orderUuid);
 
         // then
+        Order order = prepareOrder();
         then(orderRepository)
                 .should(times(1))
                 .delete(orderEntityMapper.mapToEntity(order));
     }
 
     @Test
-    @DisplayName("should throw an exception when order id is null")
+    @DisplayName("should throw an exception when order uuid is null")
     void deleteNull() {
+
         // given
         UUID orderUuid = null;
 
@@ -322,13 +352,14 @@ class OrderServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Deleting order failed. Order id is null.");
+                .hasMessage("Deleting order failed. Order uuid is null.");
     }
 
     @Test
-    @DisplayName("should throw an exception when id is null")
+    @DisplayName("should throw an exception when uuid is null")
     void updateNullUuid() {
         // given
+        Order order = new Order();
         UUID orderUuid = null;
 
         // when
@@ -338,14 +369,14 @@ class OrderServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating order failed. Order id is null.");
+                .hasMessage("Updating order failed. Order uuid is null.");
     }
 
     @Test
     @DisplayName("should throw an exception when order is null")
     void updateNullOrder() {
         // given
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID orderUuid = ORDER_UUID_1;
         Order order = null;
 
         // when
@@ -359,13 +390,16 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when newOrder's id doesn't match orderFromDb's id")
-    void updateIdMissMatch() {
+    @DisplayName("should throw an exception when newOrder's uuid doesn't match orderFromDb's uuid")
+    void updateUuidMissMatch() {
         // given
+        UUID oldUuid = ORDER_UUID_1;
+
         Order newOrder = new Order();
-        UUID oldUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
-        UUID newUuid = UUID.fromString("9137383a-1574-4981-bf7e-3b05182fcf13");
+        UUID newUuid = UUID.randomUUID();
         newOrder.setUuid(newUuid);
+
+        OrderEntity orderEntity = prepareOrderEntity();
 
         // and
         when(orderRepository.findByUuid(any(UUID.class)))
@@ -377,14 +411,15 @@ class OrderServiceTest {
         // then
         assertThat(throwable)
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Updating order fields failed. Different id's");
+                .hasMessage("Updating order fields failed. Different uuid's");
     }
 
     @Test
-    @DisplayName("should correctly update order when valid id and order are provided")
+    @DisplayName("should correctly update order when valid uuid and order are provided")
     void shouldUpdateOrder() {
         // given
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        OrderEntity orderEntity = prepareOrderEntity();
+        UUID orderUuid = ORDER_UUID_1;
         Order changedOrder = prepareOrderForEdit();
         OrderEntity changedOrderEntity = prepareOrderEntityForEdit();
 
@@ -405,6 +440,7 @@ class OrderServiceTest {
         // then
         assertThat(updatedOrder).isNotNull();
         assertThat(updatedOrder.getUuid()).isEqualTo(changedOrder.getUuid());
+        assertThat(updatedOrder.getId()).isEqualTo(changedOrder.getId());
         assertThat(updatedOrder.getSenderAddress()).isEqualTo(changedOrder.getSenderAddress());
         assertThat(updatedOrder.getReceiverAddress()).isEqualTo(changedOrder.getReceiverAddress());
         assertThat(updatedOrder.getPackageSize()).isEqualTo(changedOrder.getPackageSize());
@@ -420,14 +456,14 @@ class OrderServiceTest {
     }
 
     private Order prepareOrderForEdit() {
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID orderUuid = ORDER_UUID_1;
         String newSenderAddress = "newSenderAddress";
         String newReceiverAddress = "newReceiverAddress";
         PackageType newPackageType = PARCEL;
         PackageSize newPackageSize = EXTRA_LARGE;
         LocalDate newPreferredDeliveryDate = LocalDate.of(2023, 5, 28);
 
-        UUID newCustomerUuid = UUID.fromString("9137383a-1574-4981-bf7e-3b05182fcf13");
+        UUID newCustomerUuid = UUID.randomUUID();
         Order changedOrder = new Order();
         changedOrder.setUuid(orderUuid);
         changedOrder.setSenderAddress(newSenderAddress);
@@ -435,6 +471,8 @@ class OrderServiceTest {
         changedOrder.setPackageSize(newPackageSize);
         changedOrder.setPackageType(newPackageType);
         changedOrder.setPreferredDeliveryDate(newPreferredDeliveryDate);
+
+        Customer customer = new Customer();
         customer.setUuid(newCustomerUuid);
         changedOrder.setCustomer(customer);
 
@@ -442,7 +480,7 @@ class OrderServiceTest {
     }
 
     private OrderEntity prepareOrderEntityForEdit() {
-        UUID orderUuid = UUID.fromString("29755321-c483-4a12-9f64-30a132038b70");
+        UUID orderUuid = ORDER_UUID_1;
         String newSenderAddress = "newSenderAddress";
         String newReceiverAddress = "newReceiverAddress";
         PackageType newPackageType = PARCEL;
@@ -457,6 +495,8 @@ class OrderServiceTest {
         changedOrderEntity.setPackageSize(newPackageSize);
         changedOrderEntity.setPackageType(newPackageType);
         changedOrderEntity.setPreferredDeliveryDate(newPreferredDeliveryDate);
+
+        CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setUuid(newCustomerUuid);
         changedOrderEntity.setCustomer(customerEntity);
 

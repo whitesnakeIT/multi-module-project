@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,6 +55,7 @@ class OrderEntityMapperTest {
         order.setPackageSize(PackageSize.SMALL);
         Customer customer = prepareCustomer();
         order.setCustomer(customer);
+        order.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
 
         return order;
     }
@@ -67,6 +69,7 @@ class OrderEntityMapperTest {
         orderEntity.setPackageSize(PackageSize.SMALL);
         CustomerEntity customerEntity = prepareCustomerEntity();
         orderEntity.setCustomer(customerEntity);
+        orderEntity.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
 
         return orderEntity;
     }

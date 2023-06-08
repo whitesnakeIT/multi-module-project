@@ -83,7 +83,7 @@ public class TrackingControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return tracking based on tracking id")
+    @DisplayName("should correctly return tracking based on tracking uuid")
     public void getTrackingByUuid() throws Exception {
         // given
         Tracking tracking = getTracking();

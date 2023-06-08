@@ -87,7 +87,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    @DisplayName("should correctly return customer based on customer id")
+    @DisplayName("should correctly return customer based on customer uuid")
     public void getCustomerByUuid() throws Exception {
         // given
         Customer customer = getCustomer();
