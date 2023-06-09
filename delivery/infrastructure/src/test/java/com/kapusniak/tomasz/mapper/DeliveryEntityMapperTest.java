@@ -41,6 +41,8 @@ class DeliveryEntityMapperTest {
         delivery.setCourier(prepareCourier());
         delivery.setOrder(prepareOrder());
         delivery.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+        delivery.setVersion(0L);
+
         return delivery;
     }
 
@@ -55,6 +57,7 @@ class DeliveryEntityMapperTest {
         deliveryEntity.setCourier(prepareCourierEntity());
         deliveryEntity.setOrder(prepareOrderEntity());
         deliveryEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+        deliveryEntity.setVersion(0L);
 
         return deliveryEntity;
     }
@@ -67,6 +70,7 @@ class DeliveryEntityMapperTest {
         courier.setDeliveryList(List.of(new Delivery(), new Delivery()));
         courier.setCourierCompany(DPD);
         courier.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+        courier.setVersion(0L);
 
         return courier;
     }
@@ -79,6 +83,7 @@ class DeliveryEntityMapperTest {
         courierEntity.setDeliveryList(List.of(new DeliveryEntity(), new DeliveryEntity()));
         courierEntity.setCourierCompany(DPD);
         courierEntity.setUuid(UUID.fromString("fe362772-17c3-4547-b559-ceb13e164e6f"));
+        courierEntity.setVersion(0L);
 
         return courierEntity;
     }
@@ -93,6 +98,7 @@ class DeliveryEntityMapperTest {
         Customer customer = new Customer();
         customer.setOrders(List.of(new Order(), new Order()));
         order.setCustomer(customer);
+        order.setVersion(0L);
 
         return order;
     }
@@ -107,6 +113,7 @@ class DeliveryEntityMapperTest {
         CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setOrders(List.of(new OrderEntity(), new OrderEntity()));
         orderEntity.setCustomer(customerEntity);
+        orderEntity.setVersion(0L);
 
         return orderEntity;
     }

@@ -8,6 +8,7 @@ import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,7 +140,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Saving order failed. Order is null.");
 
         // verify
@@ -201,7 +202,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for order failed. Order uuid is null.");
 
         // verify
@@ -240,7 +241,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for order failed. Package type is null.");
     }
 
@@ -275,7 +276,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for order failed. Package size is null.");
     }
 
@@ -311,7 +312,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for customer orders failed. Customer uuid is null.");
     }
 
@@ -351,7 +352,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Deleting order failed. Order uuid is null.");
     }
 
@@ -368,7 +369,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating order failed. Order uuid is null.");
     }
 
@@ -385,7 +386,7 @@ class OrderServiceTest {
 
         // then
         assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating order failed. Order is null.");
     }
 
@@ -410,7 +411,7 @@ class OrderServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating order fields failed. Different uuid's");
     }
 

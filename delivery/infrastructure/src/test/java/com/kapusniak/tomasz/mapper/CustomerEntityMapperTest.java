@@ -36,6 +36,7 @@ class CustomerEntityMapperTest {
         customer.setLastName("testLastName");
         customer.setEmail("test@test.com");
         customer.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
+        customer.setVersion(0L);
 
         List<Order> orders = prepareOrderList();
         orders.forEach(order -> order.setCustomer(customer));
@@ -59,6 +60,7 @@ class CustomerEntityMapperTest {
         customerEntity.setLastName("testLastName");
         customerEntity.setEmail("test@test.com");
         customerEntity.setUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
+        customerEntity.setVersion(0L);
 
         List<OrderEntity> orderEntities = prepareOrderEntityList();
         orderEntities.forEach(orderEntity -> orderEntity.setCustomer(customerEntity));

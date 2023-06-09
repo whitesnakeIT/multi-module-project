@@ -7,6 +7,7 @@ import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.openapi.model.CourierCompany;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,7 @@ class CourierServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Saving courier failed. Courier is null.");
 
         // verify
@@ -186,7 +187,7 @@ class CourierServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for courier failed. Courier uuid is null.");
 
         // verify
@@ -227,7 +228,7 @@ class CourierServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Deleting courier failed. Courier uuid is null.");
     }
 
@@ -244,7 +245,7 @@ class CourierServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating courier failed. Courier uuid is null.");
     }
 
@@ -261,7 +262,7 @@ class CourierServiceTest {
 
         // then
         assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating courier failed. Courier is null.");
     }
 
@@ -285,7 +286,7 @@ class CourierServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating courier fields failed. Different uuid's");
     }
 

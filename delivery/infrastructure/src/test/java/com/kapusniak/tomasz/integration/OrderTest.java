@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageType;
+import com.kapusniak.tomasz.service.CustomerService;
 import com.kapusniak.tomasz.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -26,8 +28,7 @@ import java.util.UUID;
 import static com.kapusniak.tomasz.openapi.model.PackageSize.LARGE;
 import static com.kapusniak.tomasz.openapi.model.PackageType.DOCUMENT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -51,6 +52,9 @@ public class OrderTest {
     private OrderService orderService;
 
     @Autowired
+    private CustomerService customerService;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -64,11 +68,8 @@ public class OrderTest {
         order.setSenderAddress("test sender address");
         order.setReceiverAddress("test receiver address");
         order.setUuid(ORDER_UUID_1);
-        Customer customer = new Customer();
-        customer.setId(1L);
-        customer.setEmail("test@email.com");
-        customer.setFirstName("testFirstName");
-        customer.setLastName("testLastName");
+
+        Customer customer = customerService.findByUuid(UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3"));
         order.setCustomer(customer);
 
         return order;
@@ -94,22 +95,22 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided order uuid is not existing" +
-            " in database for searching")
-    void getOrderNonExisting() {
+    @DisplayName("should return ResponseEntity<ApiError> with correct json data" +
+            " when provided order uuid is not existing in database for searching")
+    void getOrderNonExisting() throws Exception {
         // given
         UUID orderUuid = UUID.randomUUID();
 
         // when
-        Throwable throwable = catchThrowable(
-                () -> mockMvc.perform(get(
-                        "/api/v1/orders/" + orderUuid)
-                )
-        );
+        ResultActions result = mockMvc.perform(get(
+                "/api/v1/orders/" + orderUuid));
 
         // then
-        assertThat(throwable.getCause())
-                .isInstanceOf(RuntimeException.class);
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("httpStatus", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("timestamp", notNullValue()))
+                .andExpect(jsonPath("message", equalTo("Searching for order failed. Unrecognized uuid " + orderUuid)));
     }
 
     @Test
@@ -195,22 +196,22 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided order uuid is not existing" +
-            " in database for deleting")
-    void deleteOrderNonExisting() {
+    @DisplayName("should return ResponseEntity<ApiError> with correct json data" +
+            " when provided order uuid is not existing in database for deleting")
+    void deleteOrderNonExisting() throws Exception {
         // given
         UUID orderUuid = UUID.randomUUID();
 
         // when
-        Throwable throwable = catchThrowable(
-                () -> mockMvc.perform(get(
-                        "/api/v1/orders/" + orderUuid)
-                )
-        );
+        ResultActions result = mockMvc.perform(delete(
+                "/api/v1/orders/" + orderUuid));
 
         // then
-        assertThat(throwable.getCause())
-                .isInstanceOf(RuntimeException.class);
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("httpStatus", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("timestamp", notNullValue()))
+                .andExpect(jsonPath("message", equalTo("Searching for order failed. Unrecognized uuid " + orderUuid)));
     }
 
     @Test

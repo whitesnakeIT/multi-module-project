@@ -460,6 +460,42 @@ paths:
 
 components:
   schemas:
+    ApiError:
+      type: object
+      properties:
+        httpStatus:
+          type: integer
+          format: int32
+          description: The HTTP status code
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp when the error occurred
+        message:
+          type: string
+          description: A high-level, brief, and user-friendly error message
+        debugMessage:
+          type: string
+          description: A detailed error message for debugging and development purposes
+        subErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiSubError'
+    ApiSubError:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The name of the object that the error is related to
+        field:
+          type: string
+          description: The name of the field that the error is related to
+        rejectedValue:
+          type: string
+          description: The value that was rejected during input validation
+        message:
+          type: string
+          description: A detailed error message associated with the field
     BaseModel:
       type: object
       properties:
@@ -467,6 +503,9 @@ components:
           type: string
           format: uuid
           readOnly: true
+        version:
+          type: integer
+          format: int64
     Courier:
       allOf:
         - $ref: '#/components/schemas/BaseModel'

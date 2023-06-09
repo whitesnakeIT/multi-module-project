@@ -6,6 +6,7 @@ import com.kapusniak.tomasz.mapper.CustomerEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -121,7 +122,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Saving customer failed. Customer is null.");
 
         // verify
@@ -186,7 +187,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for customer failed. Customer uuid is null.");
 
         // verify
@@ -229,7 +230,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Deleting customer failed. Customer uuid is null.");
     }
 
@@ -246,7 +247,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating customer failed. Customer uuid is null.");
     }
 
@@ -263,7 +264,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating customer failed. Customer is null.");
     }
 
@@ -287,7 +288,7 @@ class CustomerServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating customer fields failed. Different uuid's");
     }
 

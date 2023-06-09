@@ -31,6 +31,7 @@ class OrderEntityMapperTest {
         customer.setFirstName("testFirstName");
         customer.setLastName("testLastName");
         customer.setOrders(List.of(new Order(), new Order()));
+        customer.setVersion(0L);
 
         return customer;
     }
@@ -42,6 +43,7 @@ class OrderEntityMapperTest {
         customerEntity.setFirstName("testFirstName");
         customerEntity.setLastName("testLastName");
         customerEntity.setOrders(List.of(new OrderEntity(), new OrderEntity()));
+        customerEntity.setVersion(0L);
 
         return customerEntity;
     }
@@ -56,6 +58,7 @@ class OrderEntityMapperTest {
         Customer customer = prepareCustomer();
         order.setCustomer(customer);
         order.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
+        order.setVersion(0L);
 
         return order;
     }
@@ -70,6 +73,7 @@ class OrderEntityMapperTest {
         CustomerEntity customerEntity = prepareCustomerEntity();
         orderEntity.setCustomer(customerEntity);
         orderEntity.setUuid(UUID.fromString("29755321-c483-4a12-9f64-30a132038b70"));
+        orderEntity.setVersion(0L);
 
         return orderEntity;
     }

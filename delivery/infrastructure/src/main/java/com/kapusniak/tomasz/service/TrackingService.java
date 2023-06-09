@@ -4,6 +4,7 @@ import com.kapusniak.tomasz.entity.TrackingEntity;
 import com.kapusniak.tomasz.mapper.TrackingEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ public class TrackingService {
     @Transactional
     public Tracking save(Tracking tracking) {
         if (tracking == null) {
-            throw new RuntimeException("Saving tracking failed. Tracking is null.");
+            throw new IllegalArgumentException("Saving tracking failed. Tracking is null.");
         }
         TrackingEntity trackingEntity = trackingEntityMapper.mapToEntity(tracking);
         TrackingEntity savedEntity = trackingRepository.save(trackingEntity);
@@ -41,16 +42,17 @@ public class TrackingService {
 
     public Tracking findByUuid(UUID trackingUuid) {
         if (trackingUuid == null) {
-            throw new RuntimeException("Searching for tracking failed. Tracking uuid is null.");
+            throw new EntityNotFoundException("Searching for tracking failed. Tracking uuid is null.");
         }
         return trackingEntityMapper.mapToApiModel(trackingRepository.findByUuid(trackingUuid)
-                .orElseThrow(RuntimeException::new));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Searching for tracking failed. Unrecognized uuid " + trackingUuid)));
     }
 
     @Transactional
     public void delete(UUID trackingUuid) {
         if (trackingUuid == null) {
-            throw new RuntimeException("Deleting tracking failed. Tracking uuid is null.");
+            throw new IllegalArgumentException("Deleting tracking failed. Tracking uuid is null.");
         }
         Tracking tracking = findByUuid(trackingUuid);
 
@@ -60,10 +62,10 @@ public class TrackingService {
     @Transactional
     public Tracking update(UUID uuid, Tracking tracking) {
         if (uuid == null) {
-            throw new RuntimeException("Updating tracking failed. Tracking uuid is null.");
+            throw new IllegalArgumentException("Updating tracking failed. Tracking uuid is null.");
         }
         if (tracking == null) {
-            throw new RuntimeException("Updating tracking failed. Tracking is null.");
+            throw new IllegalArgumentException("Updating tracking failed. Tracking is null.");
         }
 
         Tracking trackingFromDb = findByUuid(uuid);
@@ -81,7 +83,7 @@ public class TrackingService {
             newTracking.setUuid(trackingFromDb.getUuid());
         }
         if (!newTracking.getUuid().equals(trackingFromDb.getUuid())) {
-            throw new RuntimeException("Updating tracking fields failed. Different uuid's");
+            throw new IllegalArgumentException("Updating tracking fields failed. Different uuid's");
         }
         return newTracking;
     }
