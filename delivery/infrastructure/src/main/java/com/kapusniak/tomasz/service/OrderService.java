@@ -6,6 +6,7 @@ import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.openapi.model.PackageSize;
 import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ public class OrderService {
     @Transactional
     public Order save(Order order) {
         if (order == null) {
-            throw new RuntimeException("Saving order failed. Order is null.");
+            throw new IllegalArgumentException("Saving order failed. Order is null.");
         }
         OrderEntity orderEntity = orderEntityMapper.mapToEntity(order);
         OrderEntity savedEntity = orderRepository.save(orderEntity);
@@ -43,16 +44,17 @@ public class OrderService {
 
     public Order findByUuid(UUID orderUuid) {
         if (orderUuid == null) {
-            throw new RuntimeException("Searching for order failed. Order uuid is null.");
+            throw new EntityNotFoundException("Searching for order failed. Order uuid is null.");
         }
         return orderEntityMapper.mapToApiModel(orderRepository.findByUuid(orderUuid)
-                .orElseThrow(RuntimeException::new));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Searching for order failed. Unrecognized uuid " + orderUuid)));
     }
 
     @Transactional
     public void delete(UUID orderUuid) {
         if (orderUuid == null) {
-            throw new RuntimeException("Deleting order failed. Order uuid is null.");
+            throw new IllegalArgumentException("Deleting order failed. Order uuid is null.");
         }
         Order order = findByUuid(orderUuid);
 
@@ -62,10 +64,10 @@ public class OrderService {
     @Transactional
     public Order update(UUID uuid, Order order) {
         if (uuid == null) {
-            throw new RuntimeException("Updating order failed. Order uuid is null.");
+            throw new IllegalArgumentException("Updating order failed. Order uuid is null.");
         }
         if (order == null) {
-            throw new RuntimeException("Updating order failed. Order is null.");
+            throw new IllegalArgumentException("Updating order failed. Order is null.");
         }
 
         Order orderFromDb = findByUuid(uuid);
@@ -83,14 +85,14 @@ public class OrderService {
             newOrder.setUuid(orderFromDb.getUuid());
         }
         if (!newOrder.getUuid().equals(orderFromDb.getUuid())) {
-            throw new RuntimeException("Updating order fields failed. Different uuid's");
+            throw new IllegalArgumentException("Updating order fields failed. Different uuid's");
         }
         return newOrder;
     }
 
     public List<Order> findByPackageType(PackageType packageType) {
         if (packageType == null) {
-            throw new RuntimeException("Searching for order failed. Package type is null.");
+            throw new EntityNotFoundException("Searching for order failed. Package type is null.");
         }
 
         return orderRepository
@@ -101,7 +103,7 @@ public class OrderService {
 
     public List<Order> findByPackageSize(PackageSize packageSize) {
         if (packageSize == null) {
-            throw new RuntimeException("Searching for order failed. Package size is null.");
+            throw new EntityNotFoundException("Searching for order failed. Package size is null.");
         }
 
         return orderRepository
@@ -112,7 +114,7 @@ public class OrderService {
 
     public List<Order> findAllByCustomerUuid(UUID customerUuid) {
         if (customerUuid == null) {
-            throw new RuntimeException("Searching for customer orders failed. Customer uuid is null.");
+            throw new EntityNotFoundException("Searching for customer orders failed. Customer uuid is null.");
         }
 
         return orderRepository

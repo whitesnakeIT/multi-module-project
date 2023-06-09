@@ -4,6 +4,7 @@ import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.mapper.DeliveryEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ public class DeliveryService {
     @Transactional
     public Delivery save(Delivery delivery) {
         if (delivery == null) {
-            throw new RuntimeException("Saving delivery failed. Delivery is null.");
+            throw new IllegalArgumentException("Saving delivery failed. Delivery is null.");
         }
         DeliveryEntity deliveryEntity = deliveryEntityMapper.mapToEntity(delivery);
         DeliveryEntity savedEntity = deliveryRepository.save(deliveryEntity);
@@ -41,16 +42,17 @@ public class DeliveryService {
 
     public Delivery findByUuid(UUID deliveryUuid) {
         if (deliveryUuid == null) {
-            throw new RuntimeException("Searching for delivery failed. Delivery uuid is null.");
+            throw new EntityNotFoundException("Searching for delivery failed. Delivery uuid is null.");
         }
         return deliveryEntityMapper.mapToApiModel(deliveryRepository.findByUuid(deliveryUuid)
-                .orElseThrow(RuntimeException::new));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Searching for delivery failed. Unrecognized uuid " + deliveryUuid)));
     }
 
     @Transactional
     public void delete(UUID deliveryUuid) {
         if (deliveryUuid == null) {
-            throw new RuntimeException("Deleting delivery failed. Delivery uuid is null.");
+            throw new IllegalArgumentException("Deleting delivery failed. Delivery uuid is null.");
         }
         Delivery delivery = findByUuid(deliveryUuid);
 
@@ -60,10 +62,10 @@ public class DeliveryService {
     @Transactional
     public Delivery update(UUID uuid, Delivery delivery) {
         if (uuid == null) {
-            throw new RuntimeException("Updating delivery failed. Delivery uuid is null.");
+            throw new IllegalArgumentException("Updating delivery failed. Delivery uuid is null.");
         }
         if (delivery == null) {
-            throw new RuntimeException("Updating delivery failed. Delivery is null.");
+            throw new IllegalArgumentException("Updating delivery failed. Delivery is null.");
         }
 
         Delivery deliveryFromDb = findByUuid(uuid);
@@ -81,7 +83,7 @@ public class DeliveryService {
             newDelivery.setUuid(deliveryFromDb.getUuid());
         }
         if (!newDelivery.getUuid().equals(deliveryFromDb.getUuid())) {
-            throw new RuntimeException("Updating delivery fields failed. Different uuid's");
+            throw new IllegalArgumentException("Updating delivery fields failed. Different uuid's");
         }
         return newDelivery;
     }

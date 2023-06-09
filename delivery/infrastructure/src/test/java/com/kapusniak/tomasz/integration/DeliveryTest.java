@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -28,8 +29,7 @@ import java.util.UUID;
 
 import static com.kapusniak.tomasz.openapi.model.DeliveryStatus.IN_TRANSIT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -108,22 +108,22 @@ public class DeliveryTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided delivery uuid is not existing" +
-            " in database for searching")
-    void getDeliveryNonExisting() {
+    @DisplayName("should return ResponseEntity<ApiError> with correct json data" +
+            " when provided delivery uuid is not existing in database for searching")
+    void getDeliveryNonExisting() throws Exception {
         // given
         UUID deliveryUuid = UUID.randomUUID();
 
         // when
-        Throwable throwable = catchThrowable(
-                () -> mockMvc.perform(get(
-                        "/api/v1/deliveries/" + deliveryUuid)
-                )
-        );
+        ResultActions result = mockMvc.perform(get(
+                "/api/v1/deliveries/" + deliveryUuid));
 
         // then
-        assertThat(throwable.getCause())
-                .isInstanceOf(RuntimeException.class);
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("httpStatus", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("timestamp", notNullValue()))
+                .andExpect(jsonPath("message", equalTo("Searching for delivery failed. Unrecognized uuid " + deliveryUuid)));
     }
 
     @Test
@@ -208,22 +208,22 @@ public class DeliveryTest {
     }
 
     @Test
-    @DisplayName("should throw an exception when provided delivery uuid is not existing" +
-            " in database for deleting")
-    void deleteDeliveryNonExisting() {
+    @DisplayName("should return ResponseEntity<ApiError> with correct json data" +
+            "when provided delivery uuid is not existing in database for deleting")
+    void deleteDeliveryNonExisting() throws Exception {
         // given
         UUID deliveryUuid = UUID.randomUUID();
 
         // when
-        Throwable throwable = catchThrowable(
-                () -> mockMvc.perform(get(
-                        "/api/v1/deliveries/" + deliveryUuid)
-                )
-        );
+        ResultActions result = mockMvc.perform(delete(
+                "/api/v1/deliveries/" + deliveryUuid));
 
         // then
-        assertThat(throwable.getCause())
-                .isInstanceOf(RuntimeException.class);
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("httpStatus", equalTo(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("timestamp", notNullValue()))
+                .andExpect(jsonPath("message", equalTo("Searching for delivery failed. Unrecognized uuid " + deliveryUuid)));
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
 import com.kapusniak.tomasz.openapi.model.Order;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -133,7 +134,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Saving delivery failed. Delivery is null.");
 
         // verify
@@ -198,7 +199,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Searching for delivery failed. Delivery uuid is null.");
 
         // verify
@@ -240,7 +241,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Deleting delivery failed. Delivery uuid is null.");
     }
 
@@ -257,7 +258,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating delivery failed. Delivery uuid is null.");
     }
 
@@ -274,7 +275,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(thrown)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating delivery failed. Delivery is null.");
     }
 
@@ -298,7 +299,7 @@ class DeliveryServiceTest {
 
         // then
         assertThat(throwable)
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Updating delivery fields failed. Different uuid's");
     }
 
