@@ -3,12 +3,14 @@ package com.kapusniak.tomasz.service;
 import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.mapper.DeliveryEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Delivery;
+import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,6 +88,31 @@ public class DeliveryService {
             throw new IllegalArgumentException("Updating delivery fields failed. Different uuid's");
         }
         return newDelivery;
+    }
+
+    public List<Delivery> findAllByDeliveryStatus(DeliveryStatus deliveryStatus) {
+        if (deliveryStatus == null) {
+            throw new EntityNotFoundException("Searching for deliveries failed. Delivery status is null.");
+        }
+        return deliveryRepository
+                .findAllByDeliveryStatus(deliveryStatus)
+                .stream()
+                .map(deliveryEntityMapper::mapToApiModel)
+                .toList();
+    }
+
+    public List<Delivery> findAllByDeliveryStatusAndDeliveryTimeBefore(DeliveryStatus deliveryStatus, LocalDateTime deliveryTime) {
+        if (deliveryStatus == null) {
+            throw new EntityNotFoundException("Searching for deliveries failed. Delivery status is null.");
+        }
+        if (deliveryTime == null) {
+            throw new EntityNotFoundException("Searching for deliveries failed. Delivery time is null.");
+        }
+        return deliveryRepository
+                .findAllByDeliveryStatusAndDeliveryTimeBefore(deliveryStatus, deliveryTime)
+                .stream()
+                .map(deliveryEntityMapper::mapToApiModel)
+                .toList();
     }
 
 }

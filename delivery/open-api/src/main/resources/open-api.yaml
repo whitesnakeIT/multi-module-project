@@ -474,9 +474,6 @@ components:
         message:
           type: string
           description: A high-level, brief, and user-friendly error message
-        debugMessage:
-          type: string
-          description: A detailed error message for debugging and development purposes
         subErrors:
           type: array
           items:
@@ -484,9 +481,6 @@ components:
     ApiSubError:
       type: object
       properties:
-        object:
-          type: string
-          description: The name of the object that the error is related to
         field:
           type: string
           description: The name of the field that the error is related to
@@ -556,7 +550,6 @@ components:
           minLength: 3
           maxLength: 25
           format: email
-        #          pattern: '^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$'
         orders:
           type: array
           items:
