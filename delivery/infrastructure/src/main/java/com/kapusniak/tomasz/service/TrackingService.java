@@ -6,6 +6,9 @@ import com.kapusniak.tomasz.openapi.model.Tracking;
 import com.kapusniak.tomasz.repository.jpa.TrackingJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ public class TrackingService {
     private final TrackingEntityMapper trackingEntityMapper;
 
     @Transactional
+    @CachePut(value = "tracking", key = "#tracking.uuid")
     public Tracking save(Tracking tracking) {
         if (tracking == null) {
             throw new IllegalArgumentException("Saving tracking failed. Tracking is null.");
@@ -32,6 +36,7 @@ public class TrackingService {
         return trackingEntityMapper.mapToApiModel(savedEntity);
     }
 
+    @Cacheable(value = "tracking")
     public List<Tracking> findAll() {
         return trackingRepository
                 .findAll()
@@ -40,6 +45,7 @@ public class TrackingService {
                 .toList();
     }
 
+    @Cacheable(value = "tracking", key = "#trackingUuid")
     public Tracking findByUuid(UUID trackingUuid) {
         if (trackingUuid == null) {
             throw new EntityNotFoundException("Searching for tracking failed. Tracking uuid is null.");
@@ -50,6 +56,7 @@ public class TrackingService {
     }
 
     @Transactional
+    @CacheEvict(value = "tracking", key = "#trackingUuid")
     public void delete(UUID trackingUuid) {
         if (trackingUuid == null) {
             throw new IllegalArgumentException("Deleting tracking failed. Tracking uuid is null.");
@@ -60,6 +67,7 @@ public class TrackingService {
     }
 
     @Transactional
+    @CachePut(value = "tracking", key = "#uuid")
     public Tracking update(UUID uuid, Tracking tracking) {
         if (uuid == null) {
             throw new IllegalArgumentException("Updating tracking failed. Tracking uuid is null.");

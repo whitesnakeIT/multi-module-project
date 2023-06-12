@@ -7,6 +7,9 @@ import com.kapusniak.tomasz.openapi.model.DeliveryStatus;
 import com.kapusniak.tomasz.repository.jpa.DeliveryJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ public class DeliveryService {
     private final DeliveryEntityMapper deliveryEntityMapper;
 
     @Transactional
+    @CachePut(value = "deliveries", key = "#delivery.uuid")
     public Delivery save(Delivery delivery) {
         if (delivery == null) {
             throw new IllegalArgumentException("Saving delivery failed. Delivery is null.");
@@ -34,6 +38,7 @@ public class DeliveryService {
         return deliveryEntityMapper.mapToApiModel(savedEntity);
     }
 
+    @Cacheable(value = "deliveries")
     public List<Delivery> findAll() {
         return deliveryRepository
                 .findAll()
@@ -42,6 +47,7 @@ public class DeliveryService {
                 .toList();
     }
 
+    @Cacheable(value = "deliveries", key = "#deliveryUuid")
     public Delivery findByUuid(UUID deliveryUuid) {
         if (deliveryUuid == null) {
             throw new EntityNotFoundException("Searching for delivery failed. Delivery uuid is null.");
@@ -52,6 +58,7 @@ public class DeliveryService {
     }
 
     @Transactional
+    @CacheEvict(value = "delivery", key = "#deliveryUuid")
     public void delete(UUID deliveryUuid) {
         if (deliveryUuid == null) {
             throw new IllegalArgumentException("Deleting delivery failed. Delivery uuid is null.");
@@ -62,6 +69,7 @@ public class DeliveryService {
     }
 
     @Transactional
+    @CachePut(value = "deliveries", key = "#uuid")
     public Delivery update(UUID uuid, Delivery delivery) {
         if (uuid == null) {
             throw new IllegalArgumentException("Updating delivery failed. Delivery uuid is null.");
