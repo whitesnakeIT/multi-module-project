@@ -10,5 +10,8 @@ import java.util.UUID;
 @Repository
 @Transactional(readOnly = true)
 public interface CourierJpaRepository extends UuidRepository<CourierEntity, UUID> {
+//    @Override
+//    @NonNull
+//    Page<CourierEntity> findAll(@NonNull Pageable pageable);
 
 }

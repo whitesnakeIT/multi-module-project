@@ -6,10 +6,7 @@ import com.kapusniak.tomasz.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +35,8 @@ public class CustomerController implements CustomersApi {
     }
 
     @Override
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        List<Customer> customerList = customerService.findAll();
+    public ResponseEntity<List<Customer>> getAllCustomers(@RequestParam(required = false, defaultValue = "0") Integer page) {
+        List<Customer> customerList = customerService.findAll(page);
 
         return ResponseEntity.ok(customerList);
     }

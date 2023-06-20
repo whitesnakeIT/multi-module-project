@@ -8,6 +8,14 @@ servers:
 paths:
   /customers:
     get:
+      parameters:
+        - name: page
+          in: query
+          description: Number of page
+          required: false
+          schema:
+            type: integer
+            format: int32
       summary: Get all customers
       operationId: getAllCustomers
       responses:
@@ -102,6 +110,13 @@ paths:
           description: Customer not found
   /couriers:
     get:
+      parameters:
+        - name: page
+          in: query
+          description: Number of page
+          required: false
+          schema:
+            type: integer
       summary: Get all couriers
       operationId: getAllCouriers
       responses:
@@ -188,6 +203,14 @@ paths:
           description: No Content
   /deliveries:
     get:
+      parameters:
+        - name: page
+          in: query
+          description: Number of page
+          required: false
+          schema:
+            type: integer
+            format: int32
       summary: Get all deliveries
       operationId: getAllDeliveries
       responses:
@@ -278,6 +301,14 @@ paths:
           description: No Content
   /orders:
     get:
+      parameters:
+        - name: page
+          in: query
+          description: Number of page
+          required: false
+          schema:
+            type: integer
+            format: int32
       summary: Get all orders
       operationId: getAllOrders
       responses:
@@ -368,6 +399,14 @@ paths:
           description: No Content
   /tracking:
     get:
+      parameters:
+        - name: page
+          in: query
+          description: Number of page
+          required: false
+          schema:
+            type: integer
+            format: int32
       summary: Get all tracking
       operationId: getAllTracking
       responses:
@@ -501,6 +540,10 @@ components:
           type: integer
           format: int64
     Courier:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityInfo(
+  generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class,
+  property = "uuid"
+  )'
       allOf:
         - $ref: '#/components/schemas/BaseModel'
       type: object
@@ -522,10 +565,15 @@ components:
           minLength: 3
           maxLength: 15
         deliveryList:
+          #          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityReference(alwaysAsId = true)'
           type: array
           items:
             $ref: '#/components/schemas/Delivery'
     Customer:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityInfo(
+       generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class,
+       property = "uuid"
+       )'
       allOf:
         - $ref: '#/components/schemas/BaseModel'
       type: object
@@ -551,10 +599,15 @@ components:
           maxLength: 25
           format: email
         orders:
+          #          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityReference(alwaysAsId = true)'
           type: array
           items:
             $ref: '#/components/schemas/Order'
     Delivery:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityInfo(
+       generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class,
+       property = "uuid"
+       )'
       allOf:
         - $ref: '#/components/schemas/BaseModel'
       type: object
@@ -576,10 +629,15 @@ components:
           type: string
           format: date-time
         courier:
+          #          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityReference(alwaysAsId = true)'
           $ref: '#/components/schemas/Courier'
         order:
           $ref: '#/components/schemas/Order'
     Order:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityInfo(
+       generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class,
+       property = "uuid"
+       )'
       allOf:
         - $ref: '#/components/schemas/BaseModel'
       type: object
@@ -611,6 +669,10 @@ components:
         customer:
           $ref: '#/components/schemas/Customer'
     Tracking:
+      x-class-extra-annotation: '@com.fasterxml.jackson.annotation.JsonIdentityInfo(
+       generator = com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator.class,
+       property = "uuid"
+       )'
       allOf:
         - $ref: '#/components/schemas/BaseModel'
       type: object

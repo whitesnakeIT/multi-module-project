@@ -38,9 +38,14 @@ public class OrderEntity extends BaseEntity {
     @Column(name = "preferred_delivery_date")
     private LocalDate preferredDeliveryDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @ToString.Exclude
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
+
+    //    private Long customerId;
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private DeliveryEntity delivery;
 
 }

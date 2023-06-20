@@ -1,9 +1,8 @@
 package com.kapusniak.tomasz.config;
 
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableCaching
+//@EnableCaching
 public class CachingConfiguration {
 }

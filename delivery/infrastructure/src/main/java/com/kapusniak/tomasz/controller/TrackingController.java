@@ -6,10 +6,7 @@ import com.kapusniak.tomasz.service.TrackingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +35,8 @@ public class TrackingController implements TrackingApi {
     }
 
     @Override
-    public ResponseEntity<List<Tracking>> getAllTracking() {
-        List<Tracking> trackingList = trackingService.findAll();
+    public ResponseEntity<List<Tracking>> getAllTracking(@RequestParam(required = false, defaultValue = "0") Integer page) {
+        List<Tracking> trackingList = trackingService.findAll(page);
 
         return ResponseEntity.ok(trackingList);
     }

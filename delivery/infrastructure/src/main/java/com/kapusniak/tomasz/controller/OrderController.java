@@ -6,10 +6,7 @@ import com.kapusniak.tomasz.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +35,8 @@ public class OrderController implements OrdersApi {
     }
 
     @Override
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orderList = orderService.findAll();
+    public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false, defaultValue = "0") Integer page) {
+        List<Order> orderList = orderService.findAll(page);
 
         return ResponseEntity.ok(orderList);
     }

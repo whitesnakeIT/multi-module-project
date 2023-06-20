@@ -6,10 +6,7 @@ import com.kapusniak.tomasz.service.CourierService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +35,8 @@ public class CourierController implements CouriersApi {
     }
 
     @Override
-    public ResponseEntity<List<Courier>> getAllCouriers() {
-        List<Courier> courierList = courierService.findAll();
+    public ResponseEntity<List<Courier>> getAllCouriers(@RequestParam(required = false, defaultValue = "0") Integer page) {
+        List<Courier> courierList = courierService.findAll(page);
 
         return ResponseEntity.ok(courierList);
     }

@@ -11,4 +11,9 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public interface CustomerJpaRepository extends UuidRepository<CustomerEntity, UUID> {
 
+//    @Override
+//    @NonNull
+//    Page<CustomerEntity> findAll(@NonNull Pageable pageable);
+
+//    List<CustomerEntity> findAllEntitiesByIdIn(List<Long> customerIds, Pageable pageable);
 }

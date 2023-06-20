@@ -32,12 +32,12 @@ public class DeliveryEntity extends BaseEntity {
     private LocalDateTime deliveryTime;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "courier_id")
     private CourierEntity courier;
 
     @ToString.Exclude
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @PrimaryKeyJoinColumn
     private OrderEntity order;
 

@@ -12,4 +12,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public interface TrackingJpaRepository extends UuidRepository<TrackingEntity, UUID> {
 
+//    @Override
+//    @NonNull
+//    Page<TrackingEntity> findAll(@NonNull Pageable pageable);
 }

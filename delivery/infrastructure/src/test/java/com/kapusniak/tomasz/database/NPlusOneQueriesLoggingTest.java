@@ -13,7 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
-@SpringBootTest("hibernate.query.interceptor.error-level=ERROR")
+@SpringBootTest("spring-hibernate-query-utils.n-plus-one-queries-detection.error-level=ERROR")
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ActiveProfiles("test")
 @Transactional

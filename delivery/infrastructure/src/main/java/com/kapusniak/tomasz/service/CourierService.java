@@ -1,6 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CourierEntity;
+import com.kapusniak.tomasz.entity.DeliveryEntity;
 import com.kapusniak.tomasz.mapper.CourierEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
@@ -9,11 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.kapusniak.tomasz.service.PagingService.PAGE_SIZE;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,10 @@ public class CourierService {
     private final CourierJpaRepository courierRepository;
 
     private final CourierEntityMapper courierEntityMapper;
+
+    private final DeliveryService deliveryService;
+
+    private final PagingService pagingService;
 
     @Transactional
     @CachePut(value = "couriers", key = "#courier.uuid")
@@ -37,10 +45,24 @@ public class CourierService {
     }
 
     @Cacheable(value = "couriers")
-    public List<Courier> findAll() {
-        return courierRepository
-                .findAll()
-                .stream()
+    public List<Courier> findAll(Integer page) {
+        Integer pageNumber = pagingService.validatePageNumber(page);
+        List<CourierEntity> couriers = courierRepository
+                .findAll(PageRequest.of(pageNumber, PAGE_SIZE))
+                .getContent();
+        List<Long> courierIds = couriers.stream()
+                .map(CourierEntity::getId)
+                .toList();
+        List<DeliveryEntity> deliveries = deliveryService.findAllEntitiesByCourierIdIn(courierIds, pageNumber);
+//
+        couriers.forEach(courier -> courier
+                .setDeliveryList(deliveryService.extractDeliveries(
+                                deliveries, courier.getId()
+                        )
+                )
+        );
+
+        return couriers.stream()
                 .map(courierEntityMapper::mapToApiModel)
                 .toList();
     }

@@ -1,6 +1,7 @@
 package com.kapusniak.tomasz.service;
 
 import com.kapusniak.tomasz.entity.CustomerEntity;
+import com.kapusniak.tomasz.entity.OrderEntity;
 import com.kapusniak.tomasz.mapper.CustomerEntityMapper;
 import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
@@ -9,11 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.kapusniak.tomasz.service.PagingService.PAGE_SIZE;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class CustomerService {
     private final CustomerJpaRepository customerRepository;
 
     private final CustomerEntityMapper customerEntityMapper;
+
+    private final PagingService pagingService;
 
     @Transactional
     @CachePut(value = "customers", key = "#customer.uuid")
@@ -37,9 +43,11 @@ public class CustomerService {
     }
 
     @Cacheable(value = "customers")
-    public List<Customer> findAll() {
+    public List<Customer> findAll(Integer page) {
+        Integer pageNumber = pagingService.validatePageNumber(page);
+
         return customerRepository
-                .findAll()
+                .findAll(PageRequest.of(pageNumber, PAGE_SIZE))
                 .stream()
                 .map(customerEntityMapper::mapToApiModel)
                 .toList();
@@ -96,4 +104,27 @@ public class CustomerService {
         return newCustomer;
     }
 
+    public List<CustomerEntity> findAllEntitiesByIdIn(List<Long> customerIds, Integer page) {
+        Integer pageNumber = pagingService.validatePageNumber(page);
+        List<CustomerEntity> customerEntities = customerRepository
+//                .findAllEntitiesByIdIn(customerIds, PageRequest.of(pageNumber, PAGE_SIZE));
+                .findAllPagedByIdIn(customerIds, PageRequest.of(pageNumber, PAGE_SIZE))
+                .getContent();
+
+        return customerEntities;
+    }
+
+    public CustomerEntity extractCustomersEntities(List<CustomerEntity> customerEntities, OrderEntity orderEntity) {
+        if (customerEntities == null) {
+            throw new RuntimeException();
+        }
+        if (orderEntity == null) {
+            throw new RuntimeException();
+        }
+
+        return customerEntities.stream()
+                .filter(customerEntity -> customerEntity.getOrders().contains(orderEntity)) // tutaj gdy daje getOrders() to robia sie te n+1
+                .findFirst()                                                                         // ale inaczej nie moge przypisac do orderu customera zeby bylo
+                .orElseThrow(RuntimeException::new);                                                                      // klauzula in, no chyba ze nie ogarniam juz tego :)
+    }
 }
