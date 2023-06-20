@@ -6,6 +6,9 @@ import com.kapusniak.tomasz.openapi.model.Customer;
 import com.kapusniak.tomasz.repository.jpa.CustomerJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ public class CustomerService {
     private final CustomerEntityMapper customerEntityMapper;
 
     @Transactional
+    @CachePut(value = "customers", key = "#customer.uuid")
     public Customer save(Customer customer) {
         if (customer == null) {
             throw new IllegalArgumentException("Saving customer failed. Customer is null.");
@@ -32,6 +36,7 @@ public class CustomerService {
         return customerEntityMapper.mapToApiModel(savedEntity);
     }
 
+    @Cacheable(value = "customers")
     public List<Customer> findAll() {
         return customerRepository
                 .findAll()
@@ -40,6 +45,7 @@ public class CustomerService {
                 .toList();
     }
 
+    @Cacheable(value = "customer", key = "#customerUuid")
     public Customer findByUuid(UUID customerUuid) {
         if (customerUuid == null) {
             throw new EntityNotFoundException("Searching for customer failed. Customer uuid is null.");
@@ -50,6 +56,7 @@ public class CustomerService {
     }
 
     @Transactional
+    @CacheEvict(value = "customer", key = "#customerUuid")
     public void delete(UUID customerUuid) {
         if (customerUuid == null) {
             throw new IllegalArgumentException("Deleting customer failed. Customer uuid is null.");
@@ -60,6 +67,7 @@ public class CustomerService {
     }
 
     @Transactional
+    @CachePut(value = "customers", key = "#uuid")
     public Customer update(UUID uuid, Customer customer) {
         if (uuid == null) {
             throw new IllegalArgumentException("Updating customer failed. Customer uuid is null.");

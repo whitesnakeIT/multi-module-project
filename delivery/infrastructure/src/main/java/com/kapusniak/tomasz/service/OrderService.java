@@ -8,6 +8,7 @@ import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class OrderService {
     private final OrderEntityMapper orderEntityMapper;
 
     @Transactional
+    @CachePut(value = "orders", key = "#order.uuid")
     public Order save(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Saving order failed. Order is null.");

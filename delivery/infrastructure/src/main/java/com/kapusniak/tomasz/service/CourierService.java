@@ -6,6 +6,9 @@ import com.kapusniak.tomasz.openapi.model.Courier;
 import com.kapusniak.tomasz.repository.jpa.CourierJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ public class CourierService {
     private final CourierEntityMapper courierEntityMapper;
 
     @Transactional
+    @CachePut(value = "couriers", key = "#courier.uuid")
     public Courier save(Courier courier) {
         if (courier == null) {
             throw new IllegalArgumentException("Saving courier failed. Courier is null.");
@@ -32,6 +36,7 @@ public class CourierService {
         return courierEntityMapper.mapToApiModel(savedEntity);
     }
 
+    @Cacheable(value = "couriers")
     public List<Courier> findAll() {
         return courierRepository
                 .findAll()
@@ -40,6 +45,7 @@ public class CourierService {
                 .toList();
     }
 
+    @Cacheable(value = "couriers", key = "#courierUuid")
     public Courier findByUuid(UUID courierUuid) {
         if (courierUuid == null) {
             throw new EntityNotFoundException("Searching for courier failed. Courier uuid is null.");
@@ -50,6 +56,7 @@ public class CourierService {
     }
 
     @Transactional
+    @CacheEvict(value = "couriers", key = "#courierUuid")
     public void delete(UUID courierUuid) {
         if (courierUuid == null) {
             throw new IllegalArgumentException("Deleting courier failed. Courier uuid is null.");
@@ -60,6 +67,7 @@ public class CourierService {
     }
 
     @Transactional
+    @CachePut(value = "couriers", key = "#uuid")
     public Courier update(UUID uuid, Courier courier) {
         if (uuid == null) {
             throw new IllegalArgumentException("Updating courier failed. Courier uuid is null.");
