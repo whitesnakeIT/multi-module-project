@@ -1,4 +1,4 @@
-package com.kapusniak.tomasz.security;
+package com.kapusniak.tomasz.config.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-//@RequiredArgsConstructor
 public class KeycloakLogoutHandler implements LogoutHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakLogoutHandler.class);
