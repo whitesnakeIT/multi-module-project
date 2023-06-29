@@ -25,7 +25,7 @@ public class TrackingService {
     private final TrackingEntityMapper trackingEntityMapper;
 
     @Transactional
-    @CachePut(value = "tracking", key = "#tracking.uuid")
+    @CachePut(value = "tracking", key = "#result.uuid")
     public Tracking save(Tracking tracking) {
         if (tracking == null) {
             throw new IllegalArgumentException("Saving tracking failed. Tracking is null.");

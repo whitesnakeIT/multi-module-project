@@ -7,8 +7,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,6 +21,12 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class BeanConfiguration {
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
     @Bean
     public ObjectMapper objectMapper() {
 
@@ -37,7 +45,6 @@ public class BeanConfiguration {
     public SimpleModule dateTimePrettyModule() {
         SimpleModule simpleModule = new SimpleModule();
         ZoneId defaultZoneId = ZoneId.of("UTC");
-//        ZoneId defaultZoneId = ZoneId.systemDefault();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
         simpleModule.addSerializer(OffsetDateTime.class, new JsonSerializer<OffsetDateTime>() {

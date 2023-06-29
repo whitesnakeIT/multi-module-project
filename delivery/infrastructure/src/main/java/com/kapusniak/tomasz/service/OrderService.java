@@ -8,7 +8,9 @@ import com.kapusniak.tomasz.openapi.model.PackageType;
 import com.kapusniak.tomasz.repository.jpa.OrderJpaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class OrderService {
     private final OrderEntityMapper orderEntityMapper;
 
     @Transactional
-    @CachePut(value = "orders", key = "#order.uuid")
+    @CachePut(value = "orders", key = "#result.uuid")
     public Order save(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Saving order failed. Order is null.");
@@ -36,6 +38,7 @@ public class OrderService {
         return orderEntityMapper.mapToApiModel(savedEntity);
     }
 
+    @Cacheable(value = "orders")
     public List<Order> findAll() {
         return orderRepository
                 .findAll()
@@ -44,6 +47,7 @@ public class OrderService {
                 .toList();
     }
 
+    @Cacheable(value = "orders", key = "#orderUuid")
     public Order findByUuid(UUID orderUuid) {
         if (orderUuid == null) {
             throw new EntityNotFoundException("Searching for order failed. Order uuid is null.");
@@ -53,6 +57,7 @@ public class OrderService {
                         new EntityNotFoundException("Searching for order failed. Unrecognized uuid " + orderUuid)));
     }
 
+    @CacheEvict(value = "orders", key = "#orderUuid")
     @Transactional
     public void delete(UUID orderUuid) {
         if (orderUuid == null) {
@@ -63,6 +68,7 @@ public class OrderService {
         orderRepository.delete(orderEntityMapper.mapToEntity(order));
     }
 
+    @CachePut(value = "orders", key = "#uuid")
     @Transactional
     public Order update(UUID uuid, Order order) {
         if (uuid == null) {
@@ -92,6 +98,7 @@ public class OrderService {
         return newOrder;
     }
 
+    @Cacheable(value = "orders")
     public List<Order> findByPackageType(PackageType packageType) {
         if (packageType == null) {
             throw new EntityNotFoundException("Searching for order failed. Package type is null.");
@@ -103,6 +110,7 @@ public class OrderService {
                 .toList();
     }
 
+    @Cacheable(value = "orders")
     public List<Order> findByPackageSize(PackageSize packageSize) {
         if (packageSize == null) {
             throw new EntityNotFoundException("Searching for order failed. Package size is null.");
@@ -114,6 +122,7 @@ public class OrderService {
                 .toList();
     }
 
+    @Cacheable(value = "order")
     public List<Order> findAllByCustomerUuid(UUID customerUuid) {
         if (customerUuid == null) {
             throw new EntityNotFoundException("Searching for customer orders failed. Customer uuid is null.");
