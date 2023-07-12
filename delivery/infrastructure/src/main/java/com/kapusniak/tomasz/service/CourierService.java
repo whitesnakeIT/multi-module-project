@@ -38,8 +38,8 @@ public class CourierService {
 
     @Cacheable(value = "couriers")
     public List<Courier> findAll() {
-        return courierRepository
-                .findAll()
+        List<CourierEntity> all = courierRepository.findAll();
+        return all
                 .stream()
                 .map(courierEntityMapper::mapToApiModel)
                 .toList();

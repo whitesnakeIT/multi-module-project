@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
-@Profile({"!test", "!jdbc", "!integration-test"})
+@Profile({"default"})
 @EnableScheduling
 @EnableAsync
 public class SchedulingConfiguration {
