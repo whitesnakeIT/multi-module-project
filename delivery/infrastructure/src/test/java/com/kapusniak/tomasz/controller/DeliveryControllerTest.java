@@ -3,7 +3,6 @@ package com.kapusniak.tomasz.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kapusniak.tomasz.openapi.model.Delivery;
 import com.kapusniak.tomasz.service.DeliveryService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,7 +167,6 @@ public class DeliveryControllerTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("should return no content after deleting delivery")
     public void deleteDelivery() throws Exception {
         // given

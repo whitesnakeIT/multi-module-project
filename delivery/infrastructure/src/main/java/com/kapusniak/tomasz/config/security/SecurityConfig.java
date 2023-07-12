@@ -2,8 +2,10 @@ package com.kapusniak.tomasz.config.security;
 
 import com.nimbusds.jose.shaded.gson.internal.LinkedTreeMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,6 +30,7 @@ import static com.kapusniak.tomasz.config.security.Roles.USER;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Profile({"default", "docker", "test"})
 class SecurityConfig {
 
     private final KeycloakLogoutHandler keycloakLogoutHandler;
@@ -62,6 +65,7 @@ class SecurityConfig {
         };
     }
 
+    @ConditionalOnProperty(prefix = "com.kapusniak.tomasz.app", name = "security.config", havingValue = "keycloak", matchIfMissing = true)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and()

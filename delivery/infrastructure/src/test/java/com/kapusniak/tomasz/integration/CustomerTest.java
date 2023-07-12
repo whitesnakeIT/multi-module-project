@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -40,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         "classpath:integration-test-scripts/cleanup.sql",
                         "classpath:integration-test-scripts/insert-data.sql"})
 )
+@WithMockUser(authorities = "ADMIN")
 public class CustomerTest {
 
     private static final UUID UUID_CUSTOMER_1 = UUID.fromString("28f60dc1-993a-4d08-ac54-850a1fefb6a3");
@@ -74,6 +77,29 @@ public class CustomerTest {
 
 
         return customer;
+    }
+
+    @Test
+    @DisplayName("should return http status 403 unauthorized when user is anonymous" +
+            " (test shouldn't return 401 cause of RFC 7231)")
+    @WithAnonymousUser
+    public void getAllCustomersAnonymous() throws Exception {
+        // when
+        ResultActions result = mockMvc.perform(get("/api/v1/customers"));
+
+        // then
+        result.andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("should return http status 403 forbidden when user not have ADMIN authority")
+    @WithMockUser(authorities = "USER")
+    public void getAllCustomersForbidden() throws Exception {
+        // when
+        ResultActions result = mockMvc.perform(get("/api/v1/customers"));
+
+        // then
+        result.andExpect(status().isForbidden());
     }
 
     @Test

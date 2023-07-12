@@ -35,7 +35,6 @@ public class ScheduledTasks {
                                     now()
                                     .minusDays(2));
 
-            Thread.sleep(2000);
             if (deliveryList.isEmpty()) {
                 log.info("No delivered deliveries older than 2 days were found to be deleted.");
             } else {
@@ -46,8 +45,6 @@ public class ScheduledTasks {
             log.info("{} deliveries deleted.", deliveryList.size());
         } catch (ObjectOptimisticLockingFailureException ex) {
             log.warn("Locking error occurred during deleteDeliveredOlderThan2Days. Sending details:");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 
